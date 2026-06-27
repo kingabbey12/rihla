@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/offline/domain/entities/offline_engine_state.dart';
 import 'package:rihla/features/emergency/presentation/coordinators/emergency_coordinator.dart';
+import 'package:rihla/features/account/presentation/coordinators/account_sync_coordinator.dart';
 import 'package:rihla/features/offline/presentation/coordinators/offline_coordinator.dart';
 import 'package:rihla/features/offline/presentation/providers/offline_providers.dart';
 
@@ -22,6 +23,7 @@ class _OfflineBootstrapState extends ConsumerState<OfflineBootstrap> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(offlineCoordinatorProvider).attach();
       ref.read(emergencyCoordinatorProvider).attach();
+      ref.read(accountSyncCoordinatorProvider).attach();
       ref.read(offlineControllerProvider.notifier).refresh();
     });
   }

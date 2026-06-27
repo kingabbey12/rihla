@@ -29,6 +29,12 @@ class HomePage extends StatelessWidget {
               icon: const Icon(Icons.download_for_offline),
               label: const Text('Offline Center'),
             ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: () => context.push(RoutePaths.settings),
+              icon: const Icon(Icons.cloud),
+              label: const Text('Cloud & Account'),
+            ),
           ],
         ),
       ),

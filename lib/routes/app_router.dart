@@ -17,6 +17,7 @@ import 'package:rihla/features/navigation/presentation/pages/navigation_session_
 import 'package:rihla/features/routing/presentation/pages/route_debug_page.dart';
 import 'package:rihla/features/offline/presentation/pages/offline_center_page.dart';
 import 'package:rihla/features/search/presentation/pages/search_page.dart';
+import 'package:rihla/features/account/presentation/pages/cloud_settings_page.dart';
 import 'package:rihla/routes/feature_route.dart';
 import 'package:rihla/routes/pages/feature_placeholder_page.dart';
 import 'package:rihla/routes/pages/home_page.dart';
@@ -157,9 +158,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RoutePaths.settings,
         name: RoutePaths.settings,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.settings,
-        ),
+        builder: (context, state) => const CloudSettingsPage(),
       ),
       GoRoute(
         path: RoutePaths.notifications,

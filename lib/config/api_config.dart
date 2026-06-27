@@ -162,4 +162,20 @@ abstract final class ApiConfig {
   static Duration get openAiTimeout => const Duration(
         seconds: int.fromEnvironment('OPENAI_TIMEOUT_SECONDS', defaultValue: 30),
       );
+
+  // —— Supabase (cloud platform) ———————————————————————————————————————————
+
+  static String? get supabaseUrl {
+    const url = String.fromEnvironment('SUPABASE_URL');
+    return url.isEmpty ? null : url;
+  }
+
+  static String? get supabaseAnonKey {
+    const key = String.fromEnvironment('SUPABASE_ANON_KEY');
+    return key.isEmpty ? null : key;
+  }
+
+  /// Cloud sync enabled when Supabase is configured.
+  static bool get cloudEnabled =>
+      supabaseUrl != null && supabaseAnonKey != null;
 }
