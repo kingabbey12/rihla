@@ -1,11 +1,11 @@
 {
-    "name": "rihla",
-    "short_name": "rihla",
+    "name": "Rihla",
+    "short_name": "Rihla",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0d6e6e",
+    "theme_color": "#0d6e6e",
+    "description": "Offline-ready UAE navigation with live safety alerts, emergency SOS, and an AI copilot.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

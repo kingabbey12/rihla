@@ -2,7 +2,9 @@ name: rihla
 description: Rihla — a production Flutter travel application.
 publish_to: 'none'
 
-version: 2.2.0+22
+# 1.0.0 marketing version for the public launch. Build number 100 stays above
+# the closed-beta codes (…+22) so Google Play accepts the upload.
+version: 1.0.0+100
 
 environment:
   sdk: ^3.12.2

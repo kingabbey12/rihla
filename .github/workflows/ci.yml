@@ -20,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
       - name: Analyze
         run: flutter analyze
 
@@ -40,5 +43,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Android release APK
+      # Unsigned debug-signed release build to validate the Android pipeline on PRs.
+      - name: Build Android release APK (unsigned)
         run: flutter build apk --release

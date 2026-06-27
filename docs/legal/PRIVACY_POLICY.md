@@ -53,4 +53,4 @@ Depending on your jurisdiction, you may have rights to access, correct, or delet
 We will update this policy as needed and revise the "Last updated" date.
 
 ## 11. Contact
-Provide a support email/URL before submission.
+Questions about privacy: **privacy@rihla.app** · Support: **support@rihla.app** · https://rihla.app/privacy

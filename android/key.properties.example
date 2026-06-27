@@ -1,0 +1,13 @@
+# Copy to android/key.properties and fill with real values for release signing.
+# DO NOT commit key.properties or the keystore (.gitignore excludes them).
+#
+# Generate a keystore (once):
+#   keytool -genkey -v -keystore ~/rihla-upload.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias rihla-upload
+#
+# storeFile may be an absolute path or relative to android/app.
+
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=rihla-upload
+storeFile=/absolute/path/to/rihla-upload.jks

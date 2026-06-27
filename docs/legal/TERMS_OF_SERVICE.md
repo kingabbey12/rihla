@@ -37,7 +37,7 @@ The App is provided without warranties to the extent permitted by law. We are no
 We may update these Terms; continued use after changes constitutes acceptance.
 
 ## 11. Governing law
-Specify the governing jurisdiction before submission.
+These Terms are governed by the laws of the United Arab Emirates, without regard to conflict-of-law rules. Disputes are subject to the competent courts of the UAE.
 
 ## 12. Contact
-Provide a support email/URL before submission.
+Support: **support@rihla.app** · https://rihla.app/support

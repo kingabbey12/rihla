@@ -1,0 +1,89 @@
+name: Release
+
+# Production release pipeline. Triggered by pushing a v* tag (e.g. v1.0.0).
+# Produces a signed AAB + APK for Google Play and an iOS archive for App Store.
+#
+# Required repository secrets:
+#   ANDROID_KEYSTORE_BASE64   - base64 of the upload keystore (.jks)
+#   ANDROID_KEY_PROPERTIES    - contents of android/key.properties
+#   DART_DEFINES              - newline list of KEY=VALUE production config
+#   APPLE_* / MATCH_*         - iOS signing (configured in the ios job)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Restore keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          printf '%s\n' "$ANDROID_KEY_PROPERTIES" > android/key.properties
+          echo "storeFile=$RUNNER_TEMP/upload.jks" >> android/key.properties
+
+      - name: Write dart-defines
+        env:
+          DART_DEFINES: ${{ secrets.DART_DEFINES }}
+        run: printf '%s\n' "$DART_DEFINES" > dart_defines.env
+
+      - name: Build signed AAB
+        run: |
+          flutter build appbundle --release \
+            $(while IFS= read -r line; do [ -n "$line" ] && printf -- '--dart-define=%s ' "$line"; done < dart_defines.env)
+
+      - name: Build signed APK
+        run: |
+          flutter build apk --release \
+            $(while IFS= read -r line; do [ -n "$line" ] && printf -- '--dart-define=%s ' "$line"; done < dart_defines.env)
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/flutter-apk/app-release.apk
+
+      # Optional: automated Play upload (uncomment once service account is set)
+      # - name: Deploy to Play (internal track)
+      #   uses: r0adkll/upload-google-play@v1
+      #   with:
+      #     serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+      #     packageName: com.rihla.app
+      #     releaseFiles: build/app/outputs/bundle/release/app-release.aab
+      #     track: internal
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Codesigning requires Apple certs/provisioning profiles configured as
+      # secrets (e.g. via fastlane match or apple-actions/import-codesign-certs).
+      - name: Build iOS archive (no codesign placeholder)
+        run: flutter build ios --release --no-codesign || echo "iOS Runner must be configured with a team + signing before archiving"

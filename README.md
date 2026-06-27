@@ -1,17 +1,68 @@
-# rihla
+# Rihla
 
-A new Flutter project.
+**Rihla** is an offline-ready navigation app built for the UAE: turn-by-turn
+navigation, live safety advisories (Salik, speed cameras, driving rules),
+emergency SOS, an AI copilot, and Explore (fuel, parking, charging). English &
+Arabic with full right-to-left support. Private by default.
 
-## Getting Started
+> Version **1.0.0** — first public release.
 
-This project is a starting point for a Flutter application.
+## Features
+- Offline maps & navigation (tunnels, parking, remote roads)
+- UAE intelligence: Salik / speed-camera / driving-rule / weather advisories
+- Emergency SOS with encrypted medical profile & contacts
+- AI copilot for journey help
+- Explore nearby places
+- Optional cloud sync (account) for places & preferences
+- Privacy-first: analytics/crash reporting off by default; sensitive data encrypted
 
-A few resources to get you started if this is your first Flutter project:
+## Tech stack
+Flutter · Riverpod · go_router · MapLibre GL · Supabase (optional cloud) ·
+flutter_secure_storage. Clean architecture (`domain`/`data`/`presentation`) per
+feature under `lib/features/`. Cross-cutting code in `lib/core/`.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Getting started
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter run
+```
+
+Secrets and provider keys are supplied at build time via `--dart-define`
+(never hard-coded). See `docs/release/PRODUCTION_CONFIG.md` for the full list.
+
+Example production build:
+
+```bash
+flutter build appbundle --release \
+  --dart-define=APP_ENV=production \
+  --dart-define=ANALYTICS_ENABLED=true \
+  --dart-define=REMOTE_CONFIG_URL=https://config.rihla.app/v1/remote_config.json
+```
+
+## Quality
+
+```bash
+flutter analyze
+flutter test
+```
+
+## Release & operations
+- Production config & signing: `docs/release/PRODUCTION_CONFIG.md`
+- Monitoring setup: `docs/release/MONITORING_SETUP.md`
+- Store submission: `docs/store/STORE_SUBMISSION.md`
+- Release / rollback / hotfix / versioning: `docs/release/`
+- Operations (dashboards, incidents, alerts, escalation): `docs/operations/`
+- Support workflow & knowledge base: `docs/support/`
+- Release notes / known issues / roadmap: `docs/release/`
+- CI/CD: `.github/workflows/ci.yml` (PRs) and `release.yml` (tagged releases)
+
+## Legal
+Privacy Policy, Terms of Service, and disclaimers live in `docs/legal/` and on the
+marketing site (`website/`). Safety advisories are informational only; emergency
+tools are a convenience aid, not a substitute for official services
+(UAE: 999 / 998 / 997).
+
+## App identity
+- Application ID / bundle ID: `com.rihla.app`
+- Version: `1.0.0+100`
