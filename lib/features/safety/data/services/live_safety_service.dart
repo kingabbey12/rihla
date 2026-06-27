@@ -23,9 +23,11 @@ class LiveSafetyService implements SafetyService {
 
   WeatherSnapshot? _lastWeather;
   TrafficSnapshot? _lastTraffic;
+  List<Hazard> _uaeHazards = [];
 
   void updateWeather(WeatherSnapshot? weather) => _lastWeather = weather;
   void updateTraffic(TrafficSnapshot? traffic) => _lastTraffic = traffic;
+  void updateUaeHazards(List<Hazard> hazards) => _uaeHazards = hazards;
 
   @override
   Future<SafetySnapshot> evaluate(
@@ -72,6 +74,7 @@ class LiveSafetyService implements SafetyService {
       ...osmHazards,
       ..._weatherHazards(session, tickCount),
       ..._sessionHazards(session, tickCount),
+      ..._uaeHazards,
     ]..sort((a, b) => a.distanceAheadKm.compareTo(b.distanceAheadKm));
 
     return SafetySnapshot(

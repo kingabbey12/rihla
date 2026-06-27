@@ -9,6 +9,7 @@ import 'package:rihla/features/safety/data/services/live_safety_service.dart';
 import 'package:rihla/features/safety/data/services/mock_safety_service.dart';
 import 'package:rihla/features/safety/data/services/weighted_safety_engine.dart';
 import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
+import 'package:rihla/features/uae/presentation/providers/uae_providers.dart';
 import 'package:rihla/features/weather/presentation/providers/weather_providers.dart';
 import 'package:rihla/features/safety/domain/entities/hazard.dart';
 import 'package:rihla/features/safety/domain/entities/hazard_severity.dart';
@@ -38,8 +39,10 @@ final liveSafetyServiceProvider = Provider<LiveSafetyService>((ref) {
   );
   final weather = ref.watch(weatherSnapshotProvider);
   final traffic = ref.watch(trafficSnapshotProvider);
+  final uaeHazards = ref.watch(uaeSafetyHazardsProvider);
   service.updateWeather(weather);
   service.updateTraffic(traffic);
+  service.updateUaeHazards(uaeHazards);
   return service;
 });
 

@@ -30,6 +30,7 @@ class AiContext {
     this.medicalProfileSummary = const {},
     this.includeMedicalProfile = false,
     this.userPreferences = const {},
+    this.uaeIntelligenceSummary = const {},
   });
 
   final AiCopilotMode mode;
@@ -51,6 +52,7 @@ class AiContext {
   final Map<String, String> medicalProfileSummary;
   final bool includeMedicalProfile;
   final Map<String, String> userPreferences;
+  final Map<String, String> uaeIntelligenceSummary;
 
   /// Cache key for reusable prompt context.
   String get cacheKey => [
@@ -60,6 +62,7 @@ class AiContext {
         session?.sessionId,
         safety?.assessment.timestamp.millisecondsSinceEpoch,
         isOffline,
+        uaeIntelligenceSummary['emirate'],
       ].join('|');
 
   AiContext copyWith({
@@ -81,6 +84,7 @@ class AiContext {
     Map<String, String>? medicalProfileSummary,
     bool? includeMedicalProfile,
     Map<String, String>? userPreferences,
+    Map<String, String>? uaeIntelligenceSummary,
   }) =>
       AiContext(
         mode: mode,
@@ -107,5 +111,7 @@ class AiContext {
         includeMedicalProfile:
             includeMedicalProfile ?? this.includeMedicalProfile,
         userPreferences: userPreferences ?? this.userPreferences,
+        uaeIntelligenceSummary:
+            uaeIntelligenceSummary ?? this.uaeIntelligenceSummary,
       );
 }

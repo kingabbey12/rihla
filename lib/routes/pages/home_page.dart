@@ -31,6 +31,12 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             FilledButton.icon(
+              onPressed: () => context.push(RoutePaths.uaeSettings),
+              icon: const Icon(Icons.flag),
+              label: const Text('UAE Intelligence'),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
               onPressed: () => context.push(RoutePaths.settings),
               icon: const Icon(Icons.cloud),
               label: const Text('Cloud & Account'),

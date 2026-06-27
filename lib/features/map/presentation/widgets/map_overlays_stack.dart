@@ -8,6 +8,7 @@ import 'package:rihla/features/navigation/presentation/widgets/navigation_turn_b
 import 'package:rihla/features/routing/presentation/widgets/route_map_overlay.dart';
 import 'package:rihla/features/safety/presentation/widgets/safety_alert_banner_overlay.dart';
 import 'package:rihla/features/safety/presentation/widgets/safety_map_overlay.dart';
+import 'package:rihla/features/uae/presentation/widgets/uae_alert_banner.dart';
 import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
 
 /// Feature overlays stacked above the map surface.
@@ -24,6 +25,12 @@ class MapOverlaysStack extends StatelessWidget {
         Positioned.fill(child: EmergencyMapOverlay()),
         Positioned.fill(child: RouteMapOverlay()),
         NavigationTurnBannerOverlay(),
+        const Positioned(
+          left: 0,
+          right: 0,
+          bottom: 120,
+          child: UaeAlertBanner(),
+        ),
         SafetyAlertBannerOverlay(),
         SafetyMapOverlay(),
         AiCopilotMapOverlay(),

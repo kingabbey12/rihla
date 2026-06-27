@@ -22,6 +22,7 @@ abstract final class RoutePaths {
   static const String routeDebug = '/debug/routes';
   static const String navigationSessionDebug = '/debug/navigation';
   static const String offlineCenter = '/offline';
+  static const String uaeSettings = '/uae';
 
   static const launchPaths = [
     splash,

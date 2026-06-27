@@ -4,6 +4,9 @@ import 'package:rihla/features/emergency/domain/entities/emergency_vehicle_profi
 import 'package:rihla/features/emergency/domain/entities/medical_profile.dart';
 import 'package:rihla/features/emergency/domain/repositories/emergency_repository.dart';
 import 'package:rihla/features/explore/domain/repositories/explore_repository.dart';
+import 'package:rihla/features/uae/domain/services/uae_service.dart';
+import 'package:rihla/features/uae/domain/entities/uae_preferences.dart';
+import 'package:rihla/features/weather/domain/entities/weather_snapshot.dart';
 
 /// Enriches [AiContext] with cross-feature structured data.
 class AiContextEnricher {
@@ -11,6 +14,9 @@ class AiContextEnricher {
     required EmergencyRepository emergencyRepository,
     required ExploreRepository exploreRepository,
     required bool Function() isOffline,
+    this.uaeService,
+    this.uaePreferences = UaePreferences.defaults,
+    this.weatherSnapshot,
     this.medicalSharingEnabled = false,
     this.isEmergencyRelated = false,
   })  : _emergencyRepository = emergencyRepository,
@@ -20,6 +26,9 @@ class AiContextEnricher {
   final EmergencyRepository _emergencyRepository;
   final ExploreRepository _exploreRepository;
   final bool Function() _isOffline;
+  final UaeService? uaeService;
+  final UaePreferences uaePreferences;
+  final WeatherSnapshot? weatherSnapshot;
   final bool medicalSharingEnabled;
   final bool isEmergencyRelated;
 
@@ -27,6 +36,7 @@ class AiContextEnricher {
     final vehicle = await _emergencyRepository.getVehicleProfile();
     final timeline = _emergencyRepository.getActiveTimeline();
     final exploreRecs = await _loadExploreRecommendations(context);
+    final uaeSummary = await _loadUaeIntelligence(context);
 
     Map<String, String> medicalSummary = const {};
     var includeMedical = false;
@@ -46,7 +56,30 @@ class AiContextEnricher {
       vehicleProfileSummary: _vehicleToMap(vehicle),
       medicalProfileSummary: medicalSummary,
       includeMedicalProfile: includeMedical,
+      uaeIntelligenceSummary: uaeSummary,
     );
+  }
+
+  Future<Map<String, String>> _loadUaeIntelligence(AiContext context) async {
+    if (uaeService == null) return const {};
+    final lat = context.location?.latitude ??
+        context.session?.currentPosition.latitude;
+    final lng = context.location?.longitude ??
+        context.session?.currentPosition.longitude;
+    try {
+      final snapshot = await uaeService!.evaluate(
+        latitude: lat,
+        longitude: lng,
+        speedKmh: context.session?.speedKmh,
+        remainingDistanceKm: context.session?.remainingDistanceKm,
+        currentRoad: context.session?.currentRoad,
+        preferences: uaePreferences,
+        weather: weatherSnapshot,
+      );
+      return snapshot.toAiSummaryMap();
+    } catch (_) {
+      return const {};
+    }
   }
 
   Future<List<String>> _loadExploreRecommendations(AiContext context) async {

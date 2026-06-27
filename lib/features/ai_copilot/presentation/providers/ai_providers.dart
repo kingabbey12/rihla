@@ -39,6 +39,8 @@ import 'package:rihla/features/offline/presentation/providers/offline_providers.
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
 import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
+import 'package:rihla/features/uae/presentation/providers/uae_providers.dart';
+import 'package:rihla/features/weather/presentation/providers/weather_providers.dart';
 
 // —— Infrastructure ————————————————————————————————————————————————————————
 
@@ -77,6 +79,9 @@ final aiContextEnricherProvider = Provider<AiContextEnricher>(
     emergencyRepository: ref.watch(emergencyRepositoryProvider),
     exploreRepository: ref.watch(exploreRepositoryProvider),
     isOffline: () => ref.read(isOfflineModeProvider),
+    uaeService: ref.watch(uaeServiceProvider),
+    uaePreferences: ref.watch(uaePreferencesProvider),
+    weatherSnapshot: ref.watch(weatherSnapshotProvider),
     medicalSharingEnabled: ref.watch(aiMedicalSharingEnabledProvider),
   ),
 );

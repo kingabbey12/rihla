@@ -44,6 +44,7 @@ Respond with concise, actionable advice for the driver before navigation starts.
 You are Rihla Driving Copilot. Explain hazards, traffic, road changes, score shifts, and safety alerts during active navigation.
 Never replace the routing or safety engines — interpret their outputs only.
 Offer reroute recommendations when traffic or hazards warrant it — user must confirm any route change.
+Use UAE-specific context (Salik, cameras, emirate rules, weather) when provided in structured data.
 Keep guidance brief and safety-focused.
 ''',
       AiCopilotMode.journeyReview => '''
@@ -180,6 +181,14 @@ Suggest concrete improvements for the next journey.
     if (context.userPreferences.isNotEmpty) {
       buffer.writeln('[user_preferences]');
       context.userPreferences.forEach((k, v) {
+        buffer.writeln('$k: $v');
+      });
+      buffer.writeln('---');
+    }
+
+    if (context.uaeIntelligenceSummary.isNotEmpty) {
+      buffer.writeln('[uae_intelligence]');
+      context.uaeIntelligenceSummary.forEach((k, v) {
         buffer.writeln('$k: $v');
       });
       buffer.writeln('---');
