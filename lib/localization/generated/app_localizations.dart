@@ -929,7 +929,7 @@ abstract class AppLocalizations {
   /// No description provided for @routeConfirmedMessage.
   ///
   /// In en, this message translates to:
-  /// **'Route confirmed — turn-by-turn navigation arrives in the next phase.'**
+  /// **'Route confirmed — your live journey dashboard is active.'**
   String get routeConfirmedMessage;
 
   /// No description provided for @routeProfileSafe.
@@ -991,6 +991,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Safety'**
   String get routeSafety;
+
+  /// No description provided for @liveJourneyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Journey'**
+  String get liveJourneyTitle;
+
+  /// No description provided for @liveJourneyInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey in progress'**
+  String get liveJourneyInProgress;
+
+  /// No description provided for @liveJourneyExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand dashboard'**
+  String get liveJourneyExpand;
+
+  /// No description provided for @liveJourneyCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse dashboard'**
+  String get liveJourneyCollapse;
+
+  /// No description provided for @liveJourneyFloat.
+  ///
+  /// In en, this message translates to:
+  /// **'Float dashboard'**
+  String get liveJourneyFloat;
+
+  /// No description provided for @liveJourneyEta.
+  ///
+  /// In en, this message translates to:
+  /// **'ETA'**
+  String get liveJourneyEta;
+
+  /// No description provided for @liveJourneyArrivalTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrival'**
+  String get liveJourneyArrivalTime;
+
+  /// No description provided for @liveJourneyRemainingDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get liveJourneyRemainingDistance;
+
+  /// No description provided for @liveJourneyCurrentSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get liveJourneyCurrentSpeed;
+
+  /// No description provided for @liveJourneyCurrentRoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Current road'**
+  String get liveJourneyCurrentRoad;
+
+  /// No description provided for @liveJourneyNextManeuver.
+  ///
+  /// In en, this message translates to:
+  /// **'Next maneuver'**
+  String get liveJourneyNextManeuver;
+
+  /// No description provided for @liveJourneyTrafficScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic Score'**
+  String get liveJourneyTrafficScore;
+
+  /// No description provided for @liveJourneySpeedKmh.
+  ///
+  /// In en, this message translates to:
+  /// **'{speed} km/h'**
+  String liveJourneySpeedKmh(int speed);
 }
 
 class _AppLocalizationsDelegate

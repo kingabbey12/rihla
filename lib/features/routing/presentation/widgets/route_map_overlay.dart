@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/extensions/context_extensions.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
+import 'package:rihla/features/live_journey/presentation/providers/live_journey_providers.dart';
 import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/features/routing/presentation/widgets/route_error_overlay.dart';
@@ -18,6 +19,7 @@ class RouteMapOverlay extends ConsumerWidget {
 
     ref.listen(routeControllerProvider, (previous, next) {
       if (next is RouteConfirmed) {
+        ref.read(liveJourneyControllerProvider.notifier).start(next.selected);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.routeConfirmedMessage)),
         );
@@ -55,6 +57,7 @@ class RouteMapOverlay extends ConsumerWidget {
   }
 
   void _cancel(WidgetRef ref) {
+    ref.read(liveJourneyControllerProvider.notifier).stop();
     ref.read(routeControllerProvider.notifier).clear();
     ref.read(journeyControllerProvider.notifier).cancel();
   }

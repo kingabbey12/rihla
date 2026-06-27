@@ -163,7 +163,7 @@
   "routeErrorTitle": "Routing unavailable",
   "routeErrorMessage": "We couldn't calculate routes. Please try again.",
   "routeRetry": "Try again",
-  "routeConfirmedMessage": "Route confirmed — turn-by-turn navigation arrives in the next phase.",
+  "routeConfirmedMessage": "Route confirmed — your live journey dashboard is active.",
   "routeProfileSafe": "Safe",
   "routeProfileFast": "Fast",
   "routeProfileEco": "Eco",
@@ -173,5 +173,23 @@
   "routeJourneyScore": "Journey Score",
   "routeFuel": "Fuel",
   "routeTraffic": "Traffic",
-  "routeSafety": "Safety"
+  "routeSafety": "Safety",
+  "liveJourneyTitle": "Live Journey",
+  "liveJourneyInProgress": "Journey in progress",
+  "liveJourneyExpand": "Expand dashboard",
+  "liveJourneyCollapse": "Collapse dashboard",
+  "liveJourneyFloat": "Float dashboard",
+  "liveJourneyEta": "ETA",
+  "liveJourneyArrivalTime": "Arrival",
+  "liveJourneyRemainingDistance": "Remaining",
+  "liveJourneyCurrentSpeed": "Speed",
+  "liveJourneyCurrentRoad": "Current road",
+  "liveJourneyNextManeuver": "Next maneuver",
+  "liveJourneyTrafficScore": "Traffic Score",
+  "liveJourneySpeedKmh": "{speed} km/h",
+  "@liveJourneySpeedKmh": {
+    "placeholders": {
+      "speed": { "type": "int" }
+    }
+  }
 }

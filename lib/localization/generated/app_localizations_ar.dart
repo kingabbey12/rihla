@@ -447,7 +447,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get routeConfirmedMessage =>
-      'تم تأكيد المسار — التوجيه خطوة بخطوة في المرحلة القادمة.';
+      'تم تأكيد المسار — لوحة الرحلة المباشرة نشطة الآن.';
 
   @override
   String get routeProfileSafe => 'آمن';
@@ -478,4 +478,45 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get routeSafety => 'الأمان';
+
+  @override
+  String get liveJourneyTitle => 'الرحلة المباشرة';
+
+  @override
+  String get liveJourneyInProgress => 'الرحلة جارية';
+
+  @override
+  String get liveJourneyExpand => 'توسيع اللوحة';
+
+  @override
+  String get liveJourneyCollapse => 'طي اللوحة';
+
+  @override
+  String get liveJourneyFloat => 'لوحة عائمة';
+
+  @override
+  String get liveJourneyEta => 'الوقت المتوقع';
+
+  @override
+  String get liveJourneyArrivalTime => 'الوصول';
+
+  @override
+  String get liveJourneyRemainingDistance => 'المتبقي';
+
+  @override
+  String get liveJourneyCurrentSpeed => 'السرعة';
+
+  @override
+  String get liveJourneyCurrentRoad => 'الطريق الحالي';
+
+  @override
+  String get liveJourneyNextManeuver => 'المنعطف التالي';
+
+  @override
+  String get liveJourneyTrafficScore => 'درجة الازدحام';
+
+  @override
+  String liveJourneySpeedKmh(int speed) {
+    return '$speed كم/س';
+  }
 }

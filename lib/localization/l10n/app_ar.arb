@@ -138,7 +138,7 @@
   "routeErrorTitle": "التوجيه غير متاح",
   "routeErrorMessage": "تعذّر حساب المسارات. حاول مرة أخرى.",
   "routeRetry": "حاول مرة أخرى",
-  "routeConfirmedMessage": "تم تأكيد المسار — التوجيه خطوة بخطوة في المرحلة القادمة.",
+  "routeConfirmedMessage": "تم تأكيد المسار — لوحة الرحلة المباشرة نشطة الآن.",
   "routeProfileSafe": "آمن",
   "routeProfileFast": "سريع",
   "routeProfileEco": "اقتصادي",
@@ -148,5 +148,23 @@
   "routeJourneyScore": "درجة الرحلة",
   "routeFuel": "الوقود",
   "routeTraffic": "الازدحام",
-  "routeSafety": "الأمان"
+  "routeSafety": "الأمان",
+  "liveJourneyTitle": "الرحلة المباشرة",
+  "liveJourneyInProgress": "الرحلة جارية",
+  "liveJourneyExpand": "توسيع اللوحة",
+  "liveJourneyCollapse": "طي اللوحة",
+  "liveJourneyFloat": "لوحة عائمة",
+  "liveJourneyEta": "الوقت المتوقع",
+  "liveJourneyArrivalTime": "الوصول",
+  "liveJourneyRemainingDistance": "المتبقي",
+  "liveJourneyCurrentSpeed": "السرعة",
+  "liveJourneyCurrentRoad": "الطريق الحالي",
+  "liveJourneyNextManeuver": "المنعطف التالي",
+  "liveJourneyTrafficScore": "درجة الازدحام",
+  "liveJourneySpeedKmh": "{speed} كم/س",
+  "@liveJourneySpeedKmh": {
+    "placeholders": {
+      "speed": { "type": "int" }
+    }
+  }
 }

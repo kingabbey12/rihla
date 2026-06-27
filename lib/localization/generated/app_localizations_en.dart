@@ -453,7 +453,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routeConfirmedMessage =>
-      'Route confirmed — turn-by-turn navigation arrives in the next phase.';
+      'Route confirmed — your live journey dashboard is active.';
 
   @override
   String get routeProfileSafe => 'Safe';
@@ -484,4 +484,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routeSafety => 'Safety';
+
+  @override
+  String get liveJourneyTitle => 'Live Journey';
+
+  @override
+  String get liveJourneyInProgress => 'Journey in progress';
+
+  @override
+  String get liveJourneyExpand => 'Expand dashboard';
+
+  @override
+  String get liveJourneyCollapse => 'Collapse dashboard';
+
+  @override
+  String get liveJourneyFloat => 'Float dashboard';
+
+  @override
+  String get liveJourneyEta => 'ETA';
+
+  @override
+  String get liveJourneyArrivalTime => 'Arrival';
+
+  @override
+  String get liveJourneyRemainingDistance => 'Remaining';
+
+  @override
+  String get liveJourneyCurrentSpeed => 'Speed';
+
+  @override
+  String get liveJourneyCurrentRoad => 'Current road';
+
+  @override
+  String get liveJourneyNextManeuver => 'Next maneuver';
+
+  @override
+  String get liveJourneyTrafficScore => 'Traffic Score';
+
+  @override
+  String liveJourneySpeedKmh(int speed) {
+    return '$speed km/h';
+  }
 }
