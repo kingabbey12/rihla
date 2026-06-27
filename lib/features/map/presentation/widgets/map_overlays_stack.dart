@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rihla/features/ai_copilot/presentation/widgets/ai_copilot_map_overlay.dart';
+import 'package:rihla/features/explore/presentation/widgets/explore_map_overlay.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_map_overlay.dart';
 import 'package:rihla/features/live_journey/presentation/widgets/journey_dashboard_map_overlay.dart';
 import 'package:rihla/features/navigation/presentation/widgets/navigation_turn_banner_overlay.dart';
@@ -18,6 +19,7 @@ class MapOverlaysStack extends StatelessWidget {
       children: [
         Positioned(top: 0, left: 0, right: 0, child: MapSearchBar()),
         Positioned.fill(child: JourneyMapOverlay()),
+        Positioned.fill(child: ExploreMapOverlay()),
         Positioned.fill(child: RouteMapOverlay()),
         NavigationTurnBannerOverlay(),
         SafetyAlertBannerOverlay(),

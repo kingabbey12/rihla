@@ -15,6 +15,8 @@ import 'package:rihla/features/map/domain/models/map_view_status.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/routing/domain/entities/route_coordinate.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
+import 'package:rihla/features/explore/domain/entities/explore_marker.dart';
+import 'package:rihla/features/explore/presentation/providers/explore_providers.dart';
 import 'package:rihla/features/map/presentation/widgets/map_controls.dart';
 import 'package:rihla/features/map/presentation/widgets/map_scale_indicator.dart';
 
@@ -39,6 +41,7 @@ class _MapViewState extends ConsumerState<MapView> {
   late final MapCamera _startCamera;
   Line? _routeLine;
   List<RouteCoordinate>? _pendingPolyline;
+  final Map<Circle, ExploreMarker> _exploreCircleMarkers = {};
   Brightness? _lastSyncedBrightness;
 
   @override
@@ -85,6 +88,25 @@ class _MapViewState extends ConsumerState<MapView> {
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
+    controller.onCircleTapped.add(_onExploreCircleTapped);
+  }
+
+  void _onExploreCircleTapped(Circle circle) {
+    final marker = _exploreCircleMarkers[circle];
+    if (marker == null) return;
+    if (marker.isCluster) {
+      _animate(
+        CameraUpdate.newLatLngZoom(
+          LatLng(marker.latitude, marker.longitude),
+          (ref.read(mapCameraProvider).zoom + 2).clamp(10, 18),
+        ),
+      );
+      return;
+    }
+    final place = marker.place;
+    if (place != null) {
+      ref.read(exploreControllerProvider.notifier).selectPlace(place);
+    }
   }
 
   void _onStyleLoaded() {
@@ -92,6 +114,38 @@ class _MapViewState extends ConsumerState<MapView> {
     ref.read(mapViewStatusProvider.notifier).set(const MapReady());
     if (_pendingPolyline != null) {
       _renderRouteLine(_pendingPolyline);
+    }
+    final markers = ref.read(exploreMapMarkersProvider);
+    if (markers.isNotEmpty) {
+      _renderExploreMarkers(markers);
+    }
+  }
+
+  Future<void> _renderExploreMarkers(List<ExploreMarker> markers) async {
+    final controller = _controller;
+    if (controller == null) return;
+
+    await controller.clearCircles();
+    _exploreCircleMarkers.clear();
+    if (markers.isEmpty) return;
+
+    final circles = await controller.addCircles(
+      markers
+          .map(
+            (m) => CircleOptions(
+              geometry: LatLng(m.latitude, m.longitude),
+              circleRadius: m.isCluster ? 14 : 8,
+              circleColor: m.isCluster ? '#1B6B6B' : '#0D6E6E',
+              circleStrokeWidth: 2,
+              circleStrokeColor: '#FFFFFF',
+              circleOpacity: 0.92,
+            ),
+          )
+          .toList(),
+    );
+
+    for (var i = 0; i < circles.length && i < markers.length; i++) {
+      _exploreCircleMarkers[circles[i]] = markers[i];
     }
   }
 
@@ -217,6 +271,9 @@ class _MapViewState extends ConsumerState<MapView> {
     });
     ref.listen(mapRoutePolylineProvider, (_, next) {
       _renderRouteLine(next);
+    });
+    ref.listen(exploreMapMarkersProvider, (_, next) {
+      _renderExploreMarkers(next);
     });
 
     return Stack(
