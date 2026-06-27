@@ -50,10 +50,16 @@ class LiveJourneySessionMetricsMapper {
 
     final speedStatus =
         session.speedKmh > 100 ? MetricStatus.warning : MetricStatus.good;
+    final safetyScore = session.safety.assessment.overallSafetyScore;
+    final safetyStatus = safetyScore >= 75
+        ? MetricStatus.good
+        : safetyScore >= 50
+            ? MetricStatus.warning
+            : MetricStatus.critical;
 
     return LiveJourneyMetrics(
       journeyScore: ambient.journeyScore,
-      safetyScore: ambient.safetyScore,
+      safetyScore: fromSession(safetyScore, status: safetyStatus),
       trafficScore: ambient.trafficScore,
       weather: ambient.weather,
       roadCondition: ambient.roadCondition,

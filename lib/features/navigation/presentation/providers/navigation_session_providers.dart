@@ -19,6 +19,7 @@ import 'package:rihla/features/navigation/presentation/providers/reroute_provide
 import 'package:rihla/features/navigation/presentation/providers/voice_guidance_providers.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
+import 'package:rihla/features/safety/presentation/providers/safety_providers.dart';
 
 final maneuverEngineProvider = Provider<ManeuverEngine>(
   (ref) => PolylineManeuverEngine(),
@@ -101,13 +102,16 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     _lastSpokenInstruction = null;
     final sessionId = 'nav_${DateTime.now().millisecondsSinceEpoch}';
     final engine = ref.read(navigationSessionEngineProvider);
-    final session = engine.createInitial(
+    var session = engine.createInitial(
       sessionId: sessionId,
       journey: journey,
       route: route,
       simulationMode: simulationMode,
       voiceEnabled: voiceEnabled,
     );
+    session = await ref
+        .read(safetySessionEnricherProvider)
+        .enrich(session, tickCount: 0);
     await _persist(session);
     ref.read(mapRoutePolylineProvider.notifier).set(route.coordinates);
     _scheduleTimer(session);
@@ -130,10 +134,16 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     );
 
     if (updated.isOffRoute && updated.rerouteState is RerouteIdle) {
+      updated = await ref
+          .read(safetySessionEnricherProvider)
+          .enrich(updated, tickCount: _tickCount);
       await _handleReroute(updated);
       return;
     }
 
+    updated = await ref
+        .read(safetySessionEnricherProvider)
+        .enrich(updated, tickCount: _tickCount);
     await _persist(updated);
     _scheduleTimer(updated);
     await _announceManeuver(updated);
@@ -205,13 +215,16 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
       simulationMode: current.session.simulationMode,
       voiceEnabled: current.session.voiceEnabled,
     );
-    final resumed = rebuilt.copyWith(
-      simulation: current.session.simulation,
-      rerouteState: RerouteSucceeded(newRoute),
-      isOffRoute: false,
-      status: NavigationStatus.navigating,
-      lastUpdatedAt: DateTime.now(),
-    );
+    final resumed = await ref.read(safetySessionEnricherProvider).enrich(
+          rebuilt.copyWith(
+            simulation: current.session.simulation,
+            rerouteState: RerouteSucceeded(newRoute),
+            isOffRoute: false,
+            status: NavigationStatus.navigating,
+            lastUpdatedAt: DateTime.now(),
+          ),
+          tickCount: 0,
+        );
     _tickCount = 0;
     _simulateOffRoute = false;
     await _persist(resumed.copyWith(rerouteState: const RerouteIdle()));

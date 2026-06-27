@@ -218,5 +218,40 @@
   "navSimulationPause": "Pause simulation",
   "navSimulationResume": "Resume simulation",
   "navSimulationSpeed": "Simulation speed",
-  "navSimulateDeviation": "Simulate deviation"
+  "navSimulateDeviation": "Simulate deviation",
+  "safetyDashboardTitle": "Safety Intelligence",
+  "safetyOverallScore": "Safety Score",
+  "safetyRoadSafety": "Road Safety",
+  "safetyTrafficRisk": "Traffic Risk",
+  "safetyWeatherRisk": "Weather Risk",
+  "safetyDriverAlertness": "Driver Alertness",
+  "safetyVehicleReadiness": "Vehicle Readiness",
+  "safetyJourneyRisk": "Journey Risk",
+  "safetyAlertTitle": "Safety Alert",
+  "safetyHazardFeedTitle": "Hazard Feed",
+  "safetyNoHazards": "No active hazards on your route",
+  "safetyRiskLevel": "Risk level {level}",
+  "@safetyRiskLevel": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "safetyHazardDistance": "{distance} km ahead",
+  "@safetyHazardDistance": {
+    "placeholders": {
+      "distance": { "type": "String" }
+    }
+  },
+  "hazardAccident": "Accident",
+  "hazardConstruction": "Construction",
+  "hazardRoadClosure": "Road Closure",
+  "hazardSpeedCamera": "Speed Camera",
+  "hazardSchoolZone": "School Zone",
+  "hazardSharpCurve": "Sharp Curve",
+  "hazardHeavyRain": "Heavy Rain",
+  "hazardSandstorm": "Sandstorm",
+  "hazardFlood": "Flood",
+  "hazardAnimalCrossing": "Animal Crossing",
+  "hazardEmergencyVehicle": "Emergency Vehicle",
+  "hazardCustom": "Custom Hazard"
 }

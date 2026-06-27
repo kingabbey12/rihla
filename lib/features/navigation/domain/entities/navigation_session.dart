@@ -8,6 +8,7 @@ import 'package:rihla/features/navigation/domain/entities/route_maneuver_step.da
 import 'package:rihla/features/navigation/domain/entities/speed_limit.dart';
 import 'package:rihla/features/navigation/domain/models/reroute_state.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
+import 'package:rihla/features/safety/domain/entities/safety_snapshot.dart';
 
 /// Central representation of one active navigation session.
 ///
@@ -37,6 +38,7 @@ class NavigationSession {
     required this.simulation,
     required this.voiceEnabled,
     required this.simulationMode,
+    required this.safety,
     required this.startedAt,
     required this.lastUpdatedAt,
   });
@@ -64,6 +66,7 @@ class NavigationSession {
   final NavigationSimulation simulation;
   final bool voiceEnabled;
   final bool simulationMode;
+  final SafetySnapshot safety;
   final DateTime startedAt;
   final DateTime lastUpdatedAt;
 
@@ -93,6 +96,7 @@ class NavigationSession {
     NavigationSimulation? simulation,
     bool? voiceEnabled,
     bool? simulationMode,
+    SafetySnapshot? safety,
     DateTime? startedAt,
     DateTime? lastUpdatedAt,
   }) {
@@ -120,6 +124,7 @@ class NavigationSession {
       simulation: simulation ?? this.simulation,
       voiceEnabled: voiceEnabled ?? this.voiceEnabled,
       simulationMode: simulationMode ?? this.simulationMode,
+      safety: safety ?? this.safety,
       startedAt: startedAt ?? this.startedAt,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );

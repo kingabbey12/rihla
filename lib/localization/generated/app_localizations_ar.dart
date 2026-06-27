@@ -561,4 +561,83 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get navSimulateDeviation => 'محاكاة الانحراف';
+
+  @override
+  String get safetyDashboardTitle => 'ذكاء السلامة';
+
+  @override
+  String get safetyOverallScore => 'درجة السلامة';
+
+  @override
+  String get safetyRoadSafety => 'سلامة الطريق';
+
+  @override
+  String get safetyTrafficRisk => 'مخاطر الازدحام';
+
+  @override
+  String get safetyWeatherRisk => 'مخاطر الطقس';
+
+  @override
+  String get safetyDriverAlertness => 'انتباه السائق';
+
+  @override
+  String get safetyVehicleReadiness => 'جاهزية المركبة';
+
+  @override
+  String get safetyJourneyRisk => 'مخاطر الرحلة';
+
+  @override
+  String get safetyAlertTitle => 'تنبيه السلامة';
+
+  @override
+  String get safetyHazardFeedTitle => 'تغذية المخاطر';
+
+  @override
+  String get safetyNoHazards => 'لا توجد مخاطر نشطة على مسارك';
+
+  @override
+  String safetyRiskLevel(int level) {
+    return 'مستوى المخاطر $level';
+  }
+
+  @override
+  String safetyHazardDistance(String distance) {
+    return 'على بعد $distance كم';
+  }
+
+  @override
+  String get hazardAccident => 'حادث';
+
+  @override
+  String get hazardConstruction => 'أعمال بناء';
+
+  @override
+  String get hazardRoadClosure => 'إغلاق طريق';
+
+  @override
+  String get hazardSpeedCamera => 'كاميرا سرعة';
+
+  @override
+  String get hazardSchoolZone => 'منطقة مدارس';
+
+  @override
+  String get hazardSharpCurve => 'منعطف حاد';
+
+  @override
+  String get hazardHeavyRain => 'أمطار غزيرة';
+
+  @override
+  String get hazardSandstorm => 'عاصفة رملية';
+
+  @override
+  String get hazardFlood => 'فيضان';
+
+  @override
+  String get hazardAnimalCrossing => 'عبور حيوانات';
+
+  @override
+  String get hazardEmergencyVehicle => 'مركبة طوارئ';
+
+  @override
+  String get hazardCustom => 'خطر مخصص';
 }

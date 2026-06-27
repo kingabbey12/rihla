@@ -17,6 +17,7 @@ import 'package:rihla/features/navigation/domain/services/navigation_session_eng
 import 'package:rihla/features/navigation/domain/services/route_deviation_detector.dart';
 import 'package:rihla/features/routing/domain/entities/route_coordinate.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
+import 'package:rihla/features/safety/domain/entities/safety_snapshot.dart';
 
 /// Simulates turn-by-turn navigation along a route polyline.
 class MockNavigationSessionEngine implements NavigationSessionEngine {
@@ -89,6 +90,7 @@ class MockNavigationSessionEngine implements NavigationSessionEngine {
       simulation: const NavigationSimulation(),
       voiceEnabled: voiceEnabled,
       simulationMode: simulationMode,
+      safety: SafetySnapshot.initial(),
       startedAt: now,
       lastUpdatedAt: now,
     );

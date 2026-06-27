@@ -193,5 +193,40 @@
   "navSimulationPause": "إيقاف المحاكاة",
   "navSimulationResume": "استئناف المحاكاة",
   "navSimulationSpeed": "سرعة المحاكاة",
-  "navSimulateDeviation": "محاكاة الانحراف"
+  "navSimulateDeviation": "محاكاة الانحراف",
+  "safetyDashboardTitle": "ذكاء السلامة",
+  "safetyOverallScore": "درجة السلامة",
+  "safetyRoadSafety": "سلامة الطريق",
+  "safetyTrafficRisk": "مخاطر الازدحام",
+  "safetyWeatherRisk": "مخاطر الطقس",
+  "safetyDriverAlertness": "انتباه السائق",
+  "safetyVehicleReadiness": "جاهزية المركبة",
+  "safetyJourneyRisk": "مخاطر الرحلة",
+  "safetyAlertTitle": "تنبيه السلامة",
+  "safetyHazardFeedTitle": "تغذية المخاطر",
+  "safetyNoHazards": "لا توجد مخاطر نشطة على مسارك",
+  "safetyRiskLevel": "مستوى المخاطر {level}",
+  "@safetyRiskLevel": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "safetyHazardDistance": "على بعد {distance} كم",
+  "@safetyHazardDistance": {
+    "placeholders": {
+      "distance": { "type": "String" }
+    }
+  },
+  "hazardAccident": "حادث",
+  "hazardConstruction": "أعمال بناء",
+  "hazardRoadClosure": "إغلاق طريق",
+  "hazardSpeedCamera": "كاميرا سرعة",
+  "hazardSchoolZone": "منطقة مدارس",
+  "hazardSharpCurve": "منعطف حاد",
+  "hazardHeavyRain": "أمطار غزيرة",
+  "hazardSandstorm": "عاصفة رملية",
+  "hazardFlood": "فيضان",
+  "hazardAnimalCrossing": "عبور حيوانات",
+  "hazardEmergencyVehicle": "مركبة طوارئ",
+  "hazardCustom": "خطر مخصص"
 }

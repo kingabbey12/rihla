@@ -567,4 +567,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navSimulateDeviation => 'Simulate deviation';
+
+  @override
+  String get safetyDashboardTitle => 'Safety Intelligence';
+
+  @override
+  String get safetyOverallScore => 'Safety Score';
+
+  @override
+  String get safetyRoadSafety => 'Road Safety';
+
+  @override
+  String get safetyTrafficRisk => 'Traffic Risk';
+
+  @override
+  String get safetyWeatherRisk => 'Weather Risk';
+
+  @override
+  String get safetyDriverAlertness => 'Driver Alertness';
+
+  @override
+  String get safetyVehicleReadiness => 'Vehicle Readiness';
+
+  @override
+  String get safetyJourneyRisk => 'Journey Risk';
+
+  @override
+  String get safetyAlertTitle => 'Safety Alert';
+
+  @override
+  String get safetyHazardFeedTitle => 'Hazard Feed';
+
+  @override
+  String get safetyNoHazards => 'No active hazards on your route';
+
+  @override
+  String safetyRiskLevel(int level) {
+    return 'Risk level $level';
+  }
+
+  @override
+  String safetyHazardDistance(String distance) {
+    return '$distance km ahead';
+  }
+
+  @override
+  String get hazardAccident => 'Accident';
+
+  @override
+  String get hazardConstruction => 'Construction';
+
+  @override
+  String get hazardRoadClosure => 'Road Closure';
+
+  @override
+  String get hazardSpeedCamera => 'Speed Camera';
+
+  @override
+  String get hazardSchoolZone => 'School Zone';
+
+  @override
+  String get hazardSharpCurve => 'Sharp Curve';
+
+  @override
+  String get hazardHeavyRain => 'Heavy Rain';
+
+  @override
+  String get hazardSandstorm => 'Sandstorm';
+
+  @override
+  String get hazardFlood => 'Flood';
+
+  @override
+  String get hazardAnimalCrossing => 'Animal Crossing';
+
+  @override
+  String get hazardEmergencyVehicle => 'Emergency Vehicle';
+
+  @override
+  String get hazardCustom => 'Custom Hazard';
 }

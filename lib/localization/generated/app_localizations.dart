@@ -1141,6 +1141,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Simulate deviation'**
   String get navSimulateDeviation;
+
+  /// No description provided for @safetyDashboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Intelligence'**
+  String get safetyDashboardTitle;
+
+  /// No description provided for @safetyOverallScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Score'**
+  String get safetyOverallScore;
+
+  /// No description provided for @safetyRoadSafety.
+  ///
+  /// In en, this message translates to:
+  /// **'Road Safety'**
+  String get safetyRoadSafety;
+
+  /// No description provided for @safetyTrafficRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic Risk'**
+  String get safetyTrafficRisk;
+
+  /// No description provided for @safetyWeatherRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather Risk'**
+  String get safetyWeatherRisk;
+
+  /// No description provided for @safetyDriverAlertness.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver Alertness'**
+  String get safetyDriverAlertness;
+
+  /// No description provided for @safetyVehicleReadiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle Readiness'**
+  String get safetyVehicleReadiness;
+
+  /// No description provided for @safetyJourneyRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey Risk'**
+  String get safetyJourneyRisk;
+
+  /// No description provided for @safetyAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Alert'**
+  String get safetyAlertTitle;
+
+  /// No description provided for @safetyHazardFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazard Feed'**
+  String get safetyHazardFeedTitle;
+
+  /// No description provided for @safetyNoHazards.
+  ///
+  /// In en, this message translates to:
+  /// **'No active hazards on your route'**
+  String get safetyNoHazards;
+
+  /// No description provided for @safetyRiskLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Risk level {level}'**
+  String safetyRiskLevel(int level);
+
+  /// No description provided for @safetyHazardDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km ahead'**
+  String safetyHazardDistance(String distance);
+
+  /// No description provided for @hazardAccident.
+  ///
+  /// In en, this message translates to:
+  /// **'Accident'**
+  String get hazardAccident;
+
+  /// No description provided for @hazardConstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Construction'**
+  String get hazardConstruction;
+
+  /// No description provided for @hazardRoadClosure.
+  ///
+  /// In en, this message translates to:
+  /// **'Road Closure'**
+  String get hazardRoadClosure;
+
+  /// No description provided for @hazardSpeedCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Camera'**
+  String get hazardSpeedCamera;
+
+  /// No description provided for @hazardSchoolZone.
+  ///
+  /// In en, this message translates to:
+  /// **'School Zone'**
+  String get hazardSchoolZone;
+
+  /// No description provided for @hazardSharpCurve.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharp Curve'**
+  String get hazardSharpCurve;
+
+  /// No description provided for @hazardHeavyRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy Rain'**
+  String get hazardHeavyRain;
+
+  /// No description provided for @hazardSandstorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandstorm'**
+  String get hazardSandstorm;
+
+  /// No description provided for @hazardFlood.
+  ///
+  /// In en, this message translates to:
+  /// **'Flood'**
+  String get hazardFlood;
+
+  /// No description provided for @hazardAnimalCrossing.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal Crossing'**
+  String get hazardAnimalCrossing;
+
+  /// No description provided for @hazardEmergencyVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Vehicle'**
+  String get hazardEmergencyVehicle;
+
+  /// No description provided for @hazardCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Hazard'**
+  String get hazardCustom;
 }
 
 class _AppLocalizationsDelegate
