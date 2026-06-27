@@ -6,6 +6,8 @@ import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
 import 'package:rihla/features/search/data/datasources/nominatim_datasource.dart';
 import 'package:rihla/features/search/data/datasources/search_local_datasource.dart';
+import 'package:rihla/features/offline/data/repositories/offline_aware_search_repository.dart';
+import 'package:rihla/features/offline/presentation/providers/offline_providers.dart';
 import 'package:rihla/features/search/data/repositories/search_repository_impl.dart';
 import 'package:rihla/features/search/data/services/mock_search_service.dart';
 import 'package:rihla/features/search/data/services/nominatim_search_service.dart';
@@ -41,8 +43,21 @@ final searchLocalDataSourceProvider = Provider<SearchLocalDataSource>(
   (ref) => SearchLocalDataSource(ref.watch(sharedPreferencesProvider)),
 );
 
-/// Provides the [SearchRepository] facade.
+/// Provides the [SearchRepository] facade — offline-aware injection.
 final searchRepositoryProvider = Provider<SearchRepository>(
+  (ref) => OfflineAwareSearchRepository(
+    isOffline: () => ref.read(isOfflineModeProvider),
+    online: SearchRepositoryImpl(
+      ref.watch(searchServiceProvider),
+      ref.watch(searchLocalDataSourceProvider),
+    ),
+    offline: ref.watch(offlineSearchRepositoryProvider),
+    local: ref.watch(searchLocalDataSourceProvider),
+  ),
+);
+
+/// Direct online search repository (tests / overrides).
+final onlineSearchRepositoryDirectProvider = Provider<SearchRepository>(
   (ref) => SearchRepositoryImpl(
     ref.watch(searchServiceProvider),
     ref.watch(searchLocalDataSourceProvider),

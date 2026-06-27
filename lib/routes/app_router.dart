@@ -13,6 +13,7 @@ import 'package:rihla/features/location/presentation/pages/location_debug_page.d
 import 'package:rihla/features/map/presentation/pages/map_page.dart';
 import 'package:rihla/features/navigation/presentation/pages/navigation_session_debug_page.dart';
 import 'package:rihla/features/routing/presentation/pages/route_debug_page.dart';
+import 'package:rihla/features/offline/presentation/pages/offline_center_page.dart';
 import 'package:rihla/features/search/presentation/pages/search_page.dart';
 import 'package:rihla/routes/feature_route.dart';
 import 'package:rihla/routes/pages/feature_placeholder_page.dart';
@@ -167,6 +168,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RoutePaths.notifications,
         builder: (context, state) => const FeaturePlaceholderPage(
           feature: FeatureRoute.notifications,
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.offlineCenter,
+        name: RoutePaths.offlineCenter,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const OfflineCenterPage(),
         ),
       ),
       GoRoute(

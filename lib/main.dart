@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rihla/app.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/features/offline/presentation/widgets/offline_bootstrap.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +14,7 @@ Future<void> main() async {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
-      child: const App(),
+      child: OfflineBootstrap(child: const App()),
     ),
   );
 }

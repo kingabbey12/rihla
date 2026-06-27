@@ -3,6 +3,8 @@ import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/journey/domain/entities/journey_endpoint.dart';
 import 'package:rihla/features/journey/domain/models/journey_summary.dart';
 import 'package:rihla/features/routing/data/datasources/valhalla_route_datasource.dart';
+import 'package:rihla/features/offline/data/repositories/offline_aware_route_repository.dart';
+import 'package:rihla/features/offline/presentation/providers/offline_providers.dart';
 import 'package:rihla/features/routing/data/repositories/route_repository_impl.dart';
 import 'package:rihla/features/routing/data/services/mock_route_service.dart';
 import 'package:rihla/features/routing/data/services/valhalla_route_service.dart';
@@ -33,6 +35,15 @@ final mockRouteServiceProvider = Provider<RouteService>(
 );
 
 final routeRepositoryProvider = Provider<RouteRepository>(
+  (ref) => OfflineAwareRouteRepository(
+    isOffline: () => ref.read(isOfflineModeProvider),
+    online: RouteRepositoryImpl(ref.watch(routeServiceProvider)),
+    offline: ref.watch(offlineRouteRepositoryProvider),
+  ),
+);
+
+/// Direct online route repository (tests / overrides).
+final onlineRouteRepositoryDirectProvider = Provider<RouteRepository>(
   (ref) => RouteRepositoryImpl(ref.watch(routeServiceProvider)),
 );
 

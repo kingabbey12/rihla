@@ -22,6 +22,8 @@ dependencies:
   maplibre_gl: ^0.26.2
   permission_handler: ^12.0.3
   shared_preferences: ^2.5.5
+  connectivity_plus: ^6.1.4
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
