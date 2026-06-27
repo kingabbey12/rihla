@@ -98,5 +98,61 @@
   "searchAddToFavorites": "Add to Favorites",
   "searchRemoveFromFavorites": "Remove from Favorites",
   "searchOpenMap": "Open on map",
-  "searchWhereTo": "Where to?"
+  "searchWhereTo": "Where to?",
+  "journeyPlanning": "Planning your journey…",
+  "journeyDestination": "Destination",
+  "journeyDistance": "Distance",
+  "journeyDuration": "Duration",
+  "journeyScore": "Journey Score",
+  "journeySafetyScore": "Safety Score",
+  "journeyWeather": "Weather",
+  "journeyTraffic": "Traffic",
+  "journeyFuel": "Fuel Estimate",
+  "journeyBattery": "Battery Estimate",
+  "journeyRoadConditions": "Road Conditions",
+  "journeyDeparture": "Departure Suggestions",
+  "journeyAiSummary": "AI Journey Summary",
+  "journeyStart": "Start Journey",
+  "journeyCancel": "Cancel",
+  "journeyErrorTitle": "Journey unavailable",
+  "journeyErrorMessage": "We couldn't plan this journey. Please try again.",
+  "journeyRetry": "Try again",
+  "journeyStartedMessage": "Journey confirmed — turn-by-turn navigation arrives in the next phase.",
+  "journeyTrafficLight": "Light",
+  "journeyTrafficModerate": "Moderate",
+  "journeyTrafficHeavy": "Heavy",
+  "journeyRoadExcellent": "Excellent",
+  "journeyRoadGood": "Good",
+  "journeyRoadFair": "Fair",
+  "journeyRoadPoor": "Poor",
+  "journeyKm": "{distance} km",
+  "@journeyKm": {
+    "placeholders": {
+      "distance": { "type": "String" }
+    }
+  },
+  "journeyMinutes": "{minutes} min",
+  "@journeyMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "journeyLiters": "{liters} L",
+  "@journeyLiters": {
+    "placeholders": {
+      "liters": { "type": "String" }
+    }
+  },
+  "journeyBatteryPercent": "{percent}%",
+  "@journeyBatteryPercent": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "journeyTemperature": "{temp}°C",
+  "@journeyTemperature": {
+    "placeholders": {
+      "temp": { "type": "String" }
+    }
+  }
 }

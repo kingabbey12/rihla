@@ -316,4 +316,108 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get searchWhereTo => 'إلى أين؟';
+
+  @override
+  String get journeyPlanning => 'جارٍ تخطيط رحلتك…';
+
+  @override
+  String get journeyDestination => 'الوجهة';
+
+  @override
+  String get journeyDistance => 'المسافة';
+
+  @override
+  String get journeyDuration => 'المدة';
+
+  @override
+  String get journeyScore => 'درجة الرحلة';
+
+  @override
+  String get journeySafetyScore => 'درجة الأمان';
+
+  @override
+  String get journeyWeather => 'الطقس';
+
+  @override
+  String get journeyTraffic => 'الازدحام';
+
+  @override
+  String get journeyFuel => 'تقدير الوقود';
+
+  @override
+  String get journeyBattery => 'تقدير البطارية';
+
+  @override
+  String get journeyRoadConditions => 'حالة الطريق';
+
+  @override
+  String get journeyDeparture => 'اقتراحات المغادرة';
+
+  @override
+  String get journeyAiSummary => 'ملخص الرحلة بالذكاء الاصطناعي';
+
+  @override
+  String get journeyStart => 'بدء الرحلة';
+
+  @override
+  String get journeyCancel => 'إلغاء';
+
+  @override
+  String get journeyErrorTitle => 'الرحلة غير متاحة';
+
+  @override
+  String get journeyErrorMessage => 'تعذّر تخطيط هذه الرحلة. حاول مرة أخرى.';
+
+  @override
+  String get journeyRetry => 'حاول مرة أخرى';
+
+  @override
+  String get journeyStartedMessage =>
+      'تم تأكيد الرحلة — التوجيه خطوة بخطوة في المرحلة القادمة.';
+
+  @override
+  String get journeyTrafficLight => 'خفيف';
+
+  @override
+  String get journeyTrafficModerate => 'متوسط';
+
+  @override
+  String get journeyTrafficHeavy => 'كثيف';
+
+  @override
+  String get journeyRoadExcellent => 'ممتاز';
+
+  @override
+  String get journeyRoadGood => 'جيد';
+
+  @override
+  String get journeyRoadFair => 'مقبول';
+
+  @override
+  String get journeyRoadPoor => 'سيء';
+
+  @override
+  String journeyKm(String distance) {
+    return '$distance كم';
+  }
+
+  @override
+  String journeyMinutes(int minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String journeyLiters(String liters) {
+    return '$liters ل';
+  }
+
+  @override
+  String journeyBatteryPercent(String percent) {
+    return '$percent٪';
+  }
+
+  @override
+  String journeyTemperature(String temp) {
+    return '$temp°م';
+  }
 }

@@ -6,8 +6,6 @@ import 'package:rihla/features/journey/domain/models/journey_state.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
-import 'package:rihla/features/search/domain/models/search_query_state.dart';
-import 'package:rihla/features/search/domain/services/search_service.dart';
 import 'package:rihla/features/search/presentation/providers/search_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,9 +26,6 @@ void main() {
     container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
-        searchServiceProvider.overrideWith(
-          (ref) => _TestSearchService(),
-        ),
         journeyPlanningServiceProvider.overrideWith(
           (ref) => MockJourneyPlanningService(
             ref.watch(aiRecommendationServiceProvider),
@@ -43,18 +38,14 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  test('query state starts idle', () {
-    expect(container.read(searchQueryStateProvider), isA<SearchQueryIdle>());
-  });
-
-  test('search returns results after debounce', () async {
-    container.read(searchQueryTextProvider.notifier).set('kingdom');
-    container.read(searchQueryStateProvider.notifier).onQueryChanged('kingdom');
-    await Future<void>.delayed(const Duration(milliseconds: 400));
-
-    final state = container.read(searchQueryStateProvider);
-    expect(state, isA<SearchQueryResults>());
-    expect((state as SearchQueryResults).places, isNotEmpty);
+  test('planToDestination transitions to preview', () async {
+    await container
+        .read(journeyControllerProvider.notifier)
+        .planToDestination(place);
+    expect(
+      container.read(journeyControllerProvider),
+      isA<JourneyPreview>(),
+    );
   });
 
   test('selection triggers journey preview', () async {
@@ -67,28 +58,22 @@ void main() {
     expect(flyTo?.latitude, place.latitude);
   });
 
-  test('selection adds to recents', () async {
-    await container.read(searchSelectionProvider).select(place);
-    final recents = await container.read(searchRecentsProvider.future);
-    expect(recents.first.id, place.id);
+  test('cancel returns to idle', () async {
+    await container
+        .read(journeyControllerProvider.notifier)
+        .planToDestination(place);
+    container.read(journeyControllerProvider.notifier).cancel();
+    expect(container.read(journeyControllerProvider), isA<JourneyIdle>());
   });
-}
 
-class _TestSearchService implements SearchService {
-  @override
-  Future<List<SearchPlace>> suggest(String query) async {
-    final trimmed = query.trim().toLowerCase();
-    if (trimmed.contains('kingdom')) {
-      return const [
-        SearchPlace(
-          id: 'kingdom_centre',
-          name: 'Kingdom Centre',
-          address: 'King Fahd Road',
-          latitude: 24.7113,
-          longitude: 46.6743,
-        ),
-      ];
-    }
-    return [];
-  }
+  test('startJourney transitions to started', () async {
+    await container
+        .read(journeyControllerProvider.notifier)
+        .planToDestination(place);
+    container.read(journeyControllerProvider.notifier).startJourney();
+    expect(
+      container.read(journeyControllerProvider),
+      isA<JourneyStarted>(),
+    );
+  });
 }

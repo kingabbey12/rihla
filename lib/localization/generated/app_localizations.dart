@@ -691,6 +691,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Where to?'**
   String get searchWhereTo;
+
+  /// No description provided for @journeyPlanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning your journey…'**
+  String get journeyPlanning;
+
+  /// No description provided for @journeyDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get journeyDestination;
+
+  /// No description provided for @journeyDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get journeyDistance;
+
+  /// No description provided for @journeyDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get journeyDuration;
+
+  /// No description provided for @journeyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey Score'**
+  String get journeyScore;
+
+  /// No description provided for @journeySafetyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Score'**
+  String get journeySafetyScore;
+
+  /// No description provided for @journeyWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get journeyWeather;
+
+  /// No description provided for @journeyTraffic.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic'**
+  String get journeyTraffic;
+
+  /// No description provided for @journeyFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel Estimate'**
+  String get journeyFuel;
+
+  /// No description provided for @journeyBattery.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery Estimate'**
+  String get journeyBattery;
+
+  /// No description provided for @journeyRoadConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Road Conditions'**
+  String get journeyRoadConditions;
+
+  /// No description provided for @journeyDeparture.
+  ///
+  /// In en, this message translates to:
+  /// **'Departure Suggestions'**
+  String get journeyDeparture;
+
+  /// No description provided for @journeyAiSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Journey Summary'**
+  String get journeyAiSummary;
+
+  /// No description provided for @journeyStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Journey'**
+  String get journeyStart;
+
+  /// No description provided for @journeyCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get journeyCancel;
+
+  /// No description provided for @journeyErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey unavailable'**
+  String get journeyErrorTitle;
+
+  /// No description provided for @journeyErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t plan this journey. Please try again.'**
+  String get journeyErrorMessage;
+
+  /// No description provided for @journeyRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get journeyRetry;
+
+  /// No description provided for @journeyStartedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey confirmed — turn-by-turn navigation arrives in the next phase.'**
+  String get journeyStartedMessage;
+
+  /// No description provided for @journeyTrafficLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get journeyTrafficLight;
+
+  /// No description provided for @journeyTrafficModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get journeyTrafficModerate;
+
+  /// No description provided for @journeyTrafficHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy'**
+  String get journeyTrafficHeavy;
+
+  /// No description provided for @journeyRoadExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get journeyRoadExcellent;
+
+  /// No description provided for @journeyRoadGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get journeyRoadGood;
+
+  /// No description provided for @journeyRoadFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get journeyRoadFair;
+
+  /// No description provided for @journeyRoadPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get journeyRoadPoor;
+
+  /// No description provided for @journeyKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km'**
+  String journeyKm(String distance);
+
+  /// No description provided for @journeyMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String journeyMinutes(int minutes);
+
+  /// No description provided for @journeyLiters.
+  ///
+  /// In en, this message translates to:
+  /// **'{liters} L'**
+  String journeyLiters(String liters);
+
+  /// No description provided for @journeyBatteryPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String journeyBatteryPercent(String percent);
+
+  /// No description provided for @journeyTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'{temp}°C'**
+  String journeyTemperature(String temp);
 }
 
 class _AppLocalizationsDelegate

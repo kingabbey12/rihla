@@ -7,6 +7,7 @@ import 'package:rihla/features/map/presentation/widgets/map_debug_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_empty_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_error_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_loading_view.dart';
+import 'package:rihla/features/journey/presentation/widgets/journey_map_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_view.dart';
 import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
 
@@ -58,9 +59,10 @@ class MapPage extends ConsumerWidget {
           if (kDebugMode)
             Positioned(
               left: 12,
-              top: MediaQuery.paddingOf(context).top + 12,
+              top: MediaQuery.paddingOf(context).top + 64,
               child: const MapDebugOverlay(),
             ),
+          const Positioned.fill(child: JourneyMapOverlay()),
         ],
       ),
     );

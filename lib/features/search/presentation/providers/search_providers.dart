@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/providers/app_providers.dart';
-import 'package:rihla/features/map/domain/entities/map_camera.dart';
-import 'package:rihla/features/map/presentation/providers/map_providers.dart';
+import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
 import 'package:rihla/features/search/data/datasources/search_local_datasource.dart';
 import 'package:rihla/features/search/data/repositories/search_repository_impl.dart';
 import 'package:rihla/features/search/data/services/mock_search_service.dart';
@@ -199,7 +198,7 @@ class SearchQueryStateNotifier extends Notifier<SearchQueryState> {
   }
 }
 
-/// Selects a place: persists recents, flies the map camera, returns the place.
+/// Selects a place: persists recents and opens the Journey Card on the map.
 final searchSelectionProvider = Provider<SearchSelectionHandler>(
   (ref) => SearchSelectionHandler(ref),
 );
@@ -214,17 +213,7 @@ class SearchSelectionHandler {
     await repo.addRecentSearch(place);
     await _ref.read(searchRecentsProvider.notifier).refresh();
 
-    _ref.read(mapFlyToTargetProvider.notifier).flyTo(
-          latitude: place.latitude,
-          longitude: place.longitude,
-        );
-    _ref.read(mapCameraProvider.notifier).update(
-          MapCamera(
-            latitude: place.latitude,
-            longitude: place.longitude,
-            zoom: 15.5,
-          ),
-        );
+    await _ref.read(journeyControllerProvider.notifier).planToDestination(place);
 
     return place;
   }

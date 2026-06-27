@@ -319,4 +319,109 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchWhereTo => 'Where to?';
+
+  @override
+  String get journeyPlanning => 'Planning your journey…';
+
+  @override
+  String get journeyDestination => 'Destination';
+
+  @override
+  String get journeyDistance => 'Distance';
+
+  @override
+  String get journeyDuration => 'Duration';
+
+  @override
+  String get journeyScore => 'Journey Score';
+
+  @override
+  String get journeySafetyScore => 'Safety Score';
+
+  @override
+  String get journeyWeather => 'Weather';
+
+  @override
+  String get journeyTraffic => 'Traffic';
+
+  @override
+  String get journeyFuel => 'Fuel Estimate';
+
+  @override
+  String get journeyBattery => 'Battery Estimate';
+
+  @override
+  String get journeyRoadConditions => 'Road Conditions';
+
+  @override
+  String get journeyDeparture => 'Departure Suggestions';
+
+  @override
+  String get journeyAiSummary => 'AI Journey Summary';
+
+  @override
+  String get journeyStart => 'Start Journey';
+
+  @override
+  String get journeyCancel => 'Cancel';
+
+  @override
+  String get journeyErrorTitle => 'Journey unavailable';
+
+  @override
+  String get journeyErrorMessage =>
+      'We couldn\'t plan this journey. Please try again.';
+
+  @override
+  String get journeyRetry => 'Try again';
+
+  @override
+  String get journeyStartedMessage =>
+      'Journey confirmed — turn-by-turn navigation arrives in the next phase.';
+
+  @override
+  String get journeyTrafficLight => 'Light';
+
+  @override
+  String get journeyTrafficModerate => 'Moderate';
+
+  @override
+  String get journeyTrafficHeavy => 'Heavy';
+
+  @override
+  String get journeyRoadExcellent => 'Excellent';
+
+  @override
+  String get journeyRoadGood => 'Good';
+
+  @override
+  String get journeyRoadFair => 'Fair';
+
+  @override
+  String get journeyRoadPoor => 'Poor';
+
+  @override
+  String journeyKm(String distance) {
+    return '$distance km';
+  }
+
+  @override
+  String journeyMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String journeyLiters(String liters) {
+    return '$liters L';
+  }
+
+  @override
+  String journeyBatteryPercent(String percent) {
+    return '$percent%';
+  }
+
+  @override
+  String journeyTemperature(String temp) {
+    return '$temp°C';
+  }
 }
