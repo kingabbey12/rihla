@@ -39,6 +39,7 @@ class _MapViewState extends ConsumerState<MapView> {
   late final MapCamera _startCamera;
   Line? _routeLine;
   List<RouteCoordinate>? _pendingPolyline;
+  Brightness? _lastSyncedBrightness;
 
   @override
   void initState() {
@@ -46,13 +47,27 @@ class _MapViewState extends ConsumerState<MapView> {
     _startCamera = ref.read(mapCameraProvider);
     _startInitTimeout();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(locationControllerProvider.notifier).refreshStatus();
+      if (mounted) {
+        ref.read(locationControllerProvider.notifier).refreshStatus();
+      }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final brightness = Theme.of(context).brightness;
+    if (_lastSyncedBrightness != brightness) {
+      _lastSyncedBrightness = brightness;
+      final variant = styleVariantForBrightness(brightness);
+      ref.read(mapStyleVariantProvider.notifier).setVariant(variant);
+    }
   }
 
   @override
   void dispose() {
     _initTimer?.cancel();
+    _controller = null;
     super.dispose();
   }
 
@@ -188,11 +203,6 @@ class _MapViewState extends ConsumerState<MapView> {
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     final variant = styleVariantForBrightness(brightness);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ref.read(mapStyleVariantProvider.notifier).setVariant(variant);
-      }
-    });
 
     final locationState = ref.watch(locationControllerProvider);
     final hasPermission =

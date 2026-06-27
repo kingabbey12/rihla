@@ -1,21 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/app/widgets/map_session_host.dart';
 import 'package:rihla/features/map/domain/models/map_view_status.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/map/presentation/widgets/map_debug_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_empty_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_error_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_loading_view.dart';
-import 'package:rihla/features/journey/presentation/widgets/journey_map_overlay.dart';
-import 'package:rihla/features/live_journey/presentation/widgets/journey_dashboard_map_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_view.dart';
-import 'package:rihla/features/navigation/presentation/widgets/navigation_turn_banner_overlay.dart';
-import 'package:rihla/features/routing/presentation/widgets/route_map_overlay.dart';
-import 'package:rihla/features/ai_copilot/presentation/widgets/ai_copilot_map_overlay.dart';
-import 'package:rihla/features/safety/presentation/widgets/safety_alert_banner_overlay.dart';
-import 'package:rihla/features/safety/presentation/widgets/safety_map_overlay.dart';
-import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
+import 'package:rihla/features/map/presentation/widgets/map_overlays_stack.dart';
 
 /// The production map experience: a full-screen map with overlay states.
 class MapPage extends ConsumerWidget {
@@ -31,51 +25,42 @@ class MapPage extends ConsumerWidget {
     final status = ref.watch(mapViewStatusProvider);
     final locationUnavailable = ref.watch(mapLocationUnavailableProvider);
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          const Positioned.fill(child: MapView()),
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: MapSearchBar(),
-          ),
-          if (status is MapInitializing)
-            const Positioned.fill(child: MapLoadingView()),
-          if (status is MapErrored)
-            Positioned.fill(
-              child: MapErrorView(onRetry: () => _retry(ref)),
-            ),
-          if (locationUnavailable && status is MapReady)
-            Positioned(
-              left: 24,
-              right: 24,
-              bottom: 100 + MediaQuery.paddingOf(context).bottom,
-              child: MapEmptyView(
-                onRetry: () {
-                  ref.read(mapLocationUnavailableProvider.notifier).dismiss();
-                  ref.read(mapLocationRetryProvider.notifier).request();
-                },
-                onDismiss: () {
-                  ref.read(mapLocationUnavailableProvider.notifier).dismiss();
-                },
+    return MapSessionHost(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            const Positioned.fill(child: MapView()),
+            if (status is MapInitializing)
+              const Positioned.fill(child: MapLoadingView()),
+            if (status is MapErrored)
+              Positioned.fill(
+                child: MapErrorView(onRetry: () => _retry(ref)),
               ),
-            ),
-          if (kDebugMode)
-            Positioned(
-              left: 12,
-              top: MediaQuery.paddingOf(context).top + 64,
-              child: const MapDebugOverlay(),
-            ),
-          const Positioned.fill(child: JourneyMapOverlay()),
-          const Positioned.fill(child: RouteMapOverlay()),
-          const NavigationTurnBannerOverlay(),
-          const SafetyAlertBannerOverlay(),
-          const SafetyMapOverlay(),
-          const AiCopilotMapOverlay(),
-          const JourneyDashboardMapOverlay(),
-        ],
+            if (locationUnavailable && status is MapReady)
+              Positioned(
+                left: 24,
+                right: 24,
+                bottom: 100 + MediaQuery.paddingOf(context).bottom,
+                child: MapEmptyView(
+                  onRetry: () {
+                    ref.read(mapLocationUnavailableProvider.notifier).dismiss();
+                    ref.read(mapLocationRetryProvider.notifier).request();
+                  },
+                  onDismiss: () {
+                    ref.read(mapLocationUnavailableProvider.notifier).dismiss();
+                  },
+                ),
+              ),
+            if (kDebugMode)
+              Positioned(
+                left: 12,
+                top: MediaQuery.paddingOf(context).top + 64,
+                child: const MapDebugOverlay(),
+              ),
+            const MapOverlaysStack(),
+            const DrivingSessionUiListener(),
+          ],
+        ),
       ),
     );
   }

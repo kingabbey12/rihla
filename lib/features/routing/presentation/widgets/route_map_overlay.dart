@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rihla/core/extensions/context_extensions.dart';
-import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
-import 'package:rihla/features/live_journey/presentation/providers/live_journey_providers.dart';
-import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
+import 'package:rihla/app/coordinators/driving_session_coordinator.dart';
 import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/features/routing/presentation/widgets/route_error_overlay.dart';
@@ -17,24 +14,6 @@ class RouteMapOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final routeState = ref.watch(routeControllerProvider);
-
-    ref.listen(routeControllerProvider, (previous, next) {
-      if (next is RouteConfirmed) {
-        final journey =
-            ref.read(journeyControllerProvider.notifier).activeSummary;
-        if (journey != null) {
-          ref.read(navigationSessionControllerProvider.notifier).startSession(
-                journey: journey,
-                route: next.selected,
-              );
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.routeConfirmedMessage)),
-        );
-        ref.read(journeyControllerProvider.notifier).completeJourney();
-        ref.read(routeControllerProvider.notifier).acknowledgeConfirmed();
-      }
-    });
 
     return switch (routeState) {
       RouteLoading() => const RouteLoadingOverlay(),
@@ -65,9 +44,6 @@ class RouteMapOverlay extends ConsumerWidget {
   }
 
   void _cancel(WidgetRef ref) {
-    ref.read(navigationSessionControllerProvider.notifier).stopSession();
-    ref.read(liveJourneyControllerProvider.notifier).stop();
-    ref.read(routeControllerProvider.notifier).clear();
-    ref.read(journeyControllerProvider.notifier).cancel();
+    ref.read(drivingSessionCoordinatorProvider).cancelDrivingSession();
   }
 }

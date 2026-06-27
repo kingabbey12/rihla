@@ -31,10 +31,17 @@ class LiveJourneyController extends Notifier<LiveJourneyState> {
 
   @override
   LiveJourneyState build() {
-    final navState = ref.watch(navigationSessionControllerProvider);
+    ref.listen(navigationSessionControllerProvider, (previous, next) {
+      state = _stateFromNavigation(next);
+    });
+    return _stateFromNavigation(ref.read(navigationSessionControllerProvider));
+  }
+
+  LiveJourneyState _stateFromNavigation(NavigationSessionState navState) {
     if (navState is! NavigationSessionActive) {
       _ambientTickCount = 0;
       _lastSessionUpdate = null;
+      _displayMode = DashboardDisplayMode.collapsed;
       return const LiveJourneyInactive();
     }
 
@@ -95,86 +102,113 @@ LiveJourneyActive? _activeState(LiveJourneyState state) =>
     state is LiveJourneyActive ? state : null;
 
 final liveJourneyScoreProvider = Provider<JourneyMetric<double>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .journeyScore;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.journeyScore,
+    ),
+  );
 });
 
 final liveSafetyScoreProvider = Provider<JourneyMetric<double>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .safetyScore;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.safetyScore,
+    ),
+  );
 });
 
 final liveTrafficScoreProvider = Provider<JourneyMetric<double>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .trafficScore;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.trafficScore,
+    ),
+  );
 });
 
 final liveWeatherProvider = Provider<JourneyMetric<String>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .weather;
+  return ref.watch(
+    liveJourneyControllerProvider.select((s) => _activeState(s)?.metrics.weather),
+  );
 });
 
 final liveRoadConditionProvider = Provider<JourneyMetric<String>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .roadCondition;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.roadCondition,
+    ),
+  );
 });
 
 final liveCurrentSpeedProvider = Provider<JourneyMetric<double>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .currentSpeedKmh;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.currentSpeedKmh,
+    ),
+  );
 });
 
 final liveEtaProvider = Provider<JourneyMetric<Duration>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))?.metrics.eta;
+  return ref.watch(
+    liveJourneyControllerProvider.select((s) => _activeState(s)?.metrics.eta),
+  );
 });
 
 final liveRemainingDistanceProvider = Provider<JourneyMetric<double>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .remainingDistanceKm;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.remainingDistanceKm,
+    ),
+  );
 });
 
 final liveFuelEstimateProvider = Provider<JourneyMetric<double>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .fuelEstimateLiters;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.fuelEstimateLiters,
+    ),
+  );
 });
 
 final liveBatteryEstimateProvider = Provider<JourneyMetric<double>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .batteryEstimatePercent;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.batteryEstimatePercent,
+    ),
+  );
 });
 
 final liveCurrentRoadNameProvider = Provider<JourneyMetric<String>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .currentRoadName;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.currentRoadName,
+    ),
+  );
 });
 
 final liveNextManeuverProvider = Provider<JourneyMetric<String>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .nextManeuver;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.nextManeuver,
+    ),
+  );
 });
 
 final liveArrivalTimeProvider = Provider<JourneyMetric<DateTime>?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.metrics
-      .arrivalTime;
+  return ref.watch(
+    liveJourneyControllerProvider.select(
+      (s) => _activeState(s)?.metrics.arrivalTime,
+    ),
+  );
 });
 
 final liveJourneyProgressProvider = Provider<double?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))
-      ?.progressPercent;
+  return ref.watch(
+    liveJourneyControllerProvider.select((s) => _activeState(s)?.progressPercent),
+  );
 });
 
 final liveDashboardDisplayModeProvider = Provider<DashboardDisplayMode?>((ref) {
-  return _activeState(ref.watch(liveJourneyControllerProvider))?.displayMode;
+  return ref.watch(
+    liveJourneyControllerProvider.select((s) => _activeState(s)?.displayMode),
+  );
 });

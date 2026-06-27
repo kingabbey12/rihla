@@ -17,7 +17,9 @@ import 'package:rihla/features/ai_copilot/domain/services/ai_context_builder.dar
 import 'package:rihla/features/ai_copilot/domain/services/ai_service.dart';
 import 'package:rihla/features/ai_copilot/domain/services/llm_provider.dart';
 import 'package:rihla/features/ai_copilot/domain/services/prompt_builder.dart';
+import 'package:rihla/features/journey/domain/models/journey_state.dart';
 import 'package:rihla/features/journey/domain/models/journey_summary.dart';
+import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
 import 'package:rihla/features/live_journey/domain/models/live_journey_state.dart';
 import 'package:rihla/features/live_journey/presentation/providers/live_journey_providers.dart';
 import 'package:rihla/features/location/domain/entities/location_position.dart';
@@ -65,14 +67,48 @@ final aiControllerProvider =
 class AiController extends Notifier<AiCopilotState> {
   DateTime? _lastCopilotRefresh;
   String? _lastReviewSessionId;
+  String? _lastAdvisorKey;
+  DateTime? _lastSessionTick;
 
   @override
   AiCopilotState build() {
     ref.listen(navigationSessionControllerProvider, (previous, next) {
       if (next is NavigationSessionInactive) {
         ref.read(aiRepositoryProvider).clear();
+        _lastSessionTick = null;
+        _lastReviewSessionId = null;
+        return;
       }
+      if (next is! NavigationSessionActive) return;
+      final session = next.session;
+      if (session.hasArrived) {
+        loadJourneyReview(session);
+        return;
+      }
+      final tick = session.lastUpdatedAt;
+      if (_lastSessionTick == tick) return;
+      _lastSessionTick = tick;
+      refreshDrivingCopilot(session);
     });
+
+    ref.listen(journeyControllerProvider, (previous, next) {
+      final summary = switch (next) {
+        JourneyPreview(:final summary) => summary,
+        _ => null,
+      };
+      if (summary == null) return;
+      final routeState = ref.read(routeControllerProvider);
+      final routeId = switch (routeState) {
+        RouteSelected(:final selected) => selected.id,
+        RouteReady(:final result) => result.primary?.id ?? 'preview',
+        _ => 'preview',
+      };
+      final key = '${summary.destination.id}_$routeId';
+      if (_lastAdvisorKey == key) return;
+      _lastAdvisorKey = key;
+      loadJourneyAdvisor(summary);
+    });
+
     return const AiCopilotInactive();
   }
 
@@ -214,6 +250,8 @@ class AiController extends Notifier<AiCopilotState> {
   void reset() {
     _lastCopilotRefresh = null;
     _lastReviewSessionId = null;
+    _lastAdvisorKey = null;
+    _lastSessionTick = null;
     ref.read(aiRepositoryProvider).clear();
     state = const AiCopilotInactive();
   }
