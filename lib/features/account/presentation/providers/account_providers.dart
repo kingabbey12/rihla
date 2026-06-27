@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/config/api_config.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/features/beta_feedback/presentation/providers/beta_feedback_providers.dart';
 import 'package:rihla/features/account/data/datasources/account_local_datasource.dart';
 import 'package:rihla/features/account/data/datasources/account_remote_datasource.dart';
 import 'package:rihla/features/account/data/datasources/account_secure_storage.dart';
@@ -251,6 +252,11 @@ class AccountController extends Notifier<AccountState> {
       ),
       conflicts: conflicts,
     );
+    if (result.conflicts.isEmpty) {
+      await ref.read(betaMetricsServiceProvider).recordCloudSyncSuccess();
+    } else {
+      await ref.read(betaMetricsServiceProvider).recordCloudSyncFailure();
+    }
   }
 
   Future<void> resolveConflict(

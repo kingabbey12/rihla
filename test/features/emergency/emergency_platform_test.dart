@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/features/emergency/data/datasources/emergency_secure_storage.dart';
 import 'package:rihla/features/emergency/data/datasources/emergency_local_datasource.dart';
 import 'package:rihla/features/emergency/data/datasources/emergency_queue_local_datasource.dart';
 import 'package:rihla/features/emergency/data/repositories/emergency_repository_impl.dart';
@@ -44,7 +45,10 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     repository = EmergencyRepositoryImpl(
-      EmergencyLocalDatasource(prefs),
+      EmergencyLocalDatasource(
+        prefs,
+        secure: EmergencySecureStorage(memoryStore: {}),
+      ),
       EmergencyQueueLocalDatasource(prefs),
       StubRoadsideProvider(),
     );

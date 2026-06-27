@@ -226,4 +226,12 @@ abstract final class ApiConfig {
   }
 
   static bool get certificatePinningEnabled => certificateSpkiPins.isNotEmpty;
+
+  // —— Remote configuration ———————————————————————————————————————————————
+
+  /// Hosted JSON endpoint for runtime feature flags (`--dart-define=REMOTE_CONFIG_URL=`).
+  static String? get remoteConfigUrl {
+    const url = String.fromEnvironment('REMOTE_CONFIG_URL');
+    return url.isEmpty ? null : url;
+  }
 }

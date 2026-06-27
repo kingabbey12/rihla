@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/features/emergency/data/datasources/emergency_secure_storage.dart';
+import 'package:rihla/features/emergency/data/datasources/emergency_local_datasource.dart';
 import 'package:rihla/features/account/data/datasources/account_local_datasource.dart';
 import 'package:rihla/features/account/data/datasources/account_remote_datasource.dart';
 import 'package:rihla/features/account/data/datasources/account_secure_storage.dart';
@@ -32,14 +34,26 @@ void main() {
     prefs = await SharedPreferences.getInstance();
     secureMemory = {};
     final local = AccountLocalDatasource(prefs);
+    final emergencyLocal = EmergencyLocalDatasource(
+      prefs,
+      secure: EmergencySecureStorage(memoryStore: {}),
+    );
     remote = StubAccountRemoteDatasource(prefs);
     repository = AccountRepositoryImpl(
       local: local,
       remote: remote,
       queue: AccountSyncQueueDatasource(prefs),
       secureStorage: AccountSecureStorage(memoryStore: secureMemory),
-      collector: CloudDataCollector(prefs: prefs, accountLocal: local),
-      applier: CloudDataApplier(prefs: prefs, accountLocal: local),
+      collector: CloudDataCollector(
+        prefs: prefs,
+        accountLocal: local,
+        emergency: emergencyLocal,
+      ),
+      applier: CloudDataApplier(
+        prefs: prefs,
+        accountLocal: local,
+        emergency: emergencyLocal,
+      ),
       isConnected: () => true,
     );
   });
@@ -192,18 +206,25 @@ void main() {
 
   group('Offline queue', () {
     test('enqueueWrite queues when offline', () async {
+      final local = AccountLocalDatasource(prefs);
+      final emergencyLocal = EmergencyLocalDatasource(
+        prefs,
+        secure: EmergencySecureStorage(memoryStore: {}),
+      );
       final offlineRepo = AccountRepositoryImpl(
-        local: AccountLocalDatasource(prefs),
+        local: local,
         remote: remote,
         queue: AccountSyncQueueDatasource(prefs),
         secureStorage: AccountSecureStorage(memoryStore: {}),
         collector: CloudDataCollector(
           prefs: prefs,
-          accountLocal: AccountLocalDatasource(prefs),
+          accountLocal: local,
+          emergency: emergencyLocal,
         ),
         applier: CloudDataApplier(
           prefs: prefs,
-          accountLocal: AccountLocalDatasource(prefs),
+          accountLocal: local,
+          emergency: emergencyLocal,
         ),
         isConnected: () => false,
       );

@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/observability/analytics_event.dart';
+import 'package:rihla/core/observability/product_analytics.dart';
 import 'package:rihla/core/providers/app_providers.dart';
 import 'package:rihla/features/ev_charging/presentation/providers/ev_charging_providers.dart';
 import 'package:rihla/features/explore/data/datasources/explore_favorites_local_datasource.dart';
@@ -99,6 +101,9 @@ class ExploreController extends Notifier<ExploreState> {
   }
 
   Future<void> selectCategory(ExploreCategory category) async {
+    trackProductEvent(ref, AnalyticsEvent.exploreUsed, properties: {
+      'category': category.name,
+    });
     _category = category;
     _page = 0;
     _filter = _filter.copyWith(category: category);

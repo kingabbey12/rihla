@@ -77,10 +77,10 @@ class CloudSyncEngine {
     final queueResult = await flushQueue(userId: userId, privacy: privacy);
     final allConflicts = [...conflicts, ...queueResult.conflicts];
 
-    final storageBytes = synced.fold<int>(
-      0,
-      (sum, c) => sum + _collector.estimatePayloadBytes(c),
-    );
+    var storageBytes = 0;
+    for (final c in synced) {
+      storageBytes += await _collector.estimatePayloadBytes(c);
+    }
 
     await _local.saveSyncState(
       CloudSyncState(
@@ -187,7 +187,7 @@ class CloudSyncEngine {
     required SyncCategory category,
     required ConflictResolutionStrategy strategy,
   }) async {
-    final localData = _collector.collect(category);
+    final localData = await _collector.collect(category);
     final localUpdated = _collector.localUpdatedAt(category);
     final remote = await _remote.fetchCategory(userId, category);
 

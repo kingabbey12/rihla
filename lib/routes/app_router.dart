@@ -18,6 +18,8 @@ import 'package:rihla/features/routing/presentation/pages/route_debug_page.dart'
 import 'package:rihla/features/offline/presentation/pages/offline_center_page.dart';
 import 'package:rihla/features/search/presentation/pages/search_page.dart';
 import 'package:rihla/features/uae/presentation/pages/uae_settings_page.dart';
+import 'package:rihla/features/beta_feedback/domain/entities/beta_feedback_type.dart';
+import 'package:rihla/features/beta_feedback/presentation/pages/beta_feedback_page.dart';
 import 'package:rihla/features/account/presentation/pages/cloud_settings_page.dart';
 import 'package:rihla/routes/feature_route.dart';
 import 'package:rihla/routes/pages/feature_placeholder_page.dart';
@@ -172,6 +174,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.uaeSettings,
         name: RoutePaths.uaeSettings,
         builder: (context, state) => const UaeSettingsPage(),
+      ),
+      GoRoute(
+        path: RoutePaths.betaFeedback,
+        name: RoutePaths.betaFeedback,
+        builder: (context, state) {
+          final typeName = state.uri.queryParameters['type'];
+          BetaFeedbackType? initialType;
+          if (typeName != null) {
+            for (final t in BetaFeedbackType.values) {
+              if (t.wireName == typeName) {
+                initialType = t;
+                break;
+              }
+            }
+          }
+          return BetaFeedbackPage(initialType: initialType);
+        },
       ),
       GoRoute(
         path: RoutePaths.offlineCenter,

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:rihla/features/emergency/data/datasources/emergency_profile_migration.dart';
+import 'package:rihla/features/emergency/data/datasources/emergency_secure_storage.dart';
 import 'package:rihla/features/emergency/domain/entities/emergency_contact.dart';
 import 'package:rihla/features/emergency/domain/entities/emergency_incident.dart';
 import 'package:rihla/features/emergency/domain/entities/emergency_timeline.dart';
@@ -8,56 +10,80 @@ import 'package:rihla/features/emergency/domain/entities/medical_profile.dart';
 import 'package:rihla/features/emergency/domain/entities/roadside_request.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// On-device persistence for emergency profiles, contacts, and incidents.
+/// On-device persistence for emergency data.
+///
+/// Medical, vehicle, and contact profiles are stored encrypted via
+/// [EmergencySecureStorage]. Incidents, timelines, and queues remain in
+/// [SharedPreferences] (non-sensitive operational data).
 class EmergencyLocalDatasource {
-  EmergencyLocalDatasource(this._prefs);
+  EmergencyLocalDatasource(
+    this._prefs, {
+    EmergencySecureStorage? secure,
+  }) : _secure = secure ?? EmergencySecureStorage();
 
   final SharedPreferences _prefs;
+  final EmergencySecureStorage _secure;
 
-  static const _medicalKey = 'emergency_medical_profile';
-  static const _vehicleKey = 'emergency_vehicle_profile';
-  static const _contactsKey = 'emergency_contacts';
+  Future<void>? _ready;
+
+  Future<void> _ensureReady() {
+    _ready ??= EmergencyProfileMigration.migrateIfNeeded(
+      prefs: _prefs,
+      secure: _secure,
+    );
+    return _ready!;
+  }
+
   static const _incidentsKey = 'emergency_incidents';
   static const _timelineKey = 'emergency_active_timeline';
   static const _roadsideKey = 'emergency_roadside_requests';
   static const _mediaQueueKey = 'emergency_media_queue';
 
-  MedicalProfile getMedicalProfile() {
-    final raw = _prefs.getString(_medicalKey);
-    if (raw == null) return MedicalProfile.empty;
-    return MedicalProfile.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+  Future<MedicalProfile> getMedicalProfile() async {
+    await _ensureReady();
+    final json = await _secure.readJson(EmergencySecureStorage.medicalKey);
+    if (json == null) return MedicalProfile.empty;
+    return MedicalProfile.fromJson(json);
   }
 
   Future<void> saveMedicalProfile(MedicalProfile profile) async {
-    await _prefs.setString(_medicalKey, jsonEncode(profile.toJson()));
-  }
-
-  EmergencyVehicleProfile getVehicleProfile() {
-    final raw = _prefs.getString(_vehicleKey);
-    if (raw == null) return EmergencyVehicleProfile.empty;
-    return EmergencyVehicleProfile.fromJson(
-      jsonDecode(raw) as Map<String, dynamic>,
+    await _ensureReady();
+    await _secure.writeJson(
+      EmergencySecureStorage.medicalKey,
+      profile.toJson(),
     );
   }
 
-  Future<void> saveVehicleProfile(EmergencyVehicleProfile profile) async {
-    await _prefs.setString(_vehicleKey, jsonEncode(profile.toJson()));
+  Future<EmergencyVehicleProfile> getVehicleProfile() async {
+    await _ensureReady();
+    final json = await _secure.readJson(EmergencySecureStorage.vehicleKey);
+    if (json == null) return EmergencyVehicleProfile.empty;
+    return EmergencyVehicleProfile.fromJson(json);
   }
 
-  List<EmergencyContact> getContacts() {
-    final raw = _prefs.getString(_contactsKey);
-    if (raw == null) return [];
-    final list = jsonDecode(raw) as List<dynamic>;
+  Future<void> saveVehicleProfile(EmergencyVehicleProfile profile) async {
+    await _ensureReady();
+    await _secure.writeJson(
+      EmergencySecureStorage.vehicleKey,
+      profile.toJson(),
+    );
+  }
+
+  Future<List<EmergencyContact>> getContacts() async {
+    await _ensureReady();
+    final list = await _secure.readJsonList(EmergencySecureStorage.contactsKey);
+    if (list == null) return [];
     return list
-        .map((e) => EmergencyContact.fromJson(e as Map<String, dynamic>))
+        .map((e) => EmergencyContact.fromJson(e))
         .toList()
       ..sort((a, b) => a.priority.compareTo(b.priority));
   }
 
   Future<void> saveContacts(List<EmergencyContact> contacts) async {
-    await _prefs.setString(
-      _contactsKey,
-      jsonEncode(contacts.map((c) => c.toJson()).toList()),
+    await _ensureReady();
+    await _secure.writeJsonList(
+      EmergencySecureStorage.contactsKey,
+      contacts.map((c) => c.toJson()).toList(),
     );
   }
 

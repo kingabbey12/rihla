@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/config/api_config.dart';
+import 'package:rihla/core/remote_config/presentation/providers/remote_config_providers.dart';
+import 'package:rihla/core/observability/analytics_event.dart';
+import 'package:rihla/core/observability/product_analytics.dart';
 import 'package:rihla/features/ai_copilot/data/repositories/ai_repository_impl.dart';
 import 'package:rihla/features/ai_copilot/data/services/ai_context_builder_impl.dart';
 import 'package:rihla/features/ai_copilot/data/services/ai_context_enricher.dart';
@@ -56,7 +59,7 @@ final openAiLlmProvider = Provider<OpenAiLlmProvider>(
 /// Production LLM when enabled and configured; mock fallback for dev/tests.
 final llmProviderProvider = Provider<LLMProvider>((ref) {
   final openAi = ref.watch(openAiLlmProvider);
-  if (ApiConfig.aiEnabled && openAi.isEnabled) {
+  if (ref.watch(aiFeatureEnabledProvider) && openAi.isEnabled) {
     return openAi;
   }
   return MockLlmProvider();
@@ -99,7 +102,9 @@ final aiRepositoryProvider = Provider<AiRepository>(
 
 final aiIsLiveProvider = Provider<bool>((ref) {
   final llm = ref.watch(llmProviderProvider);
-  return ApiConfig.aiEnabled && llm is OpenAiLlmProvider && llm.isEnabled;
+  return ref.watch(aiFeatureEnabledProvider) &&
+      llm is OpenAiLlmProvider &&
+      llm.isEnabled;
 });
 
 final aiLastTokenUsageProvider = Provider<LlmTokenUsage?>((ref) {
@@ -285,6 +290,9 @@ class AiController extends Notifier<AiCopilotState> {
         response: response,
         conversation: conversation,
       );
+      trackProductEvent(ref, AnalyticsEvent.aiUsed, properties: {
+        'mode': 'driving_copilot',
+      });
     } catch (e) {
       state = e is AiOfflineFailure
           ? const AiCopilotOffline()

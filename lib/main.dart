@@ -10,6 +10,12 @@ import 'package:rihla/core/observability/crash_reporter.dart';
 import 'package:rihla/core/observability/observability_providers.dart';
 import 'package:rihla/core/performance/performance_config.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/core/observability/product_analytics.dart';
+import 'package:rihla/core/observability/product_metrics_recorder.dart';
+import 'package:rihla/features/beta_feedback/data/services/beta_metrics_service_recorder.dart';
+import 'package:rihla/features/beta_feedback/presentation/providers/beta_feedback_providers.dart';
+import 'package:rihla/features/beta_feedback/presentation/coordinators/beta_feedback_coordinator.dart';
+import 'package:rihla/core/remote_config/presentation/providers/remote_config_providers.dart';
 import 'package:rihla/features/account/presentation/providers/account_providers.dart';
 import 'package:rihla/features/offline/presentation/widgets/offline_bootstrap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -59,8 +65,17 @@ Future<void> main() async {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           crashReporterProvider.overrideWithValue(crashReporter),
+          productMetricsRecorderProvider.overrideWith(
+            (ref) => BetaMetricsServiceRecorder(
+              ref.watch(betaMetricsServiceProvider),
+            ),
+          ),
         ],
-        child: const _AccountBootstrap(child: OfflineBootstrap(child: App())),
+        child: const _AccountBootstrap(
+          child: BetaFeedbackBootstrap(
+            child: OfflineBootstrap(child: App()),
+          ),
+        ),
       ),
     );
   }, (error, stack) {
@@ -83,6 +98,7 @@ class _AccountBootstrapState extends ConsumerState<_AccountBootstrap> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(accountControllerProvider.notifier).initialize();
+      ref.read(remoteConfigControllerProvider.notifier).refresh();
     });
   }
 

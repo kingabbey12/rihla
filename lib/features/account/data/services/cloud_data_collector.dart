@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:rihla/features/emergency/data/datasources/emergency_local_datasource.dart';
 import 'package:rihla/features/account/data/datasources/account_local_datasource.dart';
 import 'package:rihla/features/account/domain/entities/sync_category.dart';
 import 'package:rihla/features/emergency/data/datasources/emergency_local_datasource.dart';
@@ -20,11 +21,12 @@ class CloudDataCollector {
   CloudDataCollector({
     required SharedPreferences prefs,
     required AccountLocalDatasource accountLocal,
+    EmergencyLocalDatasource? emergency,
   })  : _prefs = prefs,
         _accountLocal = accountLocal,
         _search = SearchLocalDataSource(prefs),
         _explore = ExploreFavoritesLocalDatasource(prefs),
-        _emergency = EmergencyLocalDatasource(prefs),
+        _emergency = emergency ?? EmergencyLocalDatasource(prefs),
         _offline = OfflineDownloadLocalDatasource(prefs);
 
   final SharedPreferences _prefs;
@@ -34,7 +36,7 @@ class CloudDataCollector {
   final EmergencyLocalDatasource _emergency;
   final OfflineDownloadLocalDatasource _offline;
 
-  Map<String, dynamic> collect(SyncCategory category) {
+  Future<Map<String, dynamic>> collect(SyncCategory category) async {
     return switch (category) {
       SyncCategory.favorites => {
           'items': _search.getFavorites().map((p) => p.toJson()).toList(),
@@ -54,11 +56,14 @@ class CloudDataCollector {
       SyncCategory.journeyHistory =>
         _accountLocal.getCategoryData(_accountLocal.journeyHistoryKey),
       SyncCategory.emergencyContacts => {
-          'contacts':
-              _emergency.getContacts().map((c) => c.toJson()).toList(),
+          'contacts': (await _emergency.getContacts())
+              .map((c) => c.toJson())
+              .toList(),
         },
-      SyncCategory.vehicleProfile => _emergency.getVehicleProfile().toJson(),
-      SyncCategory.medicalProfile => _emergency.getMedicalProfile().toJson(),
+      SyncCategory.vehicleProfile =>
+        (await _emergency.getVehicleProfile()).toJson(),
+      SyncCategory.medicalProfile =>
+        (await _emergency.getMedicalProfile()).toJson(),
       SyncCategory.drivingStatistics =>
         _accountLocal.getCategoryData(_accountLocal.drivingStatsKey),
       SyncCategory.downloadedPreferences => {
@@ -87,8 +92,8 @@ class CloudDataCollector {
         DateTime.fromMillisecondsSinceEpoch(0);
   }
 
-  int estimatePayloadBytes(SyncCategory category) {
-    return utf8.encode(jsonEncode(collect(category))).length;
+  Future<int> estimatePayloadBytes(SyncCategory category) async {
+    return utf8.encode(jsonEncode(await collect(category))).length;
   }
 }
 
@@ -97,11 +102,12 @@ class CloudDataApplier {
   CloudDataApplier({
     required SharedPreferences prefs,
     required AccountLocalDatasource accountLocal,
+    EmergencyLocalDatasource? emergency,
   })  : _prefs = prefs,
         _accountLocal = accountLocal,
         _search = SearchLocalDataSource(prefs),
         _explore = ExploreFavoritesLocalDatasource(prefs),
-        _emergency = EmergencyLocalDatasource(prefs),
+        _emergency = emergency ?? EmergencyLocalDatasource(prefs),
         _offline = OfflineDownloadLocalDatasource(prefs);
 
   final SharedPreferences _prefs;

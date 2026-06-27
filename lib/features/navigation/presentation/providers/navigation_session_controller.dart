@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/observability/analytics_event.dart';
 import 'package:rihla/core/observability/breadcrumb.dart';
 import 'package:rihla/core/observability/observability_providers.dart';
+import 'package:rihla/core/observability/product_analytics.dart';
 import 'package:rihla/features/journey/domain/models/journey_summary.dart';
 import 'package:rihla/features/navigation/domain/entities/navigation_simulation.dart';
 import 'package:rihla/features/navigation/domain/entities/navigation_session.dart';
@@ -100,7 +101,7 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     _polyline.setRoute(route);
     _startTicking(session);
     await _voice.announceIfNeeded(session);
-    ref.read(analyticsServiceProvider).logEvent(AnalyticsEvent.journeyStarted);
+    trackProductEvent(ref, AnalyticsEvent.journeyStarted);
     ref.read(appLoggerProvider).log(
       'journey_started',
       category: ObservabilityCategory.navigation,
@@ -140,9 +141,7 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
 
     if (updated.hasArrived) {
       _stopTicking();
-      ref.read(analyticsServiceProvider).logEvent(
-        AnalyticsEvent.journeyCompleted,
-      );
+      trackProductEvent(ref, AnalyticsEvent.journeyCompleted);
       ref.read(appLoggerProvider).log(
         'journey_completed',
         category: ObservabilityCategory.navigation,
@@ -232,9 +231,7 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     if (!ref.mounted) return;
     state = const NavigationSessionInactive();
     if (wasNavigating) {
-      ref.read(analyticsServiceProvider).logEvent(
-        AnalyticsEvent.navigationCancelled,
-      );
+      trackProductEvent(ref, AnalyticsEvent.navigationCancelled);
       ref.read(appLoggerProvider).log(
         'navigation_cancelled',
         category: ObservabilityCategory.navigation,

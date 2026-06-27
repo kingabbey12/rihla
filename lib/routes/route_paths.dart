@@ -23,6 +23,7 @@ abstract final class RoutePaths {
   static const String navigationSessionDebug = '/debug/navigation';
   static const String offlineCenter = '/offline';
   static const String uaeSettings = '/uae';
+  static const String betaFeedback = '/beta/feedback';
 
   static const launchPaths = [
     splash,

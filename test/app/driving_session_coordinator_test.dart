@@ -1,3 +1,5 @@
+import 'package:rihla/core/remote_config/domain/entities/remote_config.dart';
+import 'package:rihla/core/remote_config/presentation/providers/remote_config_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rihla/app/coordinators/driving_session_coordinator.dart';
@@ -26,6 +28,7 @@ void main() {
         safetyServiceProvider.overrideWith(
           (ref) => MockSafetyService(),
         ),
+        remoteConfigProvider.overrideWithValue(const RemoteConfig()),
       ],
     );
     addTearDown(container.dispose);
@@ -56,6 +59,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         safetyServiceProvider.overrideWith((ref) => MockSafetyService()),
+        remoteConfigProvider.overrideWithValue(const RemoteConfig()),
       ],
     );
     addTearDown(container.dispose);

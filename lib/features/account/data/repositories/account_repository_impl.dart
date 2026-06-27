@@ -346,7 +346,7 @@ class AccountRepositoryImpl implements AccountRepository {
     buffer.write(',"preferences":${jsonEncode((await getPreferences()).toJson())}');
     buffer.write(',"privacy":${jsonEncode(_local.getPrivacySettings().toJson())}');
     for (final category in SyncCategory.values) {
-      final data = _collector.collect(category);
+      final data = await _collector.collect(category);
       buffer.write(',"${category.name}":${jsonEncode(data)}');
     }
     if (_session != null && !_session!.isGuest) {

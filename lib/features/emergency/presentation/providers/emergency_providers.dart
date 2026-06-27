@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/observability/analytics_event.dart';
+import 'package:rihla/core/observability/product_analytics.dart';
 import 'package:rihla/core/observability/breadcrumb.dart';
 import 'package:rihla/core/observability/observability_providers.dart';
 import 'package:rihla/core/providers/app_providers.dart';
@@ -38,6 +39,11 @@ import 'package:rihla/features/safety/presentation/providers/safety_providers.da
 
 final emergencyLocalDatasourceProvider = Provider<EmergencyLocalDatasource>(
   (ref) => EmergencyLocalDatasource(ref.watch(sharedPreferencesProvider)),
+);
+
+/// Emergency contacts loaded from encrypted storage.
+final emergencyContactsProvider = FutureProvider<List<EmergencyContact>>(
+  (ref) => ref.watch(emergencyRepositoryProvider).getContacts(),
 );
 
 final emergencyQueueLocalDatasourceProvider =
@@ -210,7 +216,8 @@ class EmergencyController extends Notifier<EmergencyState> {
         incidentId: incident.id,
         queued: !isOnline,
       );
-      ref.read(analyticsServiceProvider).logEvent(
+      trackProductEvent(
+        ref,
         AnalyticsEvent.emergencyActivated,
         properties: {'queued': '${!isOnline}'},
       );
@@ -312,7 +319,7 @@ class EmergencyController extends Notifier<EmergencyState> {
   Future<void> saveVehicleProfile(EmergencyVehicleProfile profile) =>
       ref.read(emergencyRepositoryProvider).saveVehicleProfile(profile);
 
-  List<EmergencyContact> getContacts() =>
+  Future<List<EmergencyContact>> getContacts() =>
       ref.read(emergencyRepositoryProvider).getContacts();
 
   Future<void> saveContact(EmergencyContact contact) =>

@@ -39,7 +39,7 @@ abstract class EmergencyRepository {
   Future<void> saveVehicleProfile(EmergencyVehicleProfile profile);
 
   // Contacts
-  List<EmergencyContact> getContacts();
+  Future<List<EmergencyContact>> getContacts();
   Future<void> saveContact(EmergencyContact contact);
   Future<void> removeContact(String contactId);
 

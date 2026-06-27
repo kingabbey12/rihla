@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rihla/routes/route_paths.dart';
 import 'package:rihla/features/account/domain/entities/cloud_sync_state.dart';
 import 'package:rihla/features/account/domain/entities/conflict_resolution_strategy.dart';
 import 'package:rihla/features/account/domain/entities/sync_category.dart';
@@ -100,6 +102,12 @@ class CloudSettingsPage extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: 24),
+          ListTile(
+            leading: const Icon(Icons.feedback_outlined),
+            title: const Text('Send beta feedback'),
+            subtitle: const Text('Report bugs, routing issues, or journey feedback'),
+            onTap: () => context.push(RoutePaths.betaFeedback),
+          ),
           ListTile(
             leading: const Icon(Icons.download),
             title: const Text('Export data'),

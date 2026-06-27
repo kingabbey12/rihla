@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/observability/analytics_event.dart';
+import 'package:rihla/core/observability/product_analytics.dart';
 import 'package:rihla/core/providers/app_providers.dart';
 import 'package:rihla/features/offline/data/datasources/offline_download_local_datasource.dart';
 import 'package:rihla/features/offline/data/datasources/offline_storage_datasource.dart';
@@ -111,6 +113,11 @@ class OfflineController extends Notifier<OfflineState> {
     final regions = await ref.read(offlineRepositoryProvider).getAvailableRegions();
     final region = regions.firstWhere((r) => r.id == regionId);
     await ref.read(offlineRepositoryProvider).enqueueDownload(region);
+    trackProductEvent(
+      ref,
+      AnalyticsEvent.offlineDownload,
+      properties: {'region': regionId},
+    );
     await refresh();
   }
 

@@ -39,11 +39,11 @@ class EmergencyRepositoryImpl implements EmergencyRepository {
       _local.saveVehicleProfile(profile);
 
   @override
-  List<EmergencyContact> getContacts() => _local.getContacts();
+  Future<List<EmergencyContact>> getContacts() => _local.getContacts();
 
   @override
   Future<void> saveContact(EmergencyContact contact) async {
-    final contacts = _local.getContacts();
+    final contacts = await _local.getContacts();
     final index = contacts.indexWhere((c) => c.id == contact.id);
     if (index >= 0) {
       contacts[index] = contact;
@@ -55,7 +55,8 @@ class EmergencyRepositoryImpl implements EmergencyRepository {
 
   @override
   Future<void> removeContact(String contactId) async {
-    final contacts = _local.getContacts()..removeWhere((c) => c.id == contactId);
+    final contacts = await _local.getContacts()
+      ..removeWhere((c) => c.id == contactId);
     await _local.saveContacts(contacts);
   }
 

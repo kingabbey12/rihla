@@ -255,7 +255,7 @@ class EmergencyContactsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final contacts = ref.watch(emergencyControllerProvider.notifier).getContacts();
+    final contactsAsync = ref.watch(emergencyContactsProvider);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       child: Column(
@@ -264,25 +264,36 @@ class EmergencyContactsSheet extends ConsumerWidget {
         children: [
           Text('Emergency Contacts', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
-          if (contacts.isEmpty)
-            const Text('No contacts saved yet.')
-          else
-            ...contacts.map(
-              (c) => ListTile(
-                leading: Icon(
-                  c.isFavorite ? Icons.star : Icons.person,
-                  color: c.isFavorite ? Colors.amber : null,
-                ),
-                title: Text(c.name),
-                subtitle: Text('${c.category.displayName} · ${c.phone}'),
-                trailing: const Icon(Icons.phone),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Dial ${c.phone}')),
-                  );
-                },
-              ),
-            ),
+          contactsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, _) => const Text('Could not load contacts.'),
+            data: (contacts) {
+              if (contacts.isEmpty) {
+                return const Text('No contacts saved yet.');
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: contacts
+                    .map(
+                      (c) => ListTile(
+                        leading: Icon(
+                          c.isFavorite ? Icons.star : Icons.person,
+                          color: c.isFavorite ? Colors.amber : null,
+                        ),
+                        title: Text(c.name),
+                        subtitle: Text('${c.category.displayName} · ${c.phone}'),
+                        trailing: const Icon(Icons.phone),
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Dial ${c.phone}')),
+                          );
+                        },
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
         ],
       ),
     );
