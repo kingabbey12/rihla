@@ -10,6 +10,7 @@ import 'package:rihla/features/launch/presentation/pages/permission_flow_page.da
 import 'package:rihla/features/launch/presentation/pages/welcome_page.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
 import 'package:rihla/features/location/presentation/pages/location_debug_page.dart';
+import 'package:rihla/features/emergency/presentation/pages/emergency_launcher_page.dart';
 import 'package:rihla/features/explore/presentation/pages/explore_launcher_page.dart';
 import 'package:rihla/features/map/presentation/pages/map_page.dart';
 import 'package:rihla/features/navigation/presentation/pages/navigation_session_debug_page.dart';
@@ -123,9 +124,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RoutePaths.emergency,
         name: RoutePaths.emergency,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.emergency,
-        ),
+        builder: (context, state) => const EmergencyLauncherPage(),
       ),
       GoRoute(
         path: RoutePaths.ai,
