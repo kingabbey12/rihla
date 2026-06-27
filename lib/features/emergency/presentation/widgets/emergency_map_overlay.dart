@@ -14,26 +14,30 @@ class EmergencyMapOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(emergencyControllerProvider);
+    final active = ref.watch(emergencyActiveProvider);
     final bottom = 100 + MediaQuery.paddingOf(context).bottom;
 
     return Stack(
       children: [
-        Positioned(
-          left: 12,
-          bottom: bottom,
-          child: _EmergencyActionBar(
-            onSos: () => ref
-                .read(emergencyControllerProvider.notifier)
-                .startSosCountdown(),
-            onRoadside: () => _showRoadsideSheet(context, ref),
-            onHospital: () => ref
-                .read(emergencyControllerProvider.notifier)
-                .openNearestHospital(),
-            onPolice: () => ref
-                .read(emergencyControllerProvider.notifier)
-                .openNearestPolice(),
+        // Action bar only appears in emergency mode (Emergency tab / launcher),
+        // keeping the idle Home Dashboard clean.
+        if (active)
+          Positioned(
+            left: 12,
+            bottom: bottom,
+            child: _EmergencyActionBar(
+              onSos: () => ref
+                  .read(emergencyControllerProvider.notifier)
+                  .startSosCountdown(),
+              onRoadside: () => _showRoadsideSheet(context, ref),
+              onHospital: () => ref
+                  .read(emergencyControllerProvider.notifier)
+                  .openNearestHospital(),
+              onPolice: () => ref
+                  .read(emergencyControllerProvider.notifier)
+                  .openNearestPolice(),
+            ),
           ),
-        ),
         if (state is EmergencySosCountdown)
           EmergencySosCountdownSheet(
             secondsRemaining: state.secondsRemaining,

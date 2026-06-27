@@ -16,19 +16,25 @@ class MapSessionHost extends ConsumerStatefulWidget {
 }
 
 class _MapSessionHostState extends ConsumerState<MapSessionHost> {
+  // Cached so dispose() doesn't touch `ref`, which is unsafe once the widget
+  // is being unmounted (Riverpod 3).
+  MapSessionActiveNotifier? _sessionNotifier;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        ref.read(mapSessionActiveProvider.notifier).setActive(true);
+        final notifier = ref.read(mapSessionActiveProvider.notifier);
+        _sessionNotifier = notifier;
+        notifier.setActive(true);
       }
     });
   }
 
   @override
   void dispose() {
-    ref.read(mapSessionActiveProvider.notifier).setActive(false);
+    _sessionNotifier?.setActive(false);
     super.dispose();
   }
 

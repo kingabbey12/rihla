@@ -9,21 +9,15 @@ import 'package:rihla/features/launch/presentation/pages/onboarding_page.dart';
 import 'package:rihla/features/launch/presentation/pages/permission_flow_page.dart';
 import 'package:rihla/features/launch/presentation/pages/welcome_page.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
-import 'package:rihla/features/location/presentation/pages/location_debug_page.dart';
 import 'package:rihla/features/emergency/presentation/pages/emergency_launcher_page.dart';
 import 'package:rihla/features/explore/presentation/pages/explore_launcher_page.dart';
 import 'package:rihla/features/map/presentation/pages/map_page.dart';
-import 'package:rihla/features/navigation/presentation/pages/navigation_session_debug_page.dart';
-import 'package:rihla/features/routing/presentation/pages/route_debug_page.dart';
 import 'package:rihla/features/offline/presentation/pages/offline_center_page.dart';
 import 'package:rihla/features/search/presentation/pages/search_page.dart';
 import 'package:rihla/features/uae/presentation/pages/uae_settings_page.dart';
 import 'package:rihla/features/beta_feedback/domain/entities/beta_feedback_type.dart';
 import 'package:rihla/features/beta_feedback/presentation/pages/beta_feedback_page.dart';
 import 'package:rihla/features/account/presentation/pages/cloud_settings_page.dart';
-import 'package:rihla/routes/feature_route.dart';
-import 'package:rihla/routes/pages/feature_placeholder_page.dart';
-import 'package:rihla/routes/pages/home_page.dart';
 import 'package:rihla/routes/route_paths.dart';
 
 /// Provides the application [GoRouter] instance.
@@ -36,7 +30,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ref.read(appPreferencesRepositoryProvider).launchFlowCompleted;
       if (launchComplete &&
           RoutePaths.launchPaths.contains(state.matchedLocation)) {
-        return RoutePaths.home;
+        // Returning users skip the launch flow and enter the production
+        // map experience (AI Home Dashboard + Maps) directly.
+        return RoutePaths.maps;
       }
       return null;
     },
@@ -90,14 +86,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: RoutePaths.home,
-        name: RoutePaths.home,
-        pageBuilder: (context, state) => fadeSlidePage(
-          key: state.pageKey,
-          child: const HomePage(),
-        ),
-      ),
-      GoRoute(
         path: RoutePaths.maps,
         name: RoutePaths.maps,
         pageBuilder: (context, state) => fadeSlidePage(
@@ -114,13 +102,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: RoutePaths.navigation,
-        name: RoutePaths.navigation,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.navigation,
-        ),
-      ),
-      GoRoute(
         path: RoutePaths.explore,
         name: RoutePaths.explore,
         builder: (context, state) => const ExploreLauncherPage(),
@@ -131,44 +112,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const EmergencyLauncherPage(),
       ),
       GoRoute(
-        path: RoutePaths.ai,
-        name: RoutePaths.ai,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.ai,
-        ),
-      ),
-      GoRoute(
-        path: RoutePaths.profile,
-        name: RoutePaths.profile,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.profile,
-        ),
-      ),
-      GoRoute(
-        path: RoutePaths.vehicles,
-        name: RoutePaths.vehicles,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.vehicles,
-        ),
-      ),
-      GoRoute(
-        path: RoutePaths.family,
-        name: RoutePaths.family,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.family,
-        ),
-      ),
-      GoRoute(
         path: RoutePaths.settings,
         name: RoutePaths.settings,
         builder: (context, state) => const CloudSettingsPage(),
-      ),
-      GoRoute(
-        path: RoutePaths.notifications,
-        name: RoutePaths.notifications,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.notifications,
-        ),
       ),
       GoRoute(
         path: RoutePaths.uaeSettings,
@@ -199,21 +145,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           child: const OfflineCenterPage(),
         ),
-      ),
-      GoRoute(
-        path: RoutePaths.locationDebug,
-        name: RoutePaths.locationDebug,
-        builder: (context, state) => const LocationDebugPage(),
-      ),
-      GoRoute(
-        path: RoutePaths.routeDebug,
-        name: RoutePaths.routeDebug,
-        builder: (context, state) => const RouteDebugPage(),
-      ),
-      GoRoute(
-        path: RoutePaths.navigationSessionDebug,
-        name: RoutePaths.navigationSessionDebug,
-        builder: (context, state) => const NavigationSessionDebugPage(),
       ),
     ],
   );

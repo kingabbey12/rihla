@@ -53,7 +53,8 @@ void main() {
       expect(repository.launchFlowCompleted, true);
     });
 
-    testWidgets('launch flow redirects to home when complete', (tester) async {
+    testWidgets('launch flow redirects to the map experience when complete',
+        (tester) async {
       SharedPreferences.setMockInitialValues({'launch_flow_completed': true});
       final completedPrefs = await SharedPreferences.getInstance();
 
@@ -65,9 +66,15 @@ void main() {
           child: const App(),
         ),
       );
-      await tester.pumpAndSettle();
+      // One frame applies the redirect; we assert on the router target instead
+      // of settling because the map page hosts a native surface.
+      await tester.pump();
 
-      expect(find.text('Home'), findsOneWidget);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(MaterialApp)),
+      );
+      final router = container.read(appRouterProvider);
+      expect(router.state.matchedLocation, RoutePaths.maps);
     });
 
     testWidgets('fresh launch starts at native splash route', (tester) async {

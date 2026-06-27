@@ -16,9 +16,10 @@ import 'package:rihla/shared/widgets/rihla_logo.dart';
 class AuthEntryPage extends ConsumerWidget {
   const AuthEntryPage({super.key});
 
-  Future<void> _completeAndGoHome(BuildContext context, WidgetRef ref) async {
+  Future<void> _completeAndEnterApp(BuildContext context, WidgetRef ref) async {
     await ref.read(launchFlowCompletionProvider.notifier).markCompleted();
-    if (context.mounted) context.go(RoutePaths.home);
+    // Enter the production map experience (AI Home Dashboard + Maps).
+    if (context.mounted) context.go(RoutePaths.maps);
   }
 
   void _showEmailSheet(BuildContext context, WidgetRef ref) {
@@ -26,7 +27,7 @@ class AuthEntryPage extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) => EmailAuthSheet(
-        onSuccess: () => _completeAndGoHome(context, ref),
+        onSuccess: () => _completeAndEnterApp(context, ref),
       ),
     );
   }
@@ -37,7 +38,7 @@ class AuthEntryPage extends ConsumerWidget {
     Future<void> Function() signIn,
   ) async {
     await signIn();
-    await _completeAndGoHome(context, ref);
+    await _completeAndEnterApp(context, ref);
   }
 
   @override
@@ -101,7 +102,7 @@ class AuthEntryPage extends ConsumerWidget {
                 label: l10n.continueAsGuest,
                 onPressed: () async {
                   await controller.continueAsGuest();
-                  await _completeAndGoHome(context, ref);
+                  await _completeAndEnterApp(context, ref);
                 },
               ),
               const Spacer(),

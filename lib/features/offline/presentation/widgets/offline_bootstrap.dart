@@ -7,6 +7,13 @@ import 'package:rihla/features/offline/presentation/coordinators/offline_coordin
 import 'package:rihla/features/offline/presentation/providers/offline_providers.dart';
 
 /// Starts the offline coordinator and network monitor at app launch.
+///
+/// This widget is mounted ABOVE [MaterialApp] (it wraps the root [App]), so it
+/// must never build directional/visual UI here — there is no [Directionality],
+/// [MediaQuery], [Theme], or [Localizations] above the app. It therefore only
+/// runs startup side-effects and returns its child unchanged. The user-facing
+/// offline banner is rendered by [OfflineBannerOverlay] from inside the
+/// `MaterialApp.builder`, where those inherited widgets exist.
 class OfflineBootstrap extends ConsumerStatefulWidget {
   const OfflineBootstrap({required this.child, super.key});
 
@@ -29,14 +36,28 @@ class _OfflineBootstrapState extends ConsumerState<OfflineBootstrap> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => widget.child;
+}
+
+/// Top-of-screen offline banner. Designed to be placed inside the
+/// `MaterialApp.builder` so it has access to [Directionality], [MediaQuery],
+/// and [Theme]. Renders nothing unless the app is in offline mode.
+class OfflineBannerOverlay extends ConsumerWidget {
+  const OfflineBannerOverlay({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final engineState = ref.watch(offlineEngineStateProvider);
     final isOffline = ref.watch(isOfflineModeProvider);
+    final showBanner = isOffline && engineState == OfflineEngineState.offline;
 
     return Stack(
+      textDirection: Directionality.of(context),
       children: [
-        widget.child,
-        if (isOffline && engineState == OfflineEngineState.offline)
+        child,
+        if (showBanner)
           Positioned(
             left: 0,
             right: 0,

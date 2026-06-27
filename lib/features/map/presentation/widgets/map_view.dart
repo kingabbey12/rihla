@@ -308,7 +308,11 @@ class _MapViewState extends ConsumerState<MapView> {
               zoom: _startCamera.zoom,
             ),
             myLocationEnabled: hasPermission,
-            myLocationRenderMode: MyLocationRenderMode.compass,
+            // MapLibre asserts that a non-normal render mode requires
+            // myLocationEnabled; fall back to normal until permission is granted.
+            myLocationRenderMode: hasPermission
+                ? MyLocationRenderMode.compass
+                : MyLocationRenderMode.normal,
             myLocationTrackingMode: MyLocationTrackingMode.none,
             compassEnabled: true,
             compassViewPosition: CompassViewPosition.topRight,

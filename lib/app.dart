@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/config/app_config.dart';
 import 'package:rihla/core/accessibility/a11y.dart';
+import 'package:rihla/features/offline/presentation/widgets/offline_bootstrap.dart';
 import 'package:rihla/localization/generated/app_localizations.dart';
 import 'package:rihla/localization/locale_provider.dart';
 import 'package:rihla/routes/app_router.dart';
@@ -31,11 +32,15 @@ class App extends ConsumerWidget {
       routerConfig: router,
       builder: (context, child) {
         // Clamp text scaling so accessibility font sizes never break layouts.
+        // The offline banner lives here (below MaterialApp) so it has access to
+        // Directionality, MediaQuery, Theme, and Localizations.
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
             textScaler: A11y.clampedTextScaler(context),
           ),
-          child: child ?? const SizedBox.shrink(),
+          child: OfflineBannerOverlay(
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );

@@ -10,6 +10,8 @@ import 'package:rihla/features/map/presentation/widgets/map_error_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_loading_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_overlays_stack.dart';
+import 'package:rihla/features/map/presentation/widgets/home_dashboard_overlay.dart';
+import 'package:rihla/features/map/presentation/widgets/home_bottom_nav.dart';
 
 /// The production map experience: a full-screen map with overlay states.
 class MapPage extends ConsumerWidget {
@@ -58,6 +60,13 @@ class MapPage extends ConsumerWidget {
                 child: const MapDebugOverlay(),
               ),
             const MapOverlaysStack(),
+            const HomeDashboardOverlay(),
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: HomeBottomNav(),
+            ),
             const DrivingSessionUiListener(),
           ],
         ),

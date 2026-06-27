@@ -34,7 +34,9 @@ void main() {
           child: const App(),
         ),
       );
-      await tester.pumpAndSettle();
+      // Single frame only: launch is complete so the app redirects to the map
+      // experience, whose native surface and loading indicator never settle.
+      await tester.pump();
     }
 
     testWidgets('Riverpod is initialized and providers are readable', (tester) async {
@@ -45,7 +47,7 @@ void main() {
       expect(container.read(appRouterProvider), isA<GoRouter>());
     });
 
-    testWidgets('go_router includes launch and home routes', (tester) async {
+    testWidgets('go_router includes launch and core routes', (tester) async {
       await pumpApp(tester);
 
       final router = container.read(appRouterProvider);
@@ -56,7 +58,7 @@ void main() {
       await pumpApp(tester);
 
       await container.read(themeModeProvider.notifier).setThemeMode(ThemeMode.dark);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(container.read(themeModeProvider), ThemeMode.dark);
 
@@ -69,7 +71,7 @@ void main() {
       await pumpApp(tester);
 
       await container.read(localeProvider.notifier).setLocale(const Locale('ar'));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(materialApp.locale?.languageCode, 'ar');
