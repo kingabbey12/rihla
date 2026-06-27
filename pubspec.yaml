@@ -1,0 +1,35 @@
+name: rihla
+description: Rihla — a production Flutter travel application.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  flutter_riverpod: ^3.3.2
+  flutter_svg: ^2.3.0
+  go_router: ^17.3.0
+  intl: any
+  permission_handler: ^12.0.3
+  shared_preferences: ^2.5.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/illustrations/
+    - assets/icons/
