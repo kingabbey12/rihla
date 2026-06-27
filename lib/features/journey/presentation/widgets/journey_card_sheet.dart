@@ -4,6 +4,7 @@ import 'package:rihla/features/journey/domain/entities/journey_endpoint.dart';
 import 'package:rihla/features/journey/domain/models/journey_summary.dart';
 import 'package:rihla/features/journey/presentation/extensions/journey_metrics_l10n.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_ai_summary_card.dart';
+import 'package:rihla/features/ai_copilot/presentation/widgets/ai_journey_advisor_card.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_departure_suggestions.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_metric_tile.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_score_badge.dart';
@@ -154,6 +155,8 @@ class JourneyCardSheet extends StatelessWidget {
                       label: context.l10n.journeyRoadConditions,
                       value: context.roadConditionLabel(metrics.roadCondition),
                     ),
+                    const SizedBox(height: 20),
+                    const AiJourneyAdvisorCard(),
                     const SizedBox(height: 20),
                     JourneyDepartureSuggestions(
                       suggestions: metrics.departureSuggestions,

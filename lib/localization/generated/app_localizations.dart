@@ -1291,6 +1291,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom Hazard'**
   String get hazardCustom;
+
+  /// No description provided for @aiJourneyAdvisorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey Advisor'**
+  String get aiJourneyAdvisorTitle;
+
+  /// No description provided for @aiDrivingCopilotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving Copilot'**
+  String get aiDrivingCopilotTitle;
+
+  /// No description provided for @aiJourneyReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey Review'**
+  String get aiJourneyReviewTitle;
+
+  /// No description provided for @aiAdvisorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing your journey…'**
+  String get aiAdvisorLoading;
+
+  /// No description provided for @aiReviewLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing your journey review…'**
+  String get aiReviewLoading;
+
+  /// No description provided for @aiCopilotOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Copilot'**
+  String get aiCopilotOpen;
+
+  /// No description provided for @aiReviewDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get aiReviewDone;
+
+  /// No description provided for @aiEnginePowered.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by routing and safety engines'**
+  String get aiEnginePowered;
 }
 
 class _AppLocalizationsDelegate

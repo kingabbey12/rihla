@@ -646,4 +646,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hazardCustom => 'Custom Hazard';
+
+  @override
+  String get aiJourneyAdvisorTitle => 'Journey Advisor';
+
+  @override
+  String get aiDrivingCopilotTitle => 'Driving Copilot';
+
+  @override
+  String get aiJourneyReviewTitle => 'Journey Review';
+
+  @override
+  String get aiAdvisorLoading => 'Analyzing your journey…';
+
+  @override
+  String get aiReviewLoading => 'Preparing your journey review…';
+
+  @override
+  String get aiCopilotOpen => 'Copilot';
+
+  @override
+  String get aiReviewDone => 'Done';
+
+  @override
+  String get aiEnginePowered => 'Powered by routing and safety engines';
 }

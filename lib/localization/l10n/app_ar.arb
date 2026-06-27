@@ -228,5 +228,13 @@
   "hazardFlood": "فيضان",
   "hazardAnimalCrossing": "عبور حيوانات",
   "hazardEmergencyVehicle": "مركبة طوارئ",
-  "hazardCustom": "خطر مخصص"
+  "hazardCustom": "خطر مخصص",
+  "aiJourneyAdvisorTitle": "مستشار الرحلة",
+  "aiDrivingCopilotTitle": "مساعد القيادة",
+  "aiJourneyReviewTitle": "مراجعة الرحلة",
+  "aiAdvisorLoading": "جارٍ تحليل رحلتك…",
+  "aiReviewLoading": "جارٍ إعداد مراجعة رحلتك…",
+  "aiCopilotOpen": "المساعد",
+  "aiReviewDone": "تم",
+  "aiEnginePowered": "مدعوم بمحركات التوجيه والسلامة"
 }

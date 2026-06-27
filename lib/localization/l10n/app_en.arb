@@ -253,5 +253,13 @@
   "hazardFlood": "Flood",
   "hazardAnimalCrossing": "Animal Crossing",
   "hazardEmergencyVehicle": "Emergency Vehicle",
-  "hazardCustom": "Custom Hazard"
+  "hazardCustom": "Custom Hazard",
+  "aiJourneyAdvisorTitle": "Journey Advisor",
+  "aiDrivingCopilotTitle": "Driving Copilot",
+  "aiJourneyReviewTitle": "Journey Review",
+  "aiAdvisorLoading": "Analyzing your journey…",
+  "aiReviewLoading": "Preparing your journey review…",
+  "aiCopilotOpen": "Copilot",
+  "aiReviewDone": "Done",
+  "aiEnginePowered": "Powered by routing and safety engines"
 }

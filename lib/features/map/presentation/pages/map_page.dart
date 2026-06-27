@@ -12,6 +12,7 @@ import 'package:rihla/features/live_journey/presentation/widgets/journey_dashboa
 import 'package:rihla/features/map/presentation/widgets/map_view.dart';
 import 'package:rihla/features/navigation/presentation/widgets/navigation_turn_banner_overlay.dart';
 import 'package:rihla/features/routing/presentation/widgets/route_map_overlay.dart';
+import 'package:rihla/features/ai_copilot/presentation/widgets/ai_copilot_map_overlay.dart';
 import 'package:rihla/features/safety/presentation/widgets/safety_alert_banner_overlay.dart';
 import 'package:rihla/features/safety/presentation/widgets/safety_map_overlay.dart';
 import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
@@ -72,6 +73,7 @@ class MapPage extends ConsumerWidget {
           const NavigationTurnBannerOverlay(),
           const SafetyAlertBannerOverlay(),
           const SafetyMapOverlay(),
+          const AiCopilotMapOverlay(),
           const JourneyDashboardMapOverlay(),
         ],
       ),

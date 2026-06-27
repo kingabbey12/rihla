@@ -640,4 +640,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hazardCustom => 'خطر مخصص';
+
+  @override
+  String get aiJourneyAdvisorTitle => 'مستشار الرحلة';
+
+  @override
+  String get aiDrivingCopilotTitle => 'مساعد القيادة';
+
+  @override
+  String get aiJourneyReviewTitle => 'مراجعة الرحلة';
+
+  @override
+  String get aiAdvisorLoading => 'جارٍ تحليل رحلتك…';
+
+  @override
+  String get aiReviewLoading => 'جارٍ إعداد مراجعة رحلتك…';
+
+  @override
+  String get aiCopilotOpen => 'المساعد';
+
+  @override
+  String get aiReviewDone => 'تم';
+
+  @override
+  String get aiEnginePowered => 'مدعوم بمحركات التوجيه والسلامة';
 }
