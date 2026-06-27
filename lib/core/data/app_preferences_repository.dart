@@ -11,6 +11,7 @@ class AppPreferencesRepository {
   static const _keyThemeMode = 'theme_mode';
   static const _keyOnboardingCompleted = 'onboarding_completed';
   static const _keyLaunchFlowCompleted = 'launch_flow_completed';
+  static const _keyHighContrast = 'high_contrast_enabled';
 
   Locale getLocale() {
     final code = _prefs.getString(_keyLocale) ?? 'en';
@@ -44,6 +45,13 @@ class AppPreferencesRepository {
 
   Future<void> setOnboardingCompleted(bool value) async {
     await _prefs.setBool(_keyOnboardingCompleted, value);
+  }
+
+  bool get highContrastEnabled =>
+      _prefs.getBool(_keyHighContrast) ?? false;
+
+  Future<void> setHighContrastEnabled(bool value) async {
+    await _prefs.setBool(_keyHighContrast, value);
   }
 
   bool get launchFlowCompleted =>

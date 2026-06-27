@@ -178,4 +178,52 @@ abstract final class ApiConfig {
   /// Cloud sync enabled when Supabase is configured.
   static bool get cloudEnabled =>
       supabaseUrl != null && supabaseAnonKey != null;
+
+  // —— Observability (analytics + crash reporting) ————————————————————————
+
+  /// Master switch for crash reporting (Firebase Crashlytics in production).
+  static bool get crashReportingEnabled {
+    const flag = String.fromEnvironment(
+      'CRASH_REPORTING_ENABLED',
+      defaultValue: 'false',
+    );
+    return flag.toLowerCase() == 'true';
+  }
+
+  /// Master switch for product analytics.
+  static bool get analyticsEnabled {
+    const flag = String.fromEnvironment(
+      'ANALYTICS_ENABLED',
+      defaultValue: 'false',
+    );
+    return flag.toLowerCase() == 'true';
+  }
+
+  static String? get posthogApiKey {
+    const key = String.fromEnvironment('POSTHOG_API_KEY');
+    return key.isEmpty ? null : key;
+  }
+
+  static String get posthogHost => const String.fromEnvironment(
+        'POSTHOG_HOST',
+        defaultValue: 'https://app.posthog.com',
+      );
+
+  static bool get posthogEnabled => analyticsEnabled && posthogApiKey != null;
+
+  // —— Certificate pinning ————————————————————————————————————————————————
+
+  /// Comma-separated base64 SHA-256 SPKI pins (`--dart-define=CERT_SPKI_PINS=`).
+  /// When empty, the default system trust store is used.
+  static List<String> get certificateSpkiPins {
+    const raw = String.fromEnvironment('CERT_SPKI_PINS');
+    if (raw.isEmpty) return const [];
+    return raw
+        .split(',')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+  }
+
+  static bool get certificatePinningEnabled => certificateSpkiPins.isNotEmpty;
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/observability/analytics_event.dart';
+import 'package:rihla/core/observability/observability_providers.dart';
 import 'package:rihla/core/providers/app_providers.dart';
 import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
@@ -204,6 +206,7 @@ class SearchQueryStateNotifier extends Notifier<SearchQueryState> {
   }
 
   Future<void> _run(String query) async {
+    final analytics = ref.read(analyticsServiceProvider);
     try {
       final results = await ref.read(searchRepositoryProvider).search(query);
       if (ref.read(searchQueryTextProvider).trim() != query) return;
@@ -211,12 +214,17 @@ class SearchQueryStateNotifier extends Notifier<SearchQueryState> {
       state = results.isEmpty
           ? SearchQueryEmpty(query)
           : SearchQueryResults(query: query, places: results);
+      analytics.logEvent(
+        AnalyticsEvent.searchSuccess,
+        properties: {'results': '${results.length}'},
+      );
     } catch (e) {
       if (ref.read(searchQueryTextProvider).trim() != query) return;
       state = SearchQueryError(
         query: query,
         failure: SearchServiceFailure(e.toString()),
       );
+      analytics.logEvent(AnalyticsEvent.searchFailure);
     }
   }
 

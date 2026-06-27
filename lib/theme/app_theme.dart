@@ -9,20 +9,41 @@ abstract final class AppTheme {
 
   static ThemeData get dark => _buildTheme(Brightness.dark);
 
-  static ThemeData _buildTheme(Brightness brightness) {
+  /// High-contrast variants for accessibility (WCAG AA+ foreground contrast).
+  static ThemeData get highContrastLight =>
+      _buildTheme(Brightness.light, highContrast: true);
+
+  static ThemeData get highContrastDark =>
+      _buildTheme(Brightness.dark, highContrast: true);
+
+  static ThemeData _buildTheme(
+    Brightness brightness, {
+    bool highContrast = false,
+  }) {
     final isLight = brightness == Brightness.light;
 
-    final colorScheme = ColorScheme(
-      brightness: brightness,
-      primary: AppColors.primary,
-      onPrimary: Colors.white,
-      secondary: AppColors.secondary,
-      onSecondary: AppColors.textPrimaryLight,
-      error: isLight ? AppColors.errorLight : AppColors.errorDark,
-      onError: Colors.white,
-      surface: isLight ? AppColors.surfaceLight : AppColors.surfaceDark,
-      onSurface: isLight ? AppColors.textPrimaryLight : AppColors.textPrimaryDark,
-    );
+    final colorScheme = highContrast
+        ? (isLight
+            ? const ColorScheme.highContrastLight(
+                primary: AppColors.primary,
+                secondary: AppColors.secondary,
+              )
+            : const ColorScheme.highContrastDark(
+                primary: AppColors.primary,
+                secondary: AppColors.secondary,
+              ))
+        : ColorScheme(
+            brightness: brightness,
+            primary: AppColors.primary,
+            onPrimary: Colors.white,
+            secondary: AppColors.secondary,
+            onSecondary: AppColors.textPrimaryLight,
+            error: isLight ? AppColors.errorLight : AppColors.errorDark,
+            onError: Colors.white,
+            surface: isLight ? AppColors.surfaceLight : AppColors.surfaceDark,
+            onSurface:
+                isLight ? AppColors.textPrimaryLight : AppColors.textPrimaryDark,
+          );
 
     return ThemeData(
       useMaterial3: true,

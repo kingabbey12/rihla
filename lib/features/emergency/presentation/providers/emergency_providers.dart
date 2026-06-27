@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/observability/analytics_event.dart';
+import 'package:rihla/core/observability/breadcrumb.dart';
+import 'package:rihla/core/observability/observability_providers.dart';
 import 'package:rihla/core/providers/app_providers.dart';
 import 'package:rihla/features/emergency/data/datasources/emergency_local_datasource.dart';
 import 'package:rihla/features/emergency/data/datasources/emergency_queue_local_datasource.dart';
@@ -207,9 +210,23 @@ class EmergencyController extends Notifier<EmergencyState> {
         incidentId: incident.id,
         queued: !isOnline,
       );
+      ref.read(analyticsServiceProvider).logEvent(
+        AnalyticsEvent.emergencyActivated,
+        properties: {'queued': '${!isOnline}'},
+      );
+      ref.read(appLoggerProvider).log(
+        'emergency_sos_confirmed',
+        category: ObservabilityCategory.emergency,
+        level: ObservabilityLevel.warning,
+      );
       await refresh();
     } catch (e) {
       state = EmergencyError(message: e.toString());
+      ref.read(appLoggerProvider).error(
+            e,
+            StackTrace.current,
+            reason: 'emergency_sos_failed',
+          );
     }
   }
 

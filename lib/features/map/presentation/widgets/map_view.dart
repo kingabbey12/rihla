@@ -43,6 +43,7 @@ class _MapViewState extends ConsumerState<MapView> {
   List<RouteCoordinate>? _pendingPolyline;
   final Map<Circle, ExploreMarker> _exploreCircleMarkers = {};
   Brightness? _lastSyncedBrightness;
+  String? _lastMarkerSignature;
 
   @override
   void initState() {
@@ -125,6 +126,11 @@ class _MapViewState extends ConsumerState<MapView> {
     final controller = _controller;
     if (controller == null) return;
 
+    // Skip redundant native clear/re-add when the marker set is unchanged.
+    final signature = _markerSignature(markers);
+    if (signature == _lastMarkerSignature) return;
+    _lastMarkerSignature = signature;
+
     await controller.clearCircles();
     _exploreCircleMarkers.clear();
     if (markers.isEmpty) return;
@@ -147,6 +153,21 @@ class _MapViewState extends ConsumerState<MapView> {
     for (var i = 0; i < circles.length && i < markers.length; i++) {
       _exploreCircleMarkers[circles[i]] = markers[i];
     }
+  }
+
+  /// Compact fingerprint of the marker set used to avoid redundant re-renders.
+  static String _markerSignature(List<ExploreMarker> markers) {
+    if (markers.isEmpty) return 'empty';
+    final buffer = StringBuffer('${markers.length}:');
+    for (final m in markers) {
+      buffer
+        ..write(m.latitude.toStringAsFixed(5))
+        ..write(',')
+        ..write(m.longitude.toStringAsFixed(5))
+        ..write(m.isCluster ? 'c' : 'p')
+        ..write(';');
+    }
+    return buffer.toString();
   }
 
   Future<void> _renderRouteLine(List<RouteCoordinate>? coords) async {

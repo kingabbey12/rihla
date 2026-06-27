@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/config/app_config.dart';
+import 'package:rihla/core/accessibility/a11y.dart';
 import 'package:rihla/localization/generated/app_localizations.dart';
 import 'package:rihla/localization/locale_provider.dart';
 import 'package:rihla/routes/app_router.dart';
@@ -16,17 +17,27 @@ class App extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+    final highContrast = ref.watch(highContrastProvider);
 
     return MaterialApp.router(
       title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: highContrast ? AppTheme.highContrastLight : AppTheme.light,
+      darkTheme: highContrast ? AppTheme.highContrastDark : AppTheme.dark,
       themeMode: themeMode,
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
+      builder: (context, child) {
+        // Clamp text scaling so accessibility font sizes never break layouts.
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: A11y.clampedTextScaler(context),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

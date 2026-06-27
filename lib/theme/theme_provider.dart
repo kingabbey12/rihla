@@ -30,3 +30,24 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
     await setThemeMode(next);
   }
 }
+
+/// Accessibility: high-contrast theme toggle with persistence.
+final highContrastProvider =
+    NotifierProvider<HighContrastNotifier, bool>(HighContrastNotifier.new);
+
+class HighContrastNotifier extends Notifier<bool> {
+  late AppPreferencesRepository _repository;
+
+  @override
+  bool build() {
+    _repository = ref.read(appPreferencesRepositoryProvider);
+    return _repository.highContrastEnabled;
+  }
+
+  Future<void> setEnabled(bool value) async {
+    state = value;
+    await _repository.setHighContrastEnabled(value);
+  }
+
+  Future<void> toggle() => setEnabled(!state);
+}
