@@ -6,13 +6,28 @@ import 'package:rihla/features/ai_copilot/domain/services/prompt_builder.dart';
 
 /// Central prompt assembly — no string concatenation elsewhere in the app.
 class PromptBuilderImpl implements PromptBuilder {
+  static const safetyRules = '''
+SAFETY RULES (mandatory):
+- You are advisory only. Never override navigation, reroute automatically, contact emergency services, send messages, or share medical data without explicit user confirmation.
+- Never invent routes, safety scores, or hazard data — use only structured context provided.
+- Recommendations must be suggestions the driver can accept or ignore.
+''';
+
+  static const outputFormat = '''
+OUTPUT FORMAT (mandatory):
+SUMMARY: <one paragraph>
+HIGHLIGHT: <bullet point>
+REC:type|title|body|priority|actionable
+Valid REC types: departure, route, safety, traffic, fuel, battery, driving, improvement, general
+''';
+
   @override
   PromptPackage build(AiContext context, {AiConversation? conversation}) {
     final toolOutputs = _toolOutputsFrom(context);
     return PromptPackage(
       mode: context.mode,
-      systemPrompt: _systemPrompt(context.mode),
-      userPrompt: _userPrompt(context),
+      systemPrompt: '${_systemPrompt(context.mode)}\n$safetyRules\n$outputFormat',
+      userPrompt: _userPrompt(context, conversation),
       toolOutputs: toolOutputs,
     );
   }
@@ -28,7 +43,7 @@ Respond with concise, actionable advice for the driver before navigation starts.
       AiCopilotMode.drivingCopilot => '''
 You are Rihla Driving Copilot. Explain hazards, traffic, road changes, score shifts, and safety alerts during active navigation.
 Never replace the routing or safety engines — interpret their outputs only.
-Offer reroute recommendations when traffic or hazards warrant it.
+Offer reroute recommendations when traffic or hazards warrant it — user must confirm any route change.
 Keep guidance brief and safety-focused.
 ''',
       AiCopilotMode.journeyReview => '''
@@ -39,10 +54,21 @@ Suggest concrete improvements for the next journey.
     };
   }
 
-  String _userPrompt(AiContext context) {
+  String _userPrompt(AiContext context, AiConversation? conversation) {
     final buffer = StringBuffer();
     buffer.writeln('mode: ${context.mode.name}');
+    if (context.isOffline) {
+      buffer.writeln('offline: true');
+    }
     buffer.writeln('---');
+
+    if (conversation != null && conversation.messages.isNotEmpty) {
+      buffer.writeln('[conversation_history]');
+      for (final msg in conversation.messages.take(6)) {
+        buffer.writeln('${msg.role.name}: ${msg.content}');
+      }
+      buffer.writeln('---');
+    }
 
     final journey = context.journey;
     if (journey != null) {
@@ -83,6 +109,7 @@ Suggest concrete improvements for the next journey.
     final session = context.session;
     if (session != null) {
       buffer.writeln('[navigation]');
+      buffer.writeln('session_id: ${session.sessionId}');
       buffer.writeln('road: ${session.currentRoad}');
       buffer.writeln('speed_kmh: ${session.speedKmh}');
       buffer.writeln('remaining_km: ${session.remainingDistanceKm}');
@@ -114,6 +141,47 @@ Suggest concrete improvements for the next journey.
       if (safety.primaryAlert != null) {
         buffer.writeln('primary_alert: ${safety.primaryAlert!.title}');
       }
+      buffer.writeln('---');
+    }
+
+    if (context.emergencyTimelineEvents.isNotEmpty) {
+      buffer.writeln('[emergency_timeline]');
+      for (final event in context.emergencyTimelineEvents) {
+        buffer.writeln('  - $event');
+      }
+      buffer.writeln('---');
+    }
+
+    if (context.exploreRecommendations.isNotEmpty) {
+      buffer.writeln('[explore_recommendations]');
+      for (final rec in context.exploreRecommendations) {
+        buffer.writeln('  - $rec');
+      }
+      buffer.writeln('---');
+    }
+
+    if (context.vehicleProfileSummary.isNotEmpty) {
+      buffer.writeln('[vehicle_profile]');
+      context.vehicleProfileSummary.forEach((k, v) {
+        buffer.writeln('$k: $v');
+      });
+      buffer.writeln('---');
+    }
+
+    if (context.includeMedicalProfile &&
+        context.medicalProfileSummary.isNotEmpty) {
+      buffer.writeln('[medical_profile]');
+      context.medicalProfileSummary.forEach((k, v) {
+        buffer.writeln('$k: $v');
+      });
+      buffer.writeln('---');
+    }
+
+    if (context.userPreferences.isNotEmpty) {
+      buffer.writeln('[user_preferences]');
+      context.userPreferences.forEach((k, v) {
+        buffer.writeln('$k: $v');
+      });
       buffer.writeln('---');
     }
 
@@ -157,13 +225,18 @@ Suggest concrete improvements for the next journey.
   List<String> _toolOutputsFrom(AiContext context) {
     final outputs = <String>[];
     if (context.safety != null) {
-      outputs.add('safety_engine: ${context.safety!.assessment.overallSafetyScore}');
+      outputs.add(
+        'safety_engine: ${context.safety!.assessment.overallSafetyScore}',
+      );
     }
     if (context.route != null) {
       outputs.add('route_engine: ${context.route!.id}');
     }
     if (context.liveMetrics != null) {
       outputs.add('live_metrics: tick');
+    }
+    if (context.isOffline) {
+      outputs.add('offline_state: active');
     }
     return outputs;
   }

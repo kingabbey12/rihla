@@ -52,3 +52,7 @@ final class AiCopilotError extends AiCopilotState {
 
   final String message;
 }
+
+final class AiCopilotOffline extends AiCopilotState {
+  const AiCopilotOffline();
+}

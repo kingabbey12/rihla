@@ -1,5 +1,7 @@
 import 'package:rihla/features/ai_copilot/domain/entities/ai_message_role.dart';
 import 'package:rihla/features/ai_copilot/domain/entities/ai_copilot_mode.dart';
+import 'package:rihla/features/ai_copilot/domain/entities/llm_token_usage.dart';
+import 'package:rihla/features/ai_copilot/domain/errors/ai_failure.dart';
 import 'package:rihla/features/ai_copilot/domain/services/llm_provider.dart';
 
 /// Deterministic mock LLM — returns templated text from [LlmRequest.mode].
@@ -7,29 +9,64 @@ class MockLlmProvider implements LLMProvider {
   MockLlmProvider({this.simulatedDelay = const Duration(milliseconds: 250)});
 
   final Duration simulatedDelay;
+  bool _cancelled = false;
+  LlmTokenUsage? _lastTokenUsage;
 
   @override
   bool get isEnabled => true;
 
   @override
+  LlmTokenUsage? get lastTokenUsage => _lastTokenUsage;
+
+  @override
+  void cancel() => _cancelled = true;
+
+  @override
   Future<LlmCompletion> complete(LlmRequest request) async {
+    if (_cancelled) throw const AiCancelledFailure();
     if (simulatedDelay > Duration.zero) {
       await Future<void>.delayed(simulatedDelay);
     }
+    if (_cancelled) throw const AiCancelledFailure();
 
+    final text = _generateText(request);
+    _lastTokenUsage = LlmTokenUsage(
+      promptTokens: request.systemPrompt.length ~/ 4,
+      completionTokens: text.length ~/ 4,
+      totalTokens: (request.systemPrompt.length + text.length) ~/ 4,
+    );
+    return LlmCompletion(
+      text: text,
+      fromMock: true,
+      tokenUsage: _lastTokenUsage!,
+    );
+  }
+
+  @override
+  Stream<String> stream(LlmRequest request) async* {
+    if (_cancelled) throw const AiCancelledFailure();
+    final text = _generateText(request);
+    const chunkSize = 20;
+    for (var i = 0; i < text.length; i += chunkSize) {
+      if (_cancelled) throw const AiCancelledFailure();
+      final end = i + chunkSize > text.length ? text.length : i + chunkSize;
+      yield text.substring(i, end);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    }
+  }
+
+  String _generateText(LlmRequest request) {
     final context = request.messages
             .where((m) => m.role == AiMessageRole.user)
             .map((m) => m.content)
             .lastOrNull ??
         '';
 
-    final text = switch (request.mode) {
+    return switch (request.mode) {
       AiCopilotMode.journeyAdvisor => _advisorText(context),
       AiCopilotMode.drivingCopilot => _copilotText(context),
       AiCopilotMode.journeyReview => _reviewText(context),
     };
-
-    return LlmCompletion(text: text, fromMock: true);
   }
 
   String _advisorText(String context) {

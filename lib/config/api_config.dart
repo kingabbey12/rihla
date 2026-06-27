@@ -124,12 +124,42 @@ abstract final class ApiConfig {
     return key.isEmpty ? null : key;
   }
 
-  // —— AI (disabled until approved) ————————————————————————————————————————
+  // —— AI (OpenAI / proxy via dart-define) —————————————————————————————————
+
+  /// Backend proxy URL — when set, requests route through your server instead
+  /// of calling OpenAI directly from the device.
+  static String? get openAiProxyUrl {
+    const url = String.fromEnvironment('OPENAI_PROXY_URL');
+    return url.isEmpty ? null : url;
+  }
+
+  static String get openAiBaseUrl {
+    final proxy = openAiProxyUrl;
+    if (proxy != null) return proxy;
+    return const String.fromEnvironment(
+      'OPENAI_BASE_URL',
+      defaultValue: 'https://api.openai.com/v1',
+    );
+  }
 
   static String? get openAiApiKey {
     const key = String.fromEnvironment('OPENAI_API_KEY');
     return key.isEmpty ? null : key;
   }
 
-  static bool get aiEnabled => false; // Await explicit approval before enabling.
+  static String get openAiModel => const String.fromEnvironment(
+        'OPENAI_MODEL',
+        defaultValue: 'gpt-4o-mini',
+      );
+
+  /// AI is enabled when AI_ENABLED=true (dart-define) and a key or proxy is set.
+  static bool get aiEnabled {
+    const flag = String.fromEnvironment('AI_ENABLED', defaultValue: 'true');
+    if (flag.toLowerCase() != 'true') return false;
+    return openAiApiKey != null || openAiProxyUrl != null;
+  }
+
+  static Duration get openAiTimeout => const Duration(
+        seconds: int.fromEnvironment('OPENAI_TIMEOUT_SECONDS', defaultValue: 30),
+      );
 }

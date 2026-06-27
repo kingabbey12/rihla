@@ -7,4 +7,6 @@ abstract class AiRepository {
   Future<void> save(AiConversation conversation);
 
   Future<void> clear();
+
+  String exportConversation(AiConversation conversation);
 }

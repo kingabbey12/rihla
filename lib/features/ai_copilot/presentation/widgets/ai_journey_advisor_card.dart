@@ -48,6 +48,7 @@ class AiJourneyAdvisorCard extends ConsumerWidget {
           ],
         ),
       AiCopilotError(:final message) => _ErrorCard(message: message),
+      AiCopilotOffline() => _OfflineCard(),
       _ => const SizedBox.shrink(),
     };
   }
@@ -92,6 +93,27 @@ class _ErrorCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Text(message, style: theme.textTheme.bodySmall),
+      ),
+    );
+  }
+}
+
+class _OfflineCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            Icon(Icons.cloud_off, color: theme.colorScheme.outline),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text('AI unavailable while offline.'),
+            ),
+          ],
+        ),
       ),
     );
   }

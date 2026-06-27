@@ -26,6 +26,14 @@ class AiDrivingCopilotPanel extends ConsumerWidget {
     final aiState = ref.watch(aiControllerProvider);
     final bottom = MediaQuery.paddingOf(context).bottom;
 
+    if (aiState is AiCopilotOffline) {
+      return Positioned(
+        right: 16,
+        bottom: 168 + bottom,
+        child: const _OfflineChip(),
+      );
+    }
+
     if (aiState is AiCopilotLoading &&
         aiState.mode == AiCopilotMode.drivingCopilot) {
       return Positioned(
@@ -101,6 +109,18 @@ class AiDrivingCopilotPanel extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _OfflineChip extends StatelessWidget {
+  const _OfflineChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      avatar: const Icon(Icons.cloud_off, size: 18),
+      label: const Text('AI unavailable while offline.'),
     );
   }
 }
