@@ -10,6 +10,7 @@ import 'package:rihla/features/map/presentation/widgets/map_loading_view.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_map_overlay.dart';
 import 'package:rihla/features/live_journey/presentation/widgets/journey_dashboard_map_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_view.dart';
+import 'package:rihla/features/navigation/presentation/widgets/navigation_turn_banner_overlay.dart';
 import 'package:rihla/features/routing/presentation/widgets/route_map_overlay.dart';
 import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
 
@@ -66,6 +67,7 @@ class MapPage extends ConsumerWidget {
             ),
           const Positioned.fill(child: JourneyMapOverlay()),
           const Positioned.fill(child: RouteMapOverlay()),
+          const NavigationTurnBannerOverlay(),
           const JourneyDashboardMapOverlay(),
         ],
       ),

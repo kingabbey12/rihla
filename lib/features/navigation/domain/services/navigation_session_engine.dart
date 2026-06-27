@@ -15,5 +15,6 @@ abstract class NavigationSessionEngine {
   NavigationSession advance({
     required NavigationSession session,
     required int tickCount,
+    bool simulateOffRoute,
   });
 }

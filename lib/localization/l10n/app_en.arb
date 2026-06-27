@@ -191,5 +191,32 @@
     "placeholders": {
       "speed": { "type": "int" }
     }
-  }
+  },
+  "navThen": "Then",
+  "navOffRoute": "Off route — rerouting",
+  "navVoiceMute": "Mute voice guidance",
+  "navVoiceUnmute": "Unmute voice guidance",
+  "navDistanceMeters": "{meters} m",
+  "@navDistanceMeters": {
+    "placeholders": {
+      "meters": { "type": "int" }
+    }
+  },
+  "navDistanceKm": "{distance} km",
+  "@navDistanceKm": {
+    "placeholders": {
+      "distance": { "type": "String" }
+    }
+  },
+  "navSpeedLimit": "{limit} km/h limit",
+  "@navSpeedLimit": {
+    "placeholders": {
+      "limit": { "type": "int" }
+    }
+  },
+  "navSimulationPlay": "Play simulation",
+  "navSimulationPause": "Pause simulation",
+  "navSimulationResume": "Resume simulation",
+  "navSimulationSpeed": "Simulation speed",
+  "navSimulateDeviation": "Simulate deviation"
 }

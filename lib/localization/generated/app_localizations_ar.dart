@@ -519,4 +519,46 @@ class AppLocalizationsAr extends AppLocalizations {
   String liveJourneySpeedKmh(int speed) {
     return '$speed كم/س';
   }
+
+  @override
+  String get navThen => 'ثم';
+
+  @override
+  String get navOffRoute => 'خارج المسار — إعادة التوجيه';
+
+  @override
+  String get navVoiceMute => 'كتم الإرشاد الصوتي';
+
+  @override
+  String get navVoiceUnmute => 'تشغيل الإرشاد الصوتي';
+
+  @override
+  String navDistanceMeters(int meters) {
+    return '$meters م';
+  }
+
+  @override
+  String navDistanceKm(String distance) {
+    return '$distance كم';
+  }
+
+  @override
+  String navSpeedLimit(int limit) {
+    return 'حد $limit كم/س';
+  }
+
+  @override
+  String get navSimulationPlay => 'تشغيل المحاكاة';
+
+  @override
+  String get navSimulationPause => 'إيقاف المحاكاة';
+
+  @override
+  String get navSimulationResume => 'استئناف المحاكاة';
+
+  @override
+  String get navSimulationSpeed => 'سرعة المحاكاة';
+
+  @override
+  String get navSimulateDeviation => 'محاكاة الانحراف';
 }

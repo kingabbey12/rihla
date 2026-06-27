@@ -61,7 +61,7 @@ void main() {
     expect(container.read(navigationCurrentRoadProvider), isNotEmpty);
     expect(container.read(navigationRemainingDistanceProvider), isNotNull);
     expect(container.read(navigationSpeedProvider), isNotNull);
-    expect(container.read(navigationRouteProgressProvider), isNotNull);
+    expect(container.read(navigationDistanceTraveledProvider), isNotNull);
   });
 
   test('live journey syncs from navigation session', () async {

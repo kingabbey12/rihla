@@ -3,6 +3,7 @@ enum NavigationStatus {
   inactive,
   navigating,
   paused,
+  rerouting,
   arrived,
   cancelled,
 }

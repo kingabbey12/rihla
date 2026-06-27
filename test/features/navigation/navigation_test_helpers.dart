@@ -63,7 +63,10 @@ RouteSummary sampleRouteSummary() => const RouteSummary(
       durationSeconds: 720,
       coordinates: [
         RouteCoordinate(latitude: 24.7136, longitude: 46.6753),
+        RouteCoordinate(latitude: 24.7130, longitude: 46.6748),
+        RouteCoordinate(latitude: 24.7125, longitude: 46.6745),
         RouteCoordinate(latitude: 24.7120, longitude: 46.6740),
+        RouteCoordinate(latitude: 24.7116, longitude: 46.6742),
         RouteCoordinate(latitude: 24.7113, longitude: 46.6743),
       ],
       journeyScore: 78,

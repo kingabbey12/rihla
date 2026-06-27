@@ -525,4 +525,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String liveJourneySpeedKmh(int speed) {
     return '$speed km/h';
   }
+
+  @override
+  String get navThen => 'Then';
+
+  @override
+  String get navOffRoute => 'Off route — rerouting';
+
+  @override
+  String get navVoiceMute => 'Mute voice guidance';
+
+  @override
+  String get navVoiceUnmute => 'Unmute voice guidance';
+
+  @override
+  String navDistanceMeters(int meters) {
+    return '$meters m';
+  }
+
+  @override
+  String navDistanceKm(String distance) {
+    return '$distance km';
+  }
+
+  @override
+  String navSpeedLimit(int limit) {
+    return '$limit km/h limit';
+  }
+
+  @override
+  String get navSimulationPlay => 'Play simulation';
+
+  @override
+  String get navSimulationPause => 'Pause simulation';
+
+  @override
+  String get navSimulationResume => 'Resume simulation';
+
+  @override
+  String get navSimulationSpeed => 'Simulation speed';
+
+  @override
+  String get navSimulateDeviation => 'Simulate deviation';
 }

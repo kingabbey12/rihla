@@ -25,7 +25,7 @@ void main() {
     expect(session.status, NavigationStatus.navigating);
     expect(session.remainingDistanceKm, route.distanceKm);
     expect(session.simulationMode, isTrue);
-    expect(session.currentManeuver.isPlaceholder, isTrue);
+    expect(session.currentManeuver.isPlaceholder, isFalse);
   });
 
   test('advance updates position and remaining distance', () {

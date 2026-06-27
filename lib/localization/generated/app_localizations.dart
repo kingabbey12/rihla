@@ -1069,6 +1069,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{speed} km/h'**
   String liveJourneySpeedKmh(int speed);
+
+  /// No description provided for @navThen.
+  ///
+  /// In en, this message translates to:
+  /// **'Then'**
+  String get navThen;
+
+  /// No description provided for @navOffRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Off route — rerouting'**
+  String get navOffRoute;
+
+  /// No description provided for @navVoiceMute.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute voice guidance'**
+  String get navVoiceMute;
+
+  /// No description provided for @navVoiceUnmute.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute voice guidance'**
+  String get navVoiceUnmute;
+
+  /// No description provided for @navDistanceMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m'**
+  String navDistanceMeters(int meters);
+
+  /// No description provided for @navDistanceKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km'**
+  String navDistanceKm(String distance);
+
+  /// No description provided for @navSpeedLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'{limit} km/h limit'**
+  String navSpeedLimit(int limit);
+
+  /// No description provided for @navSimulationPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play simulation'**
+  String get navSimulationPlay;
+
+  /// No description provided for @navSimulationPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause simulation'**
+  String get navSimulationPause;
+
+  /// No description provided for @navSimulationResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume simulation'**
+  String get navSimulationResume;
+
+  /// No description provided for @navSimulationSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulation speed'**
+  String get navSimulationSpeed;
+
+  /// No description provided for @navSimulateDeviation.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate deviation'**
+  String get navSimulateDeviation;
 }
 
 class _AppLocalizationsDelegate

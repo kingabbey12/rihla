@@ -166,5 +166,32 @@
     "placeholders": {
       "speed": { "type": "int" }
     }
-  }
+  },
+  "navThen": "ثم",
+  "navOffRoute": "خارج المسار — إعادة التوجيه",
+  "navVoiceMute": "كتم الإرشاد الصوتي",
+  "navVoiceUnmute": "تشغيل الإرشاد الصوتي",
+  "navDistanceMeters": "{meters} م",
+  "@navDistanceMeters": {
+    "placeholders": {
+      "meters": { "type": "int" }
+    }
+  },
+  "navDistanceKm": "{distance} كم",
+  "@navDistanceKm": {
+    "placeholders": {
+      "distance": { "type": "String" }
+    }
+  },
+  "navSpeedLimit": "حد {limit} كم/س",
+  "@navSpeedLimit": {
+    "placeholders": {
+      "limit": { "type": "int" }
+    }
+  },
+  "navSimulationPlay": "تشغيل المحاكاة",
+  "navSimulationPause": "إيقاف المحاكاة",
+  "navSimulationResume": "استئناف المحاكاة",
+  "navSimulationSpeed": "سرعة المحاكاة",
+  "navSimulateDeviation": "محاكاة الانحراف"
 }

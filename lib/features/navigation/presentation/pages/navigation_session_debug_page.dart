@@ -171,6 +171,8 @@ class _SessionDetails extends ConsumerWidget {
         _row('Route profile', session.route.profile.name),
         _row('Route distance', '${session.route.distanceKm.toStringAsFixed(1)} km'),
         _row('Current road', session.currentRoad),
+        _row('Maneuver type', session.currentManeuver.type.name),
+        _row('Next road', session.currentManeuver.nextRoad),
         _row('Maneuver', session.currentManeuver.instruction),
         _row(
           'Maneuver distance',
@@ -183,6 +185,10 @@ class _SessionDetails extends ConsumerWidget {
           '${session.currentPosition.longitude.toStringAsFixed(5)}',
         ),
         _row('Accuracy', '${session.currentPosition.accuracy} m'),
+        _row(
+          'Distance traveled',
+          '${session.distanceTraveledKm.toStringAsFixed(2)} km',
+        ),
         _row(
           'Remaining distance',
           '${session.remainingDistanceKm.toStringAsFixed(2)} km',
@@ -198,7 +204,13 @@ class _SessionDetails extends ConsumerWidget {
           'Route progress',
           '${session.routeProgressPercent.toStringAsFixed(1)}%',
         ),
-        _row('Started', session.startedAt.toIso8601String()),
+        _row('Off route', '${session.isOffRoute}'),
+        _row('Reroute state', session.rerouteState.runtimeType.toString()),
+        _row('Speed limit', '${session.speedLimit.limitKmh} km/h'),
+        _row('Lane lanes', '${session.laneGuidance.lanes.length}'),
+        _row('Simulation', session.simulation.playback.name),
+        _row('Sim speed', '${session.simulation.speedMultiplier}x'),
+        _row('Maneuver steps', '${session.maneuverSteps.length}'),
         _row('Last updated', session.lastUpdatedAt.toIso8601String()),
         SwitchListTile(
           title: const Text('Voice enabled'),
@@ -215,15 +227,70 @@ class _SessionDetails extends ConsumerWidget {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () => notifier.pauseSession(),
+                onPressed: () => notifier.playSimulation(),
+                child: const Text('Play'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => notifier.pauseSimulation(),
                 child: const Text('Pause'),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: OutlinedButton(
-                onPressed: () => notifier.resumeSession(),
+                onPressed: () => notifier.resumeSimulation(),
                 child: const Text('Resume'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => notifier.setSimulationSpeed(1),
+                child: const Text('1x'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => notifier.setSimulationSpeed(2),
+                child: const Text('2x'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => notifier.setSimulationSpeed(4),
+                child: const Text('4x'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: () => notifier.simulateDeviation(),
+          child: const Text('Simulate deviation'),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => notifier.pauseSession(),
+                child: const Text('Pause session'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => notifier.resumeSession(),
+                child: const Text('Resume session'),
               ),
             ),
           ],
