@@ -62,5 +62,17 @@
   "privacyPolicy": "سياسة الخصوصية",
   "termsOfService": "شروط الخدمة",
   "authLegalPrefix": "بالمتابعة، فإنك توافق على",
-  "authLegalAnd": "و"
+  "authLegalAnd": "و",
+  "mapTitle": "الخريطة",
+  "mapLoading": "جارٍ تحميل الخريطة…",
+  "mapErrorTitle": "تعذّر تحميل الخريطة",
+  "mapErrorMessage": "تعذّر علينا تحميل الخريطة. تحقق من اتصالك وحاول مرة أخرى.",
+  "mapRetry": "حاول مرة أخرى",
+  "mapLocationUnavailableTitle": "الموقع غير متاح",
+  "mapLocationUnavailableMessage": "تعذّر العثور على موقعك الحالي. تأكد من تشغيل خدمات الموقع.",
+  "mapDismiss": "تجاهل",
+  "mapRecenter": "إعادة ضبط الاتجاه",
+  "mapZoomIn": "تكبير",
+  "mapZoomOut": "تصغير",
+  "mapMyLocation": "موقعي"
 }

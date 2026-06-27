@@ -475,6 +475,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'and'**
   String get authLegalAnd;
+
+  /// No description provided for @mapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get mapTitle;
+
+  /// No description provided for @mapLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading map…'**
+  String get mapLoading;
+
+  /// No description provided for @mapErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Map failed to load'**
+  String get mapErrorTitle;
+
+  /// No description provided for @mapErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load the map. Check your connection and try again.'**
+  String get mapErrorMessage;
+
+  /// No description provided for @mapRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get mapRetry;
+
+  /// No description provided for @mapLocationUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location unavailable'**
+  String get mapLocationUnavailableTitle;
+
+  /// No description provided for @mapLocationUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find your current location. Make sure location services are on.'**
+  String get mapLocationUnavailableMessage;
+
+  /// No description provided for @mapDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get mapDismiss;
+
+  /// No description provided for @mapRecenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset orientation'**
+  String get mapRecenter;
+
+  /// No description provided for @mapZoomIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom in'**
+  String get mapZoomIn;
+
+  /// No description provided for @mapZoomOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom out'**
+  String get mapZoomOut;
+
+  /// No description provided for @mapMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'My location'**
+  String get mapMyLocation;
 }
 
 class _AppLocalizationsDelegate

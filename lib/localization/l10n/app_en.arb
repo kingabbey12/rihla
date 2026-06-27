@@ -62,5 +62,17 @@
   "privacyPolicy": "Privacy Policy",
   "termsOfService": "Terms of Service",
   "authLegalPrefix": "By continuing, you agree to our",
-  "authLegalAnd": "and"
+  "authLegalAnd": "and",
+  "mapTitle": "Map",
+  "mapLoading": "Loading map…",
+  "mapErrorTitle": "Map failed to load",
+  "mapErrorMessage": "We couldn't load the map. Check your connection and try again.",
+  "mapRetry": "Try again",
+  "mapLocationUnavailableTitle": "Location unavailable",
+  "mapLocationUnavailableMessage": "We couldn't find your current location. Make sure location services are on.",
+  "mapDismiss": "Dismiss",
+  "mapRecenter": "Reset orientation",
+  "mapZoomIn": "Zoom in",
+  "mapZoomOut": "Zoom out",
+  "mapMyLocation": "My location"
 }

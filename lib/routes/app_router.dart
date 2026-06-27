@@ -10,6 +10,7 @@ import 'package:rihla/features/launch/presentation/pages/permission_flow_page.da
 import 'package:rihla/features/launch/presentation/pages/welcome_page.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
 import 'package:rihla/features/location/presentation/pages/location_debug_page.dart';
+import 'package:rihla/features/map/presentation/pages/map_page.dart';
 import 'package:rihla/routes/feature_route.dart';
 import 'package:rihla/routes/pages/feature_placeholder_page.dart';
 import 'package:rihla/routes/pages/home_page.dart';
@@ -89,8 +90,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RoutePaths.maps,
         name: RoutePaths.maps,
-        builder: (context, state) => const FeaturePlaceholderPage(
-          feature: FeatureRoute.maps,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const MapPage(),
         ),
       ),
       GoRoute(

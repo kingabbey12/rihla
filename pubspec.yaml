@@ -18,6 +18,7 @@ dependencies:
   geolocator: ^14.0.3
   go_router: ^17.3.0
   intl: any
+  maplibre_gl: ^0.26.2
   permission_handler: ^12.0.3
   shared_preferences: ^2.5.5
 

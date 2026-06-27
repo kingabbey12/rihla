@@ -208,4 +208,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authLegalAnd => 'and';
+
+  @override
+  String get mapTitle => 'Map';
+
+  @override
+  String get mapLoading => 'Loading map…';
+
+  @override
+  String get mapErrorTitle => 'Map failed to load';
+
+  @override
+  String get mapErrorMessage =>
+      'We couldn\'t load the map. Check your connection and try again.';
+
+  @override
+  String get mapRetry => 'Try again';
+
+  @override
+  String get mapLocationUnavailableTitle => 'Location unavailable';
+
+  @override
+  String get mapLocationUnavailableMessage =>
+      'We couldn\'t find your current location. Make sure location services are on.';
+
+  @override
+  String get mapDismiss => 'Dismiss';
+
+  @override
+  String get mapRecenter => 'Reset orientation';
+
+  @override
+  String get mapZoomIn => 'Zoom in';
+
+  @override
+  String get mapZoomOut => 'Zoom out';
+
+  @override
+  String get mapMyLocation => 'My location';
 }

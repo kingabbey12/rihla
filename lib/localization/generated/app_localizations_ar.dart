@@ -206,4 +206,42 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authLegalAnd => 'و';
+
+  @override
+  String get mapTitle => 'الخريطة';
+
+  @override
+  String get mapLoading => 'جارٍ تحميل الخريطة…';
+
+  @override
+  String get mapErrorTitle => 'تعذّر تحميل الخريطة';
+
+  @override
+  String get mapErrorMessage =>
+      'تعذّر علينا تحميل الخريطة. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get mapRetry => 'حاول مرة أخرى';
+
+  @override
+  String get mapLocationUnavailableTitle => 'الموقع غير متاح';
+
+  @override
+  String get mapLocationUnavailableMessage =>
+      'تعذّر العثور على موقعك الحالي. تأكد من تشغيل خدمات الموقع.';
+
+  @override
+  String get mapDismiss => 'تجاهل';
+
+  @override
+  String get mapRecenter => 'إعادة ضبط الاتجاه';
+
+  @override
+  String get mapZoomIn => 'تكبير';
+
+  @override
+  String get mapZoomOut => 'تصغير';
+
+  @override
+  String get mapMyLocation => 'موقعي';
 }
