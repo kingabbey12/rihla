@@ -17,6 +17,7 @@ abstract final class RoutePaths {
   static const String family = '/family';
   static const String settings = '/settings';
   static const String notifications = '/notifications';
+  static const String locationDebug = '/debug/location';
 
   static const launchPaths = [
     splash,

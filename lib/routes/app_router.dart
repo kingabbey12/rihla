@@ -9,6 +9,7 @@ import 'package:rihla/features/launch/presentation/pages/onboarding_page.dart';
 import 'package:rihla/features/launch/presentation/pages/permission_flow_page.dart';
 import 'package:rihla/features/launch/presentation/pages/welcome_page.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
+import 'package:rihla/features/location/presentation/pages/location_debug_page.dart';
 import 'package:rihla/routes/feature_route.dart';
 import 'package:rihla/routes/pages/feature_placeholder_page.dart';
 import 'package:rihla/routes/pages/home_page.dart';
@@ -154,6 +155,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const FeaturePlaceholderPage(
           feature: FeatureRoute.notifications,
         ),
+      ),
+      GoRoute(
+        path: RoutePaths.locationDebug,
+        name: RoutePaths.locationDebug,
+        builder: (context, state) => const LocationDebugPage(),
       ),
     ],
   );
