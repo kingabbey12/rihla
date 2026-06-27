@@ -11,6 +11,7 @@ import 'package:rihla/features/launch/presentation/pages/welcome_page.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
 import 'package:rihla/features/location/presentation/pages/location_debug_page.dart';
 import 'package:rihla/features/map/presentation/pages/map_page.dart';
+import 'package:rihla/features/navigation/presentation/pages/navigation_session_debug_page.dart';
 import 'package:rihla/features/routing/presentation/pages/route_debug_page.dart';
 import 'package:rihla/features/search/presentation/pages/search_page.dart';
 import 'package:rihla/routes/feature_route.dart';
@@ -177,6 +178,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.routeDebug,
         name: RoutePaths.routeDebug,
         builder: (context, state) => const RouteDebugPage(),
+      ),
+      GoRoute(
+        path: RoutePaths.navigationSessionDebug,
+        name: RoutePaths.navigationSessionDebug,
+        builder: (context, state) => const NavigationSessionDebugPage(),
       ),
     ],
   );

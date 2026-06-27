@@ -1,3 +1,4 @@
+import 'package:rihla/features/live_journey/data/mappers/live_journey_session_metrics_mapper.dart';
 import 'package:rihla/features/live_journey/domain/entities/journey_metric.dart';
 import 'package:rihla/features/live_journey/domain/entities/metric_source.dart';
 import 'package:rihla/features/live_journey/domain/entities/metric_status.dart';
@@ -126,6 +127,49 @@ class MockJourneyMetricsEngine implements JourneyMetricsEngine {
       currentRoadName: _metric(_roads[tickCount % _roads.length], MetricStatus.good),
       nextManeuver: _metric(_maneuvers[tickCount % _maneuvers.length], MetricStatus.good),
       arrivalTime: _metric(arrival, MetricStatus.good),
+    );
+  }
+
+  @override
+  AmbientJourneyMetrics ambientMetrics({
+    required RouteSummary route,
+    required int tickCount,
+    required double progressPercent,
+  }) {
+    final progress = (progressPercent / 100).clamp(0.0, 1.0);
+    final journeyScore =
+        (route.journeyScore - tickCount * 0.3).clamp(40.0, 100.0).toDouble();
+    final safetyScore =
+        (journeyScore * 0.97).clamp(40.0, 100.0).toDouble();
+    final trafficScore =
+        (72.0 - tickCount * 2).clamp(30.0, 95.0).toDouble();
+    final fuelLeft = route.fuelEstimateLiters * (1 - progress);
+    final batteryLeft =
+        (route.distanceKm * 1.2 * (1 - progress)).clamp(0.0, 100.0).toDouble();
+    final remaining = route.distanceKm * (1 - progress);
+
+    return AmbientJourneyMetrics(
+      journeyScore: _metric(journeyScore, _scoreStatus(journeyScore)),
+      safetyScore: _metric(safetyScore, _scoreStatus(safetyScore)),
+      trafficScore: _metric(trafficScore, _scoreStatus(trafficScore)),
+      weather: _metric(
+        tickCount.isEven ? 'Clear skies · 32°C' : 'Partly cloudy · 31°C',
+        MetricStatus.good,
+      ),
+      roadCondition: _metric(
+        remaining < route.distanceKm * 0.2 ? 'Fair' : 'Good',
+        remaining < route.distanceKm * 0.15
+            ? MetricStatus.warning
+            : MetricStatus.good,
+      ),
+      fuelEstimateLiters: _metric(
+        fuelLeft,
+        fuelLeft < 2 ? MetricStatus.warning : MetricStatus.good,
+      ),
+      batteryEstimatePercent: _metric(
+        batteryLeft,
+        batteryLeft < 15 ? MetricStatus.warning : MetricStatus.good,
+      ),
     );
   }
 }

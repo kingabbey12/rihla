@@ -1,98 +1,88 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/features/live_journey/data/mappers/live_journey_session_metrics_mapper.dart';
 import 'package:rihla/features/live_journey/data/services/mock_journey_metrics_engine.dart';
 import 'package:rihla/features/live_journey/domain/entities/dashboard_display_mode.dart';
 import 'package:rihla/features/live_journey/domain/entities/journey_metric.dart';
 import 'package:rihla/features/live_journey/domain/models/live_journey_state.dart';
 import 'package:rihla/features/live_journey/domain/services/journey_metrics_engine.dart';
-import 'package:rihla/features/routing/domain/entities/route_summary.dart';
+import 'package:rihla/features/navigation/domain/entities/navigation_session.dart';
+import 'package:rihla/features/navigation/domain/models/navigation_session_state.dart';
+import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
 
 final journeyMetricsEngineProvider = Provider<JourneyMetricsEngine>(
   (ref) => MockJourneyMetricsEngine(),
 );
 
-/// Central live journey state — drives the dashboard and metric providers.
+final liveJourneySessionMetricsMapperProvider =
+    Provider<LiveJourneySessionMetricsMapper>(
+  (ref) => const LiveJourneySessionMetricsMapper(),
+);
+
+/// Central live journey state — drives the dashboard from the navigation session.
 final liveJourneyControllerProvider =
     NotifierProvider<LiveJourneyController, LiveJourneyState>(
   LiveJourneyController.new,
 );
 
 class LiveJourneyController extends Notifier<LiveJourneyState> {
-  Timer? _timer;
-  int _tickCount = 0;
-  RouteSummary? _route;
-
-  static const _tickInterval = Duration(seconds: 3);
+  int _ambientTickCount = 0;
+  DashboardDisplayMode _displayMode = DashboardDisplayMode.collapsed;
+  DateTime? _lastSessionUpdate;
 
   @override
   LiveJourneyState build() {
-    ref.onDispose(_disposeTimer);
-    return const LiveJourneyInactive();
+    final navState = ref.watch(navigationSessionControllerProvider);
+    if (navState is! NavigationSessionActive) {
+      _ambientTickCount = 0;
+      _lastSessionUpdate = null;
+      return const LiveJourneyInactive();
+    }
+
+    final session = navState.session;
+    if (_lastSessionUpdate != session.lastUpdatedAt) {
+      _ambientTickCount++;
+      _lastSessionUpdate = session.lastUpdatedAt;
+    }
+
+    return _composeActiveState(session);
   }
 
-  void _disposeTimer() {
-    _timer?.cancel();
-    _timer = null;
-  }
-
-  /// Starts live metric updates for the confirmed [route].
-  void start(RouteSummary route) {
-    _disposeTimer();
-    _tickCount = 0;
-    _route = route;
+  LiveJourneyActive _composeActiveState(NavigationSession session) {
     final engine = ref.read(journeyMetricsEngineProvider);
-    final metrics = engine.initialMetrics(route);
-    state = LiveJourneyActive(
-      route: route,
-      metrics: metrics,
-      displayMode: DashboardDisplayMode.collapsed,
-      startedAt: DateTime.now(),
+    final mapper = ref.read(liveJourneySessionMetricsMapperProvider);
+    final ambient = engine.ambientMetrics(
+      route: session.route,
+      tickCount: _ambientTickCount,
+      progressPercent: session.routeProgressPercent,
     );
-    _timer = Timer.periodic(_tickInterval, (_) => _onTick());
-  }
+    final metrics = mapper.compose(session: session, ambient: ambient);
 
-  void _onTick() {
-    final current = state;
-    final route = _route;
-    if (current is! LiveJourneyActive || route == null) return;
-
-    _tickCount++;
-    final engine = ref.read(journeyMetricsEngineProvider);
-    final metrics = engine.tick(
-      current: current.metrics,
-      route: route,
-      tickCount: _tickCount,
-    );
-    final remaining = metrics.remainingDistanceKm.value;
-    final progress = route.distanceKm > 0
-        ? ((route.distanceKm - remaining) / route.distanceKm * 100).clamp(0.0, 100.0)
-        : 0.0;
-
-    state = current.copyWith(
+    return LiveJourneyActive(
+      route: session.route,
       metrics: metrics,
-      progressPercent: progress,
+      displayMode: _displayMode,
+      startedAt: session.startedAt,
+      progressPercent: session.routeProgressPercent,
     );
   }
 
   void stop() {
-    _disposeTimer();
-    _route = null;
-    _tickCount = 0;
+    _ambientTickCount = 0;
+    _lastSessionUpdate = null;
+    _displayMode = DashboardDisplayMode.collapsed;
     state = const LiveJourneyInactive();
   }
 
   void setDisplayMode(DashboardDisplayMode mode) {
-    final current = state;
-    if (current is LiveJourneyActive) {
-      state = current.copyWith(displayMode: mode);
+    _displayMode = mode;
+    final navState = ref.read(navigationSessionControllerProvider);
+    if (navState is NavigationSessionActive) {
+      state = _composeActiveState(navState.session);
     }
   }
 
   void cycleDisplayMode() {
-    final current = state;
-    if (current is! LiveJourneyActive) return;
-    final next = switch (current.displayMode) {
+    final next = switch (_displayMode) {
       DashboardDisplayMode.collapsed => DashboardDisplayMode.expanded,
       DashboardDisplayMode.expanded => DashboardDisplayMode.floating,
       DashboardDisplayMode.floating => DashboardDisplayMode.collapsed,

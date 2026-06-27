@@ -20,6 +20,7 @@ abstract final class RoutePaths {
   static const String notifications = '/notifications';
   static const String locationDebug = '/debug/location';
   static const String routeDebug = '/debug/routes';
+  static const String navigationSessionDebug = '/debug/navigation';
 
   static const launchPaths = [
     splash,

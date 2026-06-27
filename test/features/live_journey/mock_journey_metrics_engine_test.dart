@@ -54,4 +54,16 @@ void main() {
     expect(updated.currentSpeedKmh.value, greaterThan(0));
     expect(updated.currentRoadName.value, isNotEmpty);
   });
+
+  test('ambientMetrics returns supplementary dashboard fields', () {
+    final ambient = engine.ambientMetrics(
+      route: route,
+      tickCount: 2,
+      progressPercent: 20,
+    );
+
+    expect(ambient.journeyScore.value, greaterThan(0));
+    expect(ambient.weather.value, isNotEmpty);
+    expect(ambient.fuelEstimateLiters.value, lessThan(route.fuelEstimateLiters));
+  });
 }
