@@ -244,4 +244,76 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mapMyLocation => 'موقعي';
+
+  @override
+  String get searchTitle => 'بحث';
+
+  @override
+  String get searchHint => 'ابحث عن مكان';
+
+  @override
+  String get searchRecentTitle => 'الأخيرة';
+
+  @override
+  String get searchClearRecent => 'مسح';
+
+  @override
+  String get searchSavedTitle => 'المحفوظة';
+
+  @override
+  String get searchHome => 'المنزل';
+
+  @override
+  String get searchWork => 'العمل';
+
+  @override
+  String get searchFavorites => 'المفضلة';
+
+  @override
+  String get searchAddHome => 'إضافة المنزل';
+
+  @override
+  String get searchAddWork => 'إضافة العمل';
+
+  @override
+  String get searchNoFavorites => 'لا توجد أماكن مفضلة بعد';
+
+  @override
+  String get searchSuggestionsTitle => 'اقتراحات';
+
+  @override
+  String get searchLoading => 'جارٍ البحث…';
+
+  @override
+  String get searchEmptyTitle => 'لا توجد نتائج';
+
+  @override
+  String get searchEmptyMessage => 'جرّب اسم مكان أو عنواناً مختلفاً.';
+
+  @override
+  String get searchErrorTitle => 'البحث غير متاح';
+
+  @override
+  String get searchErrorMessage => 'تعذّر إكمال البحث. حاول مرة أخرى.';
+
+  @override
+  String get searchRetry => 'حاول مرة أخرى';
+
+  @override
+  String get searchSetAsHome => 'تعيين كمنزل';
+
+  @override
+  String get searchSetAsWork => 'تعيين كعمل';
+
+  @override
+  String get searchAddToFavorites => 'إضافة إلى المفضلة';
+
+  @override
+  String get searchRemoveFromFavorites => 'إزالة من المفضلة';
+
+  @override
+  String get searchOpenMap => 'عرض على الخريطة';
+
+  @override
+  String get searchWhereTo => 'إلى أين؟';
 }

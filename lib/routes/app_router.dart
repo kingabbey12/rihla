@@ -11,6 +11,7 @@ import 'package:rihla/features/launch/presentation/pages/welcome_page.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
 import 'package:rihla/features/location/presentation/pages/location_debug_page.dart';
 import 'package:rihla/features/map/presentation/pages/map_page.dart';
+import 'package:rihla/features/search/presentation/pages/search_page.dart';
 import 'package:rihla/routes/feature_route.dart';
 import 'package:rihla/routes/pages/feature_placeholder_page.dart';
 import 'package:rihla/routes/pages/home_page.dart';
@@ -93,6 +94,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => fadeSlidePage(
           key: state.pageKey,
           child: const MapPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.search,
+        name: RoutePaths.search,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const SearchPage(),
         ),
       ),
       GoRoute(

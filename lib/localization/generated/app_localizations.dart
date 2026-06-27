@@ -547,6 +547,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My location'**
   String get mapMyLocation;
+
+  /// No description provided for @searchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchTitle;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a place'**
+  String get searchHint;
+
+  /// No description provided for @searchRecentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get searchRecentTitle;
+
+  /// No description provided for @searchClearRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get searchClearRecent;
+
+  /// No description provided for @searchSavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get searchSavedTitle;
+
+  /// No description provided for @searchHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get searchHome;
+
+  /// No description provided for @searchWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Work'**
+  String get searchWork;
+
+  /// No description provided for @searchFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get searchFavorites;
+
+  /// No description provided for @searchAddHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Home'**
+  String get searchAddHome;
+
+  /// No description provided for @searchAddWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Work'**
+  String get searchAddWork;
+
+  /// No description provided for @searchNoFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet'**
+  String get searchNoFavorites;
+
+  /// No description provided for @searchSuggestionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions'**
+  String get searchSuggestionsTitle;
+
+  /// No description provided for @searchLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching…'**
+  String get searchLoading;
+
+  /// No description provided for @searchEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get searchEmptyTitle;
+
+  /// No description provided for @searchEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different place name or address.'**
+  String get searchEmptyMessage;
+
+  /// No description provided for @searchErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search unavailable'**
+  String get searchErrorTitle;
+
+  /// No description provided for @searchErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t complete your search. Please try again.'**
+  String get searchErrorMessage;
+
+  /// No description provided for @searchRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get searchRetry;
+
+  /// No description provided for @searchSetAsHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as Home'**
+  String get searchSetAsHome;
+
+  /// No description provided for @searchSetAsWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as Work'**
+  String get searchSetAsWork;
+
+  /// No description provided for @searchAddToFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Favorites'**
+  String get searchAddToFavorites;
+
+  /// No description provided for @searchRemoveFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from Favorites'**
+  String get searchRemoveFromFavorites;
+
+  /// No description provided for @searchOpenMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Open on map'**
+  String get searchOpenMap;
+
+  /// No description provided for @searchWhereTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Where to?'**
+  String get searchWhereTo;
 }
 
 class _AppLocalizationsDelegate

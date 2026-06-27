@@ -87,3 +87,44 @@ class MapLocationRetryNotifier extends Notifier<int> {
 
   void request() => state = state + 1;
 }
+
+/// A one-shot camera fly-to request consumed by [MapView].
+final mapFlyToTargetProvider =
+    NotifierProvider<MapFlyToTargetNotifier, MapFlyToTarget?>(
+  MapFlyToTargetNotifier.new,
+);
+
+/// Describes where the map camera should animate to.
+class MapFlyToTarget {
+  const MapFlyToTarget({
+    required this.latitude,
+    required this.longitude,
+    this.zoom = 15.5,
+    required this.sequence,
+  });
+
+  final double latitude;
+  final double longitude;
+  final double zoom;
+
+  /// Monotonic counter so repeated selections to the same coords still fire.
+  final int sequence;
+}
+
+class MapFlyToTargetNotifier extends Notifier<MapFlyToTarget?> {
+  @override
+  MapFlyToTarget? build() => null;
+
+  void flyTo({
+    required double latitude,
+    required double longitude,
+    double zoom = 15.5,
+  }) {
+    state = MapFlyToTarget(
+      latitude: latitude,
+      longitude: longitude,
+      zoom: zoom,
+      sequence: DateTime.now().microsecondsSinceEpoch,
+    );
+  }
+}

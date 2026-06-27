@@ -97,6 +97,22 @@ class _MapViewState extends ConsumerState<MapView> {
     await _controller?.animateCamera(update);
   }
 
+  Future<void> _flyToTarget(MapFlyToTarget target) async {
+    await _animate(
+      CameraUpdate.newLatLngZoom(
+        LatLng(target.latitude, target.longitude),
+        target.zoom,
+      ),
+    );
+    ref.read(mapCameraProvider.notifier).update(
+          MapCamera(
+            latitude: target.latitude,
+            longitude: target.longitude,
+            zoom: target.zoom,
+          ),
+        );
+  }
+
   Future<void> _goToMyLocation() async {
     final repository = ref.read(locationRepositoryProvider);
     final notifier = ref.read(locationControllerProvider.notifier);
@@ -151,6 +167,9 @@ class _MapViewState extends ConsumerState<MapView> {
     final recreateKey = ref.watch(mapRecreateProvider);
     ref.listen(mapRecreateProvider, (_, _) => _startInitTimeout());
     ref.listen(mapLocationRetryProvider, (_, _) => _goToMyLocation());
+    ref.listen(mapFlyToTargetProvider, (_, next) {
+      if (next != null) _flyToTarget(next);
+    });
 
     return Stack(
       children: [

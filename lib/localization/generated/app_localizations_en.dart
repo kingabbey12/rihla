@@ -246,4 +246,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapMyLocation => 'My location';
+
+  @override
+  String get searchTitle => 'Search';
+
+  @override
+  String get searchHint => 'Search for a place';
+
+  @override
+  String get searchRecentTitle => 'Recent';
+
+  @override
+  String get searchClearRecent => 'Clear';
+
+  @override
+  String get searchSavedTitle => 'Saved';
+
+  @override
+  String get searchHome => 'Home';
+
+  @override
+  String get searchWork => 'Work';
+
+  @override
+  String get searchFavorites => 'Favorites';
+
+  @override
+  String get searchAddHome => 'Add Home';
+
+  @override
+  String get searchAddWork => 'Add Work';
+
+  @override
+  String get searchNoFavorites => 'No favorites yet';
+
+  @override
+  String get searchSuggestionsTitle => 'Suggestions';
+
+  @override
+  String get searchLoading => 'Searching…';
+
+  @override
+  String get searchEmptyTitle => 'No results';
+
+  @override
+  String get searchEmptyMessage => 'Try a different place name or address.';
+
+  @override
+  String get searchErrorTitle => 'Search unavailable';
+
+  @override
+  String get searchErrorMessage =>
+      'We couldn\'t complete your search. Please try again.';
+
+  @override
+  String get searchRetry => 'Try again';
+
+  @override
+  String get searchSetAsHome => 'Set as Home';
+
+  @override
+  String get searchSetAsWork => 'Set as Work';
+
+  @override
+  String get searchAddToFavorites => 'Add to Favorites';
+
+  @override
+  String get searchRemoveFromFavorites => 'Remove from Favorites';
+
+  @override
+  String get searchOpenMap => 'Open on map';
+
+  @override
+  String get searchWhereTo => 'Where to?';
 }

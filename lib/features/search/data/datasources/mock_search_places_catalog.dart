@@ -1,0 +1,130 @@
+import 'package:rihla/features/search/domain/entities/search_place.dart';
+
+/// Static mock catalog of Riyadh-area places for offline search.
+abstract final class MockSearchPlacesCatalog {
+  static const List<SearchPlace> all = [
+    SearchPlace(
+      id: 'kkia',
+      name: 'King Khalid International Airport',
+      address: 'Airport Road, Riyadh',
+      latitude: 24.9576,
+      longitude: 46.6988,
+      category: 'airport',
+    ),
+    SearchPlace(
+      id: 'kingdom_centre',
+      name: 'Kingdom Centre',
+      address: 'King Fahd Road, Al Olaya, Riyadh',
+      latitude: 24.7113,
+      longitude: 46.6743,
+      category: 'landmark',
+    ),
+    SearchPlace(
+      id: 'faisaliah_tower',
+      name: 'Al Faisaliah Tower',
+      address: 'King Fahd Road, Riyadh',
+      latitude: 24.6902,
+      longitude: 46.6854,
+      category: 'landmark',
+    ),
+    SearchPlace(
+      id: 'riyadh_park',
+      name: 'Riyadh Park Mall',
+      address: 'Northern Ring Road, Riyadh',
+      latitude: 24.7672,
+      longitude: 46.6021,
+      category: 'mall',
+    ),
+    SearchPlace(
+      id: 'ksu',
+      name: 'King Saud University',
+      address: 'King Saud University, Riyadh',
+      latitude: 24.7220,
+      longitude: 46.6236,
+      category: 'university',
+    ),
+    SearchPlace(
+      id: 'diplomatic_quarter',
+      name: 'Diplomatic Quarter',
+      address: 'Diplomatic Quarter, Riyadh',
+      latitude: 24.6892,
+      longitude: 46.6237,
+      category: 'district',
+    ),
+    SearchPlace(
+      id: 'boulevard_riyadh',
+      name: 'Boulevard Riyadh City',
+      address: 'Hittin, Riyadh',
+      latitude: 24.7698,
+      longitude: 46.6025,
+      category: 'entertainment',
+    ),
+    SearchPlace(
+      id: 'national_museum',
+      name: 'National Museum of Saudi Arabia',
+      address: 'King Faisal Road, Riyadh',
+      latitude: 24.6472,
+      longitude: 46.7103,
+      category: 'museum',
+    ),
+    SearchPlace(
+      id: 'king_abdullah_park',
+      name: 'King Abdullah Park',
+      address: 'Al Malaz, Riyadh',
+      latitude: 24.6668,
+      longitude: 46.7354,
+      category: 'park',
+    ),
+    SearchPlace(
+      id: 'granada_mall',
+      name: 'Granada Mall',
+      address: 'Eastern Ring Road, Riyadh',
+      latitude: 24.7785,
+      longitude: 46.7281,
+      category: 'mall',
+    ),
+    SearchPlace(
+      id: 'al_rajhi_mosque',
+      name: 'Al Rajhi Grand Mosque',
+      address: 'Al Wizarat, Riyadh',
+      latitude: 24.6401,
+      longitude: 46.7098,
+      category: 'mosque',
+    ),
+    SearchPlace(
+      id: 'wadi_hanifa',
+      name: 'Wadi Hanifah',
+      address: 'Diriyah, Riyadh',
+      latitude: 24.7356,
+      longitude: 46.5728,
+      category: 'park',
+    ),
+    SearchPlace(
+      id: 'al_masmak',
+      name: 'Al Masmak Fortress',
+      address: 'Ad Dirah, Riyadh',
+      latitude: 24.6312,
+      longitude: 46.7133,
+      category: 'landmark',
+    ),
+    SearchPlace(
+      id: 'sahara_mall',
+      name: 'Sahara Mall',
+      address: 'King Abdulaziz Road, Riyadh',
+      latitude: 24.7421,
+      longitude: 46.6589,
+      category: 'mall',
+    ),
+    SearchPlace(
+      id: 'king_fahd_stadium',
+      name: 'King Fahd International Stadium',
+      address: 'Makkah Al Mukarramah Road, Riyadh',
+      latitude: 24.6889,
+      longitude: 46.7247,
+      category: 'stadium',
+    ),
+  ];
+
+  /// Popular suggestions shown when the query is empty.
+  static List<SearchPlace> get popular => all.take(6).toList();
+}

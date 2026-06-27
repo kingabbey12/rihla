@@ -8,6 +8,7 @@ import 'package:rihla/features/map/presentation/widgets/map_empty_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_error_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_loading_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_view.dart';
+import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
 
 /// The production map experience: a full-screen map with overlay states.
 class MapPage extends ConsumerWidget {
@@ -27,6 +28,12 @@ class MapPage extends ConsumerWidget {
       body: Stack(
         children: [
           const Positioned.fill(child: MapView()),
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: MapSearchBar(),
+          ),
           if (status is MapInitializing)
             const Positioned.fill(child: MapLoadingView()),
           if (status is MapErrored)

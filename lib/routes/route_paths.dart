@@ -8,6 +8,7 @@ abstract final class RoutePaths {
   static const String authentication = '/authentication';
   static const String home = '/home';
   static const String maps = '/maps';
+  static const String search = '/search';
   static const String navigation = '/navigation';
   static const String explore = '/explore';
   static const String emergency = '/emergency';
