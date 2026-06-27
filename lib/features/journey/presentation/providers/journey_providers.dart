@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/journey/data/mappers/journey_endpoint_mapper.dart';
 import 'package:rihla/features/journey/data/repositories/journey_repository_impl.dart';
+import 'package:rihla/features/journey/data/services/live_journey_planning_service.dart';
 import 'package:rihla/features/journey/data/services/mock_journey_planning_service.dart';
+import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
+import 'package:rihla/features/weather/presentation/providers/weather_providers.dart';
 import 'package:rihla/features/journey/domain/entities/journey_endpoint.dart';
 import 'package:rihla/features/journey/domain/errors/journey_failure.dart';
 import 'package:rihla/features/journey/domain/models/journey_state.dart';
@@ -20,10 +23,18 @@ final aiRecommendationServiceProvider = Provider<AiRecommendationService>(
   (ref) => MockAiRecommendationService(),
 );
 
-final journeyPlanningServiceProvider = Provider<JourneyPlanningService>(
+final mockJourneyPlanningServiceProvider = Provider<JourneyPlanningService>(
   (ref) => MockJourneyPlanningService(
     ref.watch(aiRecommendationServiceProvider),
-    simulatedDelay: const Duration(milliseconds: 600),
+    simulatedDelay: Duration.zero,
+  ),
+);
+
+final journeyPlanningServiceProvider = Provider<JourneyPlanningService>(
+  (ref) => LiveJourneyPlanningService(
+    aiService: ref.watch(aiRecommendationServiceProvider),
+    weatherRepository: ref.watch(weatherRepositoryProvider),
+    trafficRepository: ref.watch(trafficRepositoryProvider),
   ),
 );
 

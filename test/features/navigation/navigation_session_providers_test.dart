@@ -5,6 +5,8 @@ import 'package:rihla/features/live_journey/presentation/providers/live_journey_
 import 'package:rihla/features/navigation/domain/entities/navigation_status.dart';
 import 'package:rihla/features/navigation/domain/models/navigation_session_state.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
+import 'package:rihla/features/safety/data/services/mock_safety_service.dart';
+import 'package:rihla/features/safety/presentation/providers/safety_providers.dart';
 
 import 'navigation_test_helpers.dart';
 
@@ -12,7 +14,11 @@ void main() {
   late ProviderContainer container;
 
   setUp(() {
-    container = ProviderContainer();
+    container = ProviderContainer(
+      overrides: [
+        safetyServiceProvider.overrideWith((ref) => MockSafetyService()),
+      ],
+    );
   });
 
   tearDown(() => container.dispose());

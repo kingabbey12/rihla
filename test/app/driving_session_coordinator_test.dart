@@ -10,6 +10,9 @@ import 'package:rihla/features/navigation/presentation/providers/navigation_sess
 import 'package:rihla/features/routing/data/services/mock_route_service.dart';
 import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
+import 'package:rihla/features/safety/data/services/mock_safety_service.dart';
+import 'package:rihla/features/safety/domain/services/safety_service.dart';
+import 'package:rihla/features/safety/presentation/providers/safety_providers.dart';
 
 import '../features/navigation/navigation_test_helpers.dart';
 
@@ -19,6 +22,9 @@ void main() {
       overrides: [
         routeServiceProvider.overrideWith(
           (ref) => MockRouteService(simulatedDelay: Duration.zero),
+        ),
+        safetyServiceProvider.overrideWith(
+          (ref) => MockSafetyService(),
         ),
       ],
     );
@@ -47,7 +53,11 @@ void main() {
   });
 
   test('cancelDrivingSession clears navigation', () async {
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        safetyServiceProvider.overrideWith((ref) => MockSafetyService()),
+      ],
+    );
     addTearDown(container.dispose);
 
     container.read(drivingSessionCoordinatorProvider);

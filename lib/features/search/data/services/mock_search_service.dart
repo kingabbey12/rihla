@@ -36,4 +36,43 @@ class MockSearchService implements SearchService {
         )
         .toList();
   }
+
+  @override
+  Future<SearchPlace?> forwardGeocode(String query) async {
+    final results = await suggest(query);
+    return results.isNotEmpty ? results.first : null;
+  }
+
+  @override
+  Future<SearchPlace?> reverseGeocode({
+    required double latitude,
+    required double longitude,
+  }) async {
+    await Future<void>.delayed(simulatedDelay);
+    return SearchPlace(
+      id: 'mock_reverse',
+      name: 'Resolved location',
+      address: '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
+      latitude: latitude,
+      longitude: longitude,
+    );
+  }
+
+  @override
+  Future<SearchPlace?> placeDetails(String placeId) async {
+    await Future<void>.delayed(simulatedDelay);
+    for (final place in MockSearchPlacesCatalog.all) {
+      if (place.id == placeId) return place;
+    }
+    return null;
+  }
+
+  @override
+  Future<({double latitude, double longitude})?> coordinatesForPlace(
+    String placeId,
+  ) async {
+    final place = await placeDetails(placeId);
+    if (place == null) return null;
+    return (latitude: place.latitude, longitude: place.longitude);
+  }
 }

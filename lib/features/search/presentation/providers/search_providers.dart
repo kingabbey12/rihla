@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
+import 'package:rihla/features/search/data/datasources/nominatim_datasource.dart';
 import 'package:rihla/features/search/data/datasources/search_local_datasource.dart';
 import 'package:rihla/features/search/data/repositories/search_repository_impl.dart';
 import 'package:rihla/features/search/data/services/mock_search_service.dart';
+import 'package:rihla/features/search/data/services/nominatim_search_service.dart';
 import 'package:rihla/features/search/domain/entities/saved_place_kind.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 import 'package:rihla/features/search/domain/errors/search_failure.dart';
@@ -13,9 +16,24 @@ import 'package:rihla/features/search/domain/models/search_query_state.dart';
 import 'package:rihla/features/search/domain/repositories/search_repository.dart';
 import 'package:rihla/features/search/domain/services/search_service.dart';
 
-/// Provides the mock [SearchService].
-final searchServiceProvider = Provider<SearchService>(
+/// Nominatim datasource for geocoding HTTP.
+final nominatimDatasourceProvider = Provider<NominatimDatasource>((ref) {
+  return NominatimDatasource(ref.watch(apiClientProvider));
+});
+
+/// Production [SearchService] backed by Nominatim.
+final nominatimSearchServiceProvider = Provider<SearchService>(
+  (ref) => NominatimSearchService(ref.watch(nominatimDatasourceProvider)),
+);
+
+/// Mock search for tests.
+final mockSearchServiceProvider = Provider<SearchService>(
   (ref) => MockSearchService(),
+);
+
+/// Default search service — live Nominatim geocoding.
+final searchServiceProvider = Provider<SearchService>(
+  (ref) => ref.watch(nominatimSearchServiceProvider),
 );
 
 /// Provides the local search data source.

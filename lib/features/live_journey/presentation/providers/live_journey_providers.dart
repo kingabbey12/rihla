@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/live_journey/data/mappers/live_journey_session_metrics_mapper.dart';
+import 'package:rihla/features/live_journey/data/services/live_journey_metrics_engine.dart';
 import 'package:rihla/features/live_journey/data/services/mock_journey_metrics_engine.dart';
+import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
+import 'package:rihla/features/weather/presentation/providers/weather_providers.dart';
 import 'package:rihla/features/live_journey/domain/entities/dashboard_display_mode.dart';
 import 'package:rihla/features/live_journey/domain/entities/journey_metric.dart';
 import 'package:rihla/features/live_journey/domain/models/live_journey_state.dart';
@@ -9,9 +12,15 @@ import 'package:rihla/features/navigation/domain/entities/navigation_session.dar
 import 'package:rihla/features/navigation/domain/models/navigation_session_state.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
 
-final journeyMetricsEngineProvider = Provider<JourneyMetricsEngine>(
+final mockJourneyMetricsEngineProvider = Provider<JourneyMetricsEngine>(
   (ref) => MockJourneyMetricsEngine(),
 );
+
+final journeyMetricsEngineProvider = Provider<JourneyMetricsEngine>((ref) {
+  final weather = ref.watch(weatherSnapshotProvider);
+  final traffic = ref.watch(trafficSnapshotProvider);
+  return LiveJourneyMetricsEngine(weather: weather, traffic: traffic);
+});
 
 final liveJourneySessionMetricsMapperProvider =
     Provider<LiveJourneySessionMetricsMapper>(

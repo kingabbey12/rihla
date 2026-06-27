@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
 import 'package:rihla/features/safety/domain/models/safety_state.dart';
+import 'package:rihla/features/safety/data/services/mock_safety_service.dart';
 import 'package:rihla/features/safety/presentation/providers/safety_providers.dart';
 
 import '../navigation/navigation_test_helpers.dart';
@@ -10,7 +11,13 @@ void main() {
   late ProviderContainer container;
 
   setUp(() {
-    container = ProviderContainer();
+    container = ProviderContainer(
+      overrides: [
+        safetyServiceProvider.overrideWith(
+          (ref) => MockSafetyService(),
+        ),
+      ],
+    );
   });
 
   tearDown(() => container.dispose());

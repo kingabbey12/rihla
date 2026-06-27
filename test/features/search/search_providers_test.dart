@@ -91,4 +91,30 @@ class _TestSearchService implements SearchService {
     }
     return [];
   }
+
+  @override
+  Future<SearchPlace?> forwardGeocode(String query) async =>
+      (await suggest(query)).firstOrNull;
+
+  @override
+  Future<SearchPlace?> reverseGeocode({
+    required double latitude,
+    required double longitude,
+  }) async =>
+      SearchPlace(
+        id: 'reverse',
+        name: 'Location',
+        address: '$latitude, $longitude',
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+  @override
+  Future<SearchPlace?> placeDetails(String placeId) async => null;
+
+  @override
+  Future<({double latitude, double longitude})?> coordinatesForPlace(
+    String placeId,
+  ) async =>
+      null;
 }

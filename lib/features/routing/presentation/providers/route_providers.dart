@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/journey/domain/entities/journey_endpoint.dart';
 import 'package:rihla/features/journey/domain/models/journey_summary.dart';
 import 'package:rihla/features/routing/data/datasources/valhalla_route_datasource.dart';
@@ -15,17 +16,15 @@ import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/domain/repositories/route_repository.dart';
 import 'package:rihla/features/routing/domain/services/route_service.dart';
 
-/// Provides the Valhalla-backed [RouteService] (debug / production HTTP).
+/// Provides the Valhalla-backed [RouteService] (production HTTP).
 final valhallaRouteServiceProvider = Provider<RouteService>((ref) {
-  final datasource = ValhallaRouteDatasource();
-  ref.onDispose(datasource.dispose);
+  final datasource = ValhallaRouteDatasource(ref.watch(apiClientProvider));
   return ValhallaRouteService(datasource);
 });
 
-/// Default route service — mock for reliable offline journey flow.
-/// Swap to [valhallaRouteServiceProvider] when a Valhalla server is available.
+/// Default route service — production Valhalla routing.
 final routeServiceProvider = Provider<RouteService>(
-  (ref) => MockRouteService(simulatedDelay: const Duration(milliseconds: 500)),
+  (ref) => ref.watch(valhallaRouteServiceProvider),
 );
 
 /// Mock route service for development and tests.

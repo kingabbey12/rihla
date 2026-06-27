@@ -1,12 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/navigation/data/services/mock_reroute_service.dart';
+import 'package:rihla/features/navigation/data/services/valhalla_reroute_service.dart';
 import 'package:rihla/features/navigation/domain/entities/navigation_session.dart';
 import 'package:rihla/features/navigation/domain/models/reroute_state.dart';
 import 'package:rihla/features/navigation/domain/services/reroute_service.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
+import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
+
+final mockRerouteServiceProvider = Provider<RerouteService>(
+  (ref) => MockRerouteService(simulatedDelay: const Duration(milliseconds: 300)),
+);
 
 final rerouteServiceProvider = Provider<RerouteService>(
-  (ref) => MockRerouteService(simulatedDelay: const Duration(milliseconds: 300)),
+  (ref) => ValhallaRerouteService(ref.watch(routeServiceProvider)),
 );
 
 /// Orchestrates automatic rerouting when the driver leaves the corridor.

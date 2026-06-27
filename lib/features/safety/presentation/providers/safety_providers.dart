@@ -1,10 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/navigation/domain/entities/navigation_session.dart';
 import 'package:rihla/features/navigation/domain/models/navigation_session_state.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
+import 'package:rihla/features/safety/data/datasources/overpass_hazard_datasource.dart';
 import 'package:rihla/features/safety/data/repositories/safety_repository_impl.dart';
+import 'package:rihla/features/safety/data/services/live_safety_service.dart';
 import 'package:rihla/features/safety/data/services/mock_safety_service.dart';
 import 'package:rihla/features/safety/data/services/weighted_safety_engine.dart';
+import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
+import 'package:rihla/features/weather/presentation/providers/weather_providers.dart';
 import 'package:rihla/features/safety/domain/entities/hazard.dart';
 import 'package:rihla/features/safety/domain/entities/hazard_severity.dart';
 import 'package:rihla/features/safety/domain/entities/safety_assessment.dart';
@@ -18,8 +23,28 @@ final safetyEngineProvider = Provider<SafetyEngine>(
   (ref) => WeightedSafetyEngine(),
 );
 
-final safetyServiceProvider = Provider<SafetyService>(
+final overpassHazardDatasourceProvider = Provider<OverpassHazardDatasource>(
+  (ref) => OverpassHazardDatasource(ref.watch(apiClientProvider)),
+);
+
+final mockSafetyServiceProvider = Provider<SafetyService>(
   (ref) => MockSafetyService(engine: ref.watch(safetyEngineProvider)),
+);
+
+final liveSafetyServiceProvider = Provider<LiveSafetyService>((ref) {
+  final service = LiveSafetyService(
+    hazardDatasource: ref.watch(overpassHazardDatasourceProvider),
+    engine: ref.watch(safetyEngineProvider),
+  );
+  final weather = ref.watch(weatherSnapshotProvider);
+  final traffic = ref.watch(trafficSnapshotProvider);
+  service.updateWeather(weather);
+  service.updateTraffic(traffic);
+  return service;
+});
+
+final safetyServiceProvider = Provider<SafetyService>(
+  (ref) => ref.watch(liveSafetyServiceProvider),
 );
 
 final safetyRepositoryProvider = Provider<SafetyRepository>(

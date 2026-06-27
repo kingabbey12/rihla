@@ -3,14 +3,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rihla/app/providers/map_session_providers.dart';
 import 'package:rihla/features/navigation/domain/entities/navigation_status.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
+import 'package:rihla/features/safety/data/services/mock_safety_service.dart';
+import 'package:rihla/features/safety/presentation/providers/safety_providers.dart';
 
 import 'navigation_test_helpers.dart';
 
 void main() {
-  test('pauseForLifecycle pauses active navigation', () async {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
+  late ProviderContainer container;
 
+  setUp(() {
+    container = ProviderContainer(
+      overrides: [
+        safetyServiceProvider.overrideWith((ref) => MockSafetyService()),
+      ],
+    );
+  });
+
+  tearDown(() => container.dispose());
+
+  test('pauseForLifecycle pauses active navigation', () async {
     await container
         .read(navigationSessionControllerProvider.notifier)
         .startSession(
@@ -29,9 +40,6 @@ void main() {
   });
 
   test('map session visibility triggers lifecycle pause and resume', () async {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
-
     await container
         .read(navigationSessionControllerProvider.notifier)
         .startSession(
