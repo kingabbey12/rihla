@@ -424,4 +424,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String journeyTemperature(String temp) {
     return '$temp°C';
   }
+
+  @override
+  String get routeCalculating => 'Calculating routes…';
+
+  @override
+  String get routeChooseTitle => 'Choose your route';
+
+  @override
+  String get routeChooseSubtitle =>
+      'Select the journey style that fits you best';
+
+  @override
+  String get routeConfirm => 'Confirm Route';
+
+  @override
+  String get routeCancel => 'Cancel';
+
+  @override
+  String get routeErrorTitle => 'Routing unavailable';
+
+  @override
+  String get routeErrorMessage =>
+      'We couldn\'t calculate routes. Please try again.';
+
+  @override
+  String get routeRetry => 'Try again';
+
+  @override
+  String get routeConfirmedMessage =>
+      'Route confirmed — turn-by-turn navigation arrives in the next phase.';
+
+  @override
+  String get routeProfileSafe => 'Safe';
+
+  @override
+  String get routeProfileFast => 'Fast';
+
+  @override
+  String get routeProfileEco => 'Eco';
+
+  @override
+  String get routeProfileScenic => 'Scenic';
+
+  @override
+  String get routeDistance => 'Distance';
+
+  @override
+  String get routeDuration => 'Duration';
+
+  @override
+  String get routeJourneyScore => 'Journey Score';
+
+  @override
+  String get routeFuel => 'Fuel';
+
+  @override
+  String get routeTraffic => 'Traffic';
+
+  @override
+  String get routeSafety => 'Safety';
 }

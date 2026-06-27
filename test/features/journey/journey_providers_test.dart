@@ -4,6 +4,9 @@ import 'package:rihla/core/providers/app_providers.dart';
 import 'package:rihla/features/journey/data/services/mock_journey_planning_service.dart';
 import 'package:rihla/features/journey/domain/models/journey_state.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
+import 'package:rihla/features/routing/data/services/mock_route_service.dart';
+import 'package:rihla/features/routing/domain/models/route_state.dart';
+import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 import 'package:rihla/features/search/presentation/providers/search_providers.dart';
@@ -32,6 +35,7 @@ void main() {
             simulatedDelay: Duration.zero,
           ),
         ),
+        routeServiceProvider.overrideWith((ref) => MockRouteService()),
       ],
     );
   });
@@ -66,14 +70,15 @@ void main() {
     expect(container.read(journeyControllerProvider), isA<JourneyIdle>());
   });
 
-  test('startJourney transitions to started', () async {
+  test('startJourney transitions to started and triggers routing', () async {
     await container
         .read(journeyControllerProvider.notifier)
         .planToDestination(place);
-    container.read(journeyControllerProvider.notifier).startJourney();
+    await container.read(journeyControllerProvider.notifier).startJourney();
     expect(
       container.read(journeyControllerProvider),
       isA<JourneyStarted>(),
     );
+    expect(container.read(routeControllerProvider), isA<RouteReady>());
   });
 }

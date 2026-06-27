@@ -154,5 +154,24 @@
     "placeholders": {
       "temp": { "type": "String" }
     }
-  }
+  },
+  "routeCalculating": "Calculating routes…",
+  "routeChooseTitle": "Choose your route",
+  "routeChooseSubtitle": "Select the journey style that fits you best",
+  "routeConfirm": "Confirm Route",
+  "routeCancel": "Cancel",
+  "routeErrorTitle": "Routing unavailable",
+  "routeErrorMessage": "We couldn't calculate routes. Please try again.",
+  "routeRetry": "Try again",
+  "routeConfirmedMessage": "Route confirmed — turn-by-turn navigation arrives in the next phase.",
+  "routeProfileSafe": "Safe",
+  "routeProfileFast": "Fast",
+  "routeProfileEco": "Eco",
+  "routeProfileScenic": "Scenic",
+  "routeDistance": "Distance",
+  "routeDuration": "Duration",
+  "routeJourneyScore": "Journey Score",
+  "routeFuel": "Fuel",
+  "routeTraffic": "Traffic",
+  "routeSafety": "Safety"
 }

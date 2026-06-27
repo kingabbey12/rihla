@@ -31,6 +31,12 @@ final class RouteSelected extends RouteState {
   final RouteSummary selected;
 }
 
+final class RouteConfirmed extends RouteState {
+  const RouteConfirmed(this.selected);
+
+  final RouteSummary selected;
+}
+
 final class RouteError extends RouteState {
   const RouteError(this.failure);
 

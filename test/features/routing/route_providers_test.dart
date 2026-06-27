@@ -46,6 +46,17 @@ void main() {
     expect(container.read(routeControllerProvider), isA<RouteSelected>());
   });
 
+  test('confirmSelection transitions to confirmed', () async {
+    final notifier = container.read(routeControllerProvider.notifier);
+    await notifier.fetchRoutes(
+      const RouteRequest(origin: origin, destination: destination),
+    );
+    final ready = container.read(routeControllerProvider) as RouteReady;
+    notifier.selectRoute(ready.result.routes.first.id);
+    notifier.confirmSelection();
+    expect(container.read(routeControllerProvider), isA<RouteConfirmed>());
+  });
+
   test('retry re-fetches after error', () async {
     var calls = 0;
     final retryContainer = ProviderContainer(

@@ -877,6 +877,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{temp}°C'**
   String journeyTemperature(String temp);
+
+  /// No description provided for @routeCalculating.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating routes…'**
+  String get routeCalculating;
+
+  /// No description provided for @routeChooseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your route'**
+  String get routeChooseTitle;
+
+  /// No description provided for @routeChooseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the journey style that fits you best'**
+  String get routeChooseSubtitle;
+
+  /// No description provided for @routeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Route'**
+  String get routeConfirm;
+
+  /// No description provided for @routeCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get routeCancel;
+
+  /// No description provided for @routeErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Routing unavailable'**
+  String get routeErrorTitle;
+
+  /// No description provided for @routeErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t calculate routes. Please try again.'**
+  String get routeErrorMessage;
+
+  /// No description provided for @routeRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get routeRetry;
+
+  /// No description provided for @routeConfirmedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Route confirmed — turn-by-turn navigation arrives in the next phase.'**
+  String get routeConfirmedMessage;
+
+  /// No description provided for @routeProfileSafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe'**
+  String get routeProfileSafe;
+
+  /// No description provided for @routeProfileFast.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast'**
+  String get routeProfileFast;
+
+  /// No description provided for @routeProfileEco.
+  ///
+  /// In en, this message translates to:
+  /// **'Eco'**
+  String get routeProfileEco;
+
+  /// No description provided for @routeProfileScenic.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenic'**
+  String get routeProfileScenic;
+
+  /// No description provided for @routeDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get routeDistance;
+
+  /// No description provided for @routeDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get routeDuration;
+
+  /// No description provided for @routeJourneyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey Score'**
+  String get routeJourneyScore;
+
+  /// No description provided for @routeFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get routeFuel;
+
+  /// No description provided for @routeTraffic.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic'**
+  String get routeTraffic;
+
+  /// No description provided for @routeSafety.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety'**
+  String get routeSafety;
 }
 
 class _AppLocalizationsDelegate

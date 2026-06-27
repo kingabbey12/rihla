@@ -13,6 +13,8 @@ import 'package:rihla/features/map/domain/entities/map_camera.dart';
 import 'package:rihla/features/map/domain/errors/map_failure.dart';
 import 'package:rihla/features/map/domain/models/map_view_status.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
+import 'package:rihla/features/routing/domain/entities/route_coordinate.dart';
+import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/features/map/presentation/widgets/map_controls.dart';
 import 'package:rihla/features/map/presentation/widgets/map_scale_indicator.dart';
 
@@ -35,6 +37,8 @@ class _MapViewState extends ConsumerState<MapView> {
   MapLibreMapController? _controller;
   Timer? _initTimer;
   late final MapCamera _startCamera;
+  Line? _routeLine;
+  List<RouteCoordinate>? _pendingPolyline;
 
   @override
   void initState() {
@@ -71,6 +75,37 @@ class _MapViewState extends ConsumerState<MapView> {
   void _onStyleLoaded() {
     _initTimer?.cancel();
     ref.read(mapViewStatusProvider.notifier).set(const MapReady());
+    if (_pendingPolyline != null) {
+      _renderRouteLine(_pendingPolyline);
+    }
+  }
+
+  Future<void> _renderRouteLine(List<RouteCoordinate>? coords) async {
+    _pendingPolyline = coords;
+    final controller = _controller;
+    if (controller == null || coords == null || coords.isEmpty) {
+      if (coords == null && _routeLine != null) {
+        await _controller?.removeLine(_routeLine!);
+        _routeLine = null;
+      }
+      return;
+    }
+
+    if (_routeLine != null) {
+      await controller.removeLine(_routeLine!);
+      _routeLine = null;
+    }
+
+    _routeLine = await controller.addLine(
+      LineOptions(
+        geometry: coords
+            .map((c) => LatLng(c.latitude, c.longitude))
+            .toList(),
+        lineColor: '#0D6E6E',
+        lineWidth: 5,
+        lineOpacity: 0.9,
+      ),
+    );
   }
 
   void _onCameraIdle() {
@@ -169,6 +204,9 @@ class _MapViewState extends ConsumerState<MapView> {
     ref.listen(mapLocationRetryProvider, (_, _) => _goToMyLocation());
     ref.listen(mapFlyToTargetProvider, (_, next) {
       if (next != null) _flyToTarget(next);
+    });
+    ref.listen(mapRoutePolylineProvider, (_, next) {
+      _renderRouteLine(next);
     });
 
     return Stack(

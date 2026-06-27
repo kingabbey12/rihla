@@ -420,4 +420,62 @@ class AppLocalizationsAr extends AppLocalizations {
   String journeyTemperature(String temp) {
     return '$temp°م';
   }
+
+  @override
+  String get routeCalculating => 'جارٍ حساب المسارات…';
+
+  @override
+  String get routeChooseTitle => 'اختر مسارك';
+
+  @override
+  String get routeChooseSubtitle => 'اختر أسلوب الرحلة الأنسب لك';
+
+  @override
+  String get routeConfirm => 'تأكيد المسار';
+
+  @override
+  String get routeCancel => 'إلغاء';
+
+  @override
+  String get routeErrorTitle => 'التوجيه غير متاح';
+
+  @override
+  String get routeErrorMessage => 'تعذّر حساب المسارات. حاول مرة أخرى.';
+
+  @override
+  String get routeRetry => 'حاول مرة أخرى';
+
+  @override
+  String get routeConfirmedMessage =>
+      'تم تأكيد المسار — التوجيه خطوة بخطوة في المرحلة القادمة.';
+
+  @override
+  String get routeProfileSafe => 'آمن';
+
+  @override
+  String get routeProfileFast => 'سريع';
+
+  @override
+  String get routeProfileEco => 'اقتصادي';
+
+  @override
+  String get routeProfileScenic => 'مناظر خلابة';
+
+  @override
+  String get routeDistance => 'المسافة';
+
+  @override
+  String get routeDuration => 'المدة';
+
+  @override
+  String get routeJourneyScore => 'درجة الرحلة';
+
+  @override
+  String get routeFuel => 'الوقود';
+
+  @override
+  String get routeTraffic => 'الازدحام';
+
+  @override
+  String get routeSafety => 'الأمان';
 }

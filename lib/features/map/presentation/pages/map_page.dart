@@ -9,6 +9,7 @@ import 'package:rihla/features/map/presentation/widgets/map_error_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_loading_view.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_map_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_view.dart';
+import 'package:rihla/features/routing/presentation/widgets/route_map_overlay.dart';
 import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
 
 /// The production map experience: a full-screen map with overlay states.
@@ -63,6 +64,7 @@ class MapPage extends ConsumerWidget {
               child: const MapDebugOverlay(),
             ),
           const Positioned.fill(child: JourneyMapOverlay()),
+          const Positioned.fill(child: RouteMapOverlay()),
         ],
       ),
     );

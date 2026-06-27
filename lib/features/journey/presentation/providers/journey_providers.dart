@@ -13,6 +13,7 @@ import 'package:rihla/features/location/domain/entities/location_state.dart';
 import 'package:rihla/features/location/presentation/providers/location_providers.dart';
 import 'package:rihla/features/map/domain/entities/map_camera.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
+import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 
 final aiRecommendationServiceProvider = Provider<AiRecommendationService>(
@@ -94,15 +95,18 @@ class JourneyController extends Notifier<JourneyState> {
     if (dest != null) await planToDestination(dest);
   }
 
-  /// Confirms the journey — routing engine hooks in during the next phase.
-  void startJourney() {
+  /// Requests routes for the journey preview — route UI handles the rest.
+  Future<void> startJourney() async {
     final current = state;
     if (current is! JourneyPreview) return;
     state = JourneyStarted(current.summary);
+    await ref.read(routeControllerProvider.notifier).fetchFromJourney(
+          current.summary,
+        );
   }
 
-  /// Resets after the routing placeholder acknowledges start.
-  void acknowledgeStarted() => state = const JourneyIdle();
+  /// Resets journey after route confirmation.
+  void completeJourney() => state = const JourneyIdle();
 
   JourneySummary? get activeSummary => switch (state) {
         JourneyPreview(:final summary) => summary,
