@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/app/widgets/map_session_host.dart';
+import 'package:rihla/config/app_config.dart';
 import 'package:rihla/features/map/domain/models/map_view_status.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/map/presentation/widgets/map_debug_overlay.dart';
@@ -30,6 +31,13 @@ class MapPage extends ConsumerWidget {
     return MapSessionHost(
       child: Scaffold(
         body: Stack(
+          // Expand so the map fills the screen regardless of which overlays are
+          // active. The map (MapView) is a Positioned.fill child and therefore
+          // does NOT contribute to the Stack's size; without expand the Stack
+          // would size to its largest *non-positioned* child and collapse to
+          // 0x0 whenever every overlay is hidden or itself Positioned.fill
+          // (e.g. the journey preview), turning the whole window white.
+          fit: StackFit.expand,
           children: [
             const Positioned.fill(child: MapView()),
             if (status is MapInitializing)
@@ -53,7 +61,7 @@ class MapPage extends ConsumerWidget {
                   },
                 ),
               ),
-            if (kDebugMode)
+            if (kDebugMode && AppConfig.showDebugOverlay)
               Positioned(
                 left: 12,
                 top: MediaQuery.paddingOf(context).top + 64,

@@ -7,11 +7,11 @@ import 'package:rihla/app.dart';
 import 'package:rihla/config/api_config.dart';
 import 'package:rihla/core/observability/breadcrumb.dart';
 import 'package:rihla/core/observability/crash_reporter.dart';
+import 'package:rihla/core/error/app_error_widget.dart';
 import 'package:rihla/core/observability/observability_providers.dart';
 import 'package:rihla/core/performance/performance_config.dart';
 import 'package:rihla/core/providers/app_providers.dart';
 import 'package:rihla/core/observability/product_analytics.dart';
-import 'package:rihla/core/observability/product_metrics_recorder.dart';
 import 'package:rihla/features/beta_feedback/data/services/beta_metrics_service_recorder.dart';
 import 'package:rihla/features/beta_feedback/presentation/providers/beta_feedback_providers.dart';
 import 'package:rihla/features/beta_feedback/presentation/coordinators/beta_feedback_coordinator.dart';
@@ -31,6 +31,11 @@ Future<void> main() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     PerformanceConfig.apply();
+
+    // Never let a widget build failure paint a bare white/red screen — render a
+    // readable error surface instead (shows details in debug). This is the
+    // safety net for the navigation transition and every other screen.
+    ErrorWidget.builder = buildAppErrorWidget;
 
     // Route framework + platform errors into the crash reporter.
     final priorOnError = FlutterError.onError;

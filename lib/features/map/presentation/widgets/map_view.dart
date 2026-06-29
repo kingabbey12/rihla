@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math' show Point;
+import 'dart:math' show Point, max, min;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,8 +12,13 @@ import 'package:rihla/features/map/data/styles/map_style_catalog.dart';
 import 'package:rihla/features/map/domain/entities/map_camera.dart';
 import 'package:rihla/features/map/domain/errors/map_failure.dart';
 import 'package:rihla/features/map/domain/models/map_view_status.dart';
+import 'package:rihla/features/map/presentation/map_platform_support.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
+import 'package:rihla/features/map/presentation/widgets/map_fallback_view.dart';
 import 'package:rihla/features/routing/domain/entities/route_coordinate.dart';
+import 'package:rihla/features/routing/domain/entities/route_profile.dart';
+import 'package:rihla/features/routing/domain/entities/route_summary.dart';
+import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/features/explore/domain/entities/explore_marker.dart';
 import 'package:rihla/features/explore/presentation/providers/explore_providers.dart';
@@ -38,18 +43,33 @@ class _MapViewState extends ConsumerState<MapView> {
 
   MapLibreMapController? _controller;
   Timer? _initTimer;
+  Timer? _routeDrawTimer;
   late final MapCamera _startCamera;
   Line? _routeLine;
+  Line? _animatedRouteLine;
+  final List<Line> _routeAlternativeLines = [];
   List<RouteCoordinate>? _pendingPolyline;
   final Map<Circle, ExploreMarker> _exploreCircleMarkers = {};
   Brightness? _lastSyncedBrightness;
   String? _lastMarkerSignature;
+  String? _lastRouteSignature;
 
   @override
   void initState() {
     super.initState();
     _startCamera = ref.read(mapCameraProvider);
-    _startInitTimeout();
+    if (MapPlatformSupport.supportsNativeMap) {
+      // Native engine drives the ready/error transitions via its callbacks.
+      _startInitTimeout();
+    } else {
+      // No native map on this platform: the static fallback is immediately
+      // "ready" so the loading overlay clears and no blank surface remains.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(mapViewStatusProvider.notifier).set(const MapReady());
+        }
+      });
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(locationControllerProvider.notifier).refreshStatus();
@@ -71,6 +91,7 @@ class _MapViewState extends ConsumerState<MapView> {
   @override
   void dispose() {
     _initTimer?.cancel();
+    _routeDrawTimer?.cancel();
     _controller = null;
     super.dispose();
   }
@@ -119,6 +140,13 @@ class _MapViewState extends ConsumerState<MapView> {
     final markers = ref.read(exploreMapMarkersProvider);
     if (markers.isNotEmpty) {
       _renderExploreMarkers(markers);
+    }
+    _renderRouteState(ref.read(routeControllerProvider));
+    final routeState = ref.read(routeControllerProvider);
+    if (routeState is! RouteReady &&
+        routeState is! RouteSelected &&
+        _pendingPolyline != null) {
+      _renderRouteLine(_pendingPolyline);
     }
   }
 
@@ -196,6 +224,159 @@ class _MapViewState extends ConsumerState<MapView> {
         lineOpacity: 0.9,
       ),
     );
+  }
+
+  Future<void> _clearRouteAlternatives() async {
+    _routeDrawTimer?.cancel();
+    _routeDrawTimer = null;
+    final controller = _controller;
+    if (controller == null) return;
+
+    if (_animatedRouteLine != null) {
+      await controller.removeLine(_animatedRouteLine!);
+      _animatedRouteLine = null;
+    }
+    for (final line in _routeAlternativeLines) {
+      await controller.removeLine(line);
+    }
+    _routeAlternativeLines.clear();
+    _lastRouteSignature = null;
+  }
+
+  Future<void> _renderRouteState(RouteState state) async {
+    final controller = _controller;
+    if (controller == null) return;
+
+    final routes = switch (state) {
+      RouteReady(:final result) => result.routes,
+      RouteSelected(:final result) => result.routes,
+      _ => const <RouteSummary>[],
+    };
+    final selected = switch (state) {
+      RouteSelected(:final selected) => selected,
+      RouteReady(:final result) => result.primary,
+      _ => null,
+    };
+
+    if (routes.isEmpty || selected == null) {
+      await _clearRouteAlternatives();
+      return;
+    }
+
+    final signature =
+        '${routes.map((r) => '${r.id}:${r.coordinates.length}').join('|')}:selected=${selected.id}';
+    if (signature == _lastRouteSignature) return;
+    _lastRouteSignature = signature;
+
+    _routeDrawTimer?.cancel();
+    if (_routeLine != null) {
+      await controller.removeLine(_routeLine!);
+      _routeLine = null;
+    }
+    if (_animatedRouteLine != null) {
+      await controller.removeLine(_animatedRouteLine!);
+      _animatedRouteLine = null;
+    }
+    for (final line in _routeAlternativeLines) {
+      await controller.removeLine(line);
+    }
+    _routeAlternativeLines.clear();
+
+    // Draw alternatives first so the selected route sits visually on top.
+    for (final route in routes.where((r) => r.id != selected.id)) {
+      if (route.coordinates.length < 2) continue;
+      final line = await controller.addLine(
+        LineOptions(
+          geometry: route.coordinates
+              .map((c) => LatLng(c.latitude, c.longitude))
+              .toList(),
+          lineColor: _colorForProfile(route.profile, selected: false),
+          lineWidth: 4,
+          lineOpacity: 0.55,
+        ),
+      );
+      _routeAlternativeLines.add(line);
+    }
+
+    await _frameRoutes(routes);
+    await _drawSelectedRouteProgressively(selected);
+  }
+
+  Future<void> _frameRoutes(List<RouteSummary> routes) async {
+    final all = routes.expand((route) => route.coordinates).toList();
+    if (all.length < 2) return;
+
+    var minLat = all.first.latitude;
+    var maxLat = all.first.latitude;
+    var minLng = all.first.longitude;
+    var maxLng = all.first.longitude;
+
+    for (final coord in all.skip(1)) {
+      minLat = min(minLat, coord.latitude);
+      maxLat = max(maxLat, coord.latitude);
+      minLng = min(minLng, coord.longitude);
+      maxLng = max(maxLng, coord.longitude);
+    }
+
+    await _animate(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(minLat, minLng),
+          northeast: LatLng(maxLat, maxLng),
+        ),
+        left: 48,
+        top: 112,
+        right: 48,
+        bottom: 360,
+      ),
+    );
+  }
+
+  Future<void> _drawSelectedRouteProgressively(RouteSummary route) async {
+    final controller = _controller;
+    final coords = route.coordinates;
+    if (controller == null || coords.length < 2) return;
+
+    var count = 2;
+    final chunk = (coords.length / 20).ceil().clamp(1, 8);
+
+    Future<void> drawPrefix(int visibleCount) async {
+      final visible = coords.take(visibleCount).toList();
+      if (visible.length < 2) return;
+      if (_animatedRouteLine != null) {
+        await controller.removeLine(_animatedRouteLine!);
+      }
+      _animatedRouteLine = await controller.addLine(
+        LineOptions(
+          geometry: visible
+              .map((c) => LatLng(c.latitude, c.longitude))
+              .toList(),
+          lineColor: _colorForProfile(route.profile, selected: true),
+          lineWidth: 7,
+          lineOpacity: 0.95,
+        ),
+      );
+    }
+
+    await drawPrefix(count);
+    _routeDrawTimer = Timer.periodic(const Duration(milliseconds: 28), (timer) {
+      count = (count + chunk).clamp(2, coords.length);
+      drawPrefix(count);
+      if (count >= coords.length) {
+        timer.cancel();
+        _routeDrawTimer = null;
+      }
+    });
+  }
+
+  String _colorForProfile(RouteProfile profile, {required bool selected}) {
+    if (!selected) return '#6B7280';
+    return switch (profile) {
+      RouteProfile.safe => '#0D7C7C',
+      RouteProfile.fast => '#2563EB',
+      RouteProfile.eco => '#159947',
+      RouteProfile.scenic => '#B45309',
+    };
   }
 
   void _onCameraIdle() {
@@ -284,6 +465,13 @@ class _MapViewState extends ConsumerState<MapView> {
         _permissionOf(locationState) == LocationPermissionStatus.granted;
     final camera = ref.watch(mapCameraProvider);
 
+    // Platforms without a native MapLibre engine (e.g. macOS desktop) get a
+    // real interactive raster-tile map fallback instead of a blank white
+    // surface. It is self-contained (tiles, location marker, controls).
+    if (!MapPlatformSupport.supportsNativeMap) {
+      return const MapFallbackView();
+    }
+
     final recreateKey = ref.watch(mapRecreateProvider);
     ref.listen(mapRecreateProvider, (_, _) => _startInitTimeout());
     ref.listen(mapLocationRetryProvider, (_, _) => _goToMyLocation());
@@ -291,7 +479,12 @@ class _MapViewState extends ConsumerState<MapView> {
       if (next != null) _flyToTarget(next);
     });
     ref.listen(mapRoutePolylineProvider, (_, next) {
+      final routeState = ref.read(routeControllerProvider);
+      if (routeState is RouteReady || routeState is RouteSelected) return;
       _renderRouteLine(next);
+    });
+    ref.listen(routeControllerProvider, (_, next) {
+      _renderRouteState(next);
     });
     ref.listen(exploreMapMarkersProvider, (_, next) {
       _renderExploreMarkers(next);

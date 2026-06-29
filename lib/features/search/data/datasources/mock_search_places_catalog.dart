@@ -4,6 +4,22 @@ import 'package:rihla/features/search/domain/entities/search_place.dart';
 abstract final class MockSearchPlacesCatalog {
   static const List<SearchPlace> all = [
     SearchPlace(
+      id: 'dubai_mall',
+      name: 'Dubai Mall',
+      address: 'Downtown Dubai, Dubai',
+      latitude: 25.1972,
+      longitude: 55.2744,
+      category: 'mall',
+    ),
+    SearchPlace(
+      id: 'burj_khalifa',
+      name: 'Burj Khalifa',
+      address: '1 Sheikh Mohammed bin Rashid Blvd, Downtown Dubai',
+      latitude: 25.1972,
+      longitude: 55.2744,
+      category: 'landmark',
+    ),
+    SearchPlace(
       id: 'kkia',
       name: 'King Khalid International Airport',
       address: 'Airport Road, Riyadh',

@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/location/data/datasources/geolocator_location_service.dart';
 import 'package:rihla/features/location/data/repositories/location_repository_impl.dart';
+import 'package:rihla/features/location/data/services/simulated_driving_location_service.dart';
 import 'package:rihla/features/location/data/services/unimplemented_background_location_service.dart';
+import 'package:rihla/features/map/presentation/map_platform_support.dart';
 import 'package:rihla/features/location/domain/entities/gps_service_status.dart';
 import 'package:rihla/features/location/domain/entities/location_accuracy.dart';
 import 'package:rihla/features/location/domain/entities/location_permission_status.dart';
@@ -15,8 +17,14 @@ import 'package:rihla/features/location/domain/services/background_location_serv
 import 'package:rihla/features/location/domain/services/location_service.dart';
 
 /// Provides the platform [LocationService] implementation.
+///
+/// On platforms with no real GPS / native map engine (e.g. macOS desktop) we
+/// use a simulated "driving" location so the map shows a live, moving marker.
+/// Real devices (Android/iOS) use the geolocator-backed service.
 final locationServiceProvider = Provider<LocationService>(
-  (ref) => GeolocatorLocationService(),
+  (ref) => MapPlatformSupport.supportsNativeMap
+      ? GeolocatorLocationService()
+      : SimulatedDrivingLocationService(),
 );
 
 /// Provides the [LocationRepository] facade.

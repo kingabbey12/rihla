@@ -18,11 +18,13 @@ class MapCamera {
   /// Camera pitch in degrees (0 = top-down).
   final double tilt;
 
-  /// Default camera centered on Riyadh as a neutral starting view.
+  /// Default camera centered on Dubai when the user's location is not yet
+  /// available (e.g. permission not granted). Replaced with the live position
+  /// as soon as it resolves.
   static const MapCamera initial = MapCamera(
-    latitude: 24.7136,
-    longitude: 46.6753,
-    zoom: 11,
+    latitude: 25.2048,
+    longitude: 55.2708,
+    zoom: 12,
   );
 
   MapCamera copyWith({
