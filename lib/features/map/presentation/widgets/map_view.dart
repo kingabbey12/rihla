@@ -4,6 +4,7 @@ import 'dart:math' show Point, max, min;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:rihla/features/location/domain/entities/location_position.dart';
 import 'package:rihla/features/location/domain/entities/location_permission_status.dart';
 import 'package:rihla/features/location/domain/entities/location_state.dart';
 import 'package:rihla/features/location/domain/models/location_result.dart';
@@ -15,6 +16,7 @@ import 'package:rihla/features/map/domain/models/map_view_status.dart';
 import 'package:rihla/features/map/presentation/map_platform_support.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/map/presentation/widgets/map_fallback_view.dart';
+import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
 import 'package:rihla/features/routing/domain/entities/route_coordinate.dart';
 import 'package:rihla/features/routing/domain/entities/route_profile.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
@@ -53,6 +55,11 @@ class _MapViewState extends ConsumerState<MapView> {
   Brightness? _lastSyncedBrightness;
   String? _lastMarkerSignature;
   String? _lastRouteSignature;
+  bool _centeredOnFirstFix = false;
+
+  /// While navigating, keep the camera locked behind the vehicle (heading-up,
+  /// tilted) until the user requests an overview.
+  bool _navFollow = true;
 
   @override
   void initState() {
@@ -61,19 +68,13 @@ class _MapViewState extends ConsumerState<MapView> {
     if (MapPlatformSupport.supportsNativeMap) {
       // Native engine drives the ready/error transitions via its callbacks.
       _startInitTimeout();
-    } else {
-      // No native map on this platform: the static fallback is immediately
-      // "ready" so the loading overlay clears and no blank surface remains.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ref.read(mapViewStatusProvider.notifier).set(const MapReady());
-        }
-      });
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ref.read(locationControllerProvider.notifier).refreshStatus();
-      }
+    // Start GPS immediately — map centers on the first real fix (never a fixed city).
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final notifier = ref.read(locationControllerProvider.notifier);
+      await notifier.refreshStatus();
+      await notifier.startForegroundStream();
     });
   }
 
@@ -419,6 +420,50 @@ class _MapViewState extends ConsumerState<MapView> {
         );
   }
 
+  /// Dynamic navigation zoom: zoom in when crawling, out on the highway.
+  static double _navZoomForSpeed(double speedKmh) {
+    const slow = 17.5;
+    const fast = 14.0;
+    final t = (speedKmh.clamp(20, 110) - 20) / 90;
+    return slow + (fast - slow) * t;
+  }
+
+  /// Camera follow during navigation: centre on the vehicle, rotate heading-up,
+  /// tilt for a 3D forward perspective, and zoom with speed.
+  Future<void> _followNavigation(
+    LocationPosition position,
+    double speedKmh,
+    double heading,
+  ) async {
+    await _animate(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: _navZoomForSpeed(speedKmh),
+          bearing: heading,
+          tilt: 55,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _centerOnGpsFix(LocationPosition position) async {
+    await _animate(
+      CameraUpdate.newLatLngZoom(
+        LatLng(position.latitude, position.longitude),
+        _focusZoom,
+      ),
+    );
+    ref.read(mapCameraProvider.notifier).update(
+          MapCamera(
+            latitude: position.latitude,
+            longitude: position.longitude,
+            zoom: _focusZoom,
+            bearing: position.heading ?? 0,
+          ),
+        );
+  }
+
   Future<void> _goToMyLocation() async {
     final repository = ref.read(locationRepositoryProvider);
     final notifier = ref.read(locationControllerProvider.notifier);
@@ -465,6 +510,16 @@ class _MapViewState extends ConsumerState<MapView> {
         _permissionOf(locationState) == LocationPermissionStatus.granted;
     final camera = ref.watch(mapCameraProvider);
 
+    ref.listen(locationControllerProvider, (prev, next) {
+      if (next is LocationActive && !_centeredOnFirstFix) {
+        _centeredOnFirstFix = true;
+        _centerOnGpsFix(next.position);
+        ref.read(mapUserLocationResolvedProvider.notifier).resolve();
+      } else if (next is LocationError) {
+        ref.read(mapLocationUnavailableProvider.notifier).show();
+      }
+    });
+
     // Platforms without a native MapLibre engine (e.g. macOS desktop) get a
     // real interactive raster-tile map fallback instead of a blank white
     // surface. It is self-contained (tiles, location marker, controls).
@@ -488,6 +543,48 @@ class _MapViewState extends ConsumerState<MapView> {
     });
     ref.listen(exploreMapMarkersProvider, (_, next) {
       _renderExploreMarkers(next);
+    });
+    ref.listen(navigationIsActiveProvider, (_, next) {
+      if (next) _navFollow = true;
+    });
+    ref.listen(navigationCurrentPositionProvider, (_, next) {
+      if (next == null || !_navFollow) return;
+      if (!ref.read(navigationIsActiveProvider)) return;
+      final speed =
+          ref.read(navigationSpeedProvider) ?? (next.speed ?? 0) * 3.6;
+      final heading = ref.read(navigationHeadingProvider) ?? next.heading ?? 0;
+      _followNavigation(next, speed, heading);
+    });
+    ref.listen(navigationFollowRecenterProvider, (_, _) {
+      _navFollow = true;
+      final pos = ref.read(navigationCurrentPositionProvider);
+      if (pos == null) return;
+      final speed = ref.read(navigationSpeedProvider) ?? (pos.speed ?? 0) * 3.6;
+      final heading = ref.read(navigationHeadingProvider) ?? pos.heading ?? 0;
+      _followNavigation(pos, speed, heading);
+    });
+    ref.listen(navigationOverviewRequestProvider, (_, _) {
+      _navFollow = false;
+      final route = ref.read(navigationSessionProvider)?.route;
+      if (route != null) _frameRoutes([route]);
+    });
+    ref.listen(navigationHasArrivedProvider, (_, arrived) {
+      if (!arrived) return;
+      // Ease out of the tilted follow view so arrival feels like a settle.
+      _navFollow = false;
+      final pos = ref.read(navigationCurrentPositionProvider);
+      _animate(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: pos != null
+                ? LatLng(pos.latitude, pos.longitude)
+                : LatLng(_startCamera.latitude, _startCamera.longitude),
+            zoom: 14,
+            tilt: 0,
+            bearing: 0,
+          ),
+        ),
+      );
     });
 
     return Stack(

@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rihla/core/network/api_client.dart';
 import 'package:rihla/core/providers/app_providers.dart';
 import 'package:rihla/features/ev_charging/domain/entities/ev_charger.dart';
 import 'package:rihla/features/ev_charging/domain/repositories/ev_charging_repository.dart';
-import 'package:rihla/features/explore/data/catalog/explore_place_catalog.dart';
+import 'package:rihla/features/explore/data/datasources/overpass_poi_datasource.dart';
 import 'package:rihla/features/explore/data/datasources/explore_favorites_local_datasource.dart';
 import 'package:rihla/features/explore/data/repositories/explore_favorites_repository_impl.dart';
 import 'package:rihla/features/explore/data/repositories/explore_repository_impl.dart';
@@ -30,33 +31,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ExploreServiceImpl buildService({bool offline = false, bool downloaded = false}) {
+  ExploreServiceImpl buildService({
+    bool offline = false,
+    bool downloaded = false,
+  }) {
     return ExploreServiceImpl(
       offlineRepository: _FakeOfflineRepository(downloaded: downloaded),
       fuelRepository: _FakeFuelRepository(),
       evChargingRepository: _FakeEvRepository(),
       parkingRepository: _FakeParkingRepository(),
+      poiDatasource: _FakePoiDatasource(),
       isOffline: () => offline,
     );
   }
 
   group('Marker clustering', () {
     test('clusters nearby places at low zoom', () {
-      final places = ExplorePlaceCatalog.allPlaces().take(20).toList();
-      final markers = ExploreMarkerClusterer.cluster(
-        places: places,
-        zoom: 10,
-      );
+      final places = _clusterFixturePlaces(20);
+      final markers = ExploreMarkerClusterer.cluster(places: places, zoom: 10);
       expect(markers.length, lessThan(places.length));
       expect(markers.any((m) => m.isCluster), isTrue);
     });
 
     test('shows individual markers at high zoom', () {
-      final places = ExplorePlaceCatalog.allPlaces().take(5).toList();
-      final markers = ExploreMarkerClusterer.cluster(
-        places: places,
-        zoom: 16,
-      );
+      final places = _clusterFixturePlaces(5);
+      final markers = ExploreMarkerClusterer.cluster(places: places, zoom: 16);
       expect(markers.every((m) => !m.isCluster), isTrue);
     });
   });
@@ -158,10 +157,7 @@ void main() {
         recs.any((r) => r.category == ExploreCategory.fuelStation),
         isTrue,
       );
-      expect(
-        recs.any((r) => r.category == ExploreCategory.coffeeShop),
-        isTrue,
-      );
+      expect(recs.any((r) => r.category == ExploreCategory.coffeeShop), isTrue);
     });
   });
 
@@ -181,10 +177,12 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(exploreControllerProvider.notifier).activate(
-            initialCategory: ExploreCategory.coffeeShop,
-          );
-      container.read(exploreControllerProvider.notifier).selectFromSearch(
+      await container
+          .read(exploreControllerProvider.notifier)
+          .activate(initialCategory: ExploreCategory.coffeeShop);
+      container
+          .read(exploreControllerProvider.notifier)
+          .selectFromSearch(
             const SearchPlace(
               id: 'search_1',
               name: 'Search Result',
@@ -198,6 +196,59 @@ void main() {
       expect((state as ExplorePlaceSelected).place.name, 'Search Result');
     });
   });
+}
+
+List<ExplorePlace> _clusterFixturePlaces(int count) {
+  return List.generate(
+    count,
+    (i) => ExplorePlace(
+      id: 'place_$i',
+      name: 'Dubai Place $i',
+      category: ExploreCategory.restaurant,
+      latitude: 25.20 + i * 0.01,
+      longitude: 55.27 + i * 0.01,
+      address: 'Dubai',
+    ),
+  );
+}
+
+class _FakePoiDatasource extends OverpassPoiDatasource {
+  _FakePoiDatasource() : super(ApiClient());
+
+  @override
+  Future<List<ExplorePlace>> fetchNearby({
+    required ExploreCategory category,
+    required double latitude,
+    required double longitude,
+    double radiusKm = 25,
+    int limit = 40,
+  }) async {
+    if (category == ExploreCategory.coffeeShop) {
+      return [
+        ExplorePlace(
+          id: 'osm_cafe',
+          name: 'Dubai Coffee',
+          category: category,
+          latitude: latitude + 0.001,
+          longitude: longitude + 0.001,
+          address: 'Dubai',
+        ),
+      ];
+    }
+    if (category == ExploreCategory.restaurant) {
+      return [
+        ExplorePlace(
+          id: 'osm_restaurant',
+          name: 'Dubai Restaurant',
+          category: category,
+          latitude: latitude + 0.002,
+          longitude: longitude + 0.002,
+          address: 'Dubai',
+        ),
+      ];
+    }
+    return [];
+  }
 }
 
 class _FakeOfflineRepository implements OfflineRepository {
@@ -221,8 +272,7 @@ class _FakeFuelRepository implements FuelRepository {
     required double latitude,
     required double longitude,
     double radiusKm = 10,
-  }) async =>
-      [];
+  }) async => [];
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -234,8 +284,7 @@ class _FakeEvRepository implements EvChargingRepository {
     required double latitude,
     required double longitude,
     double radiusKm = 15,
-  }) async =>
-      [];
+  }) async => [];
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -247,8 +296,7 @@ class _FakeParkingRepository implements ParkingRepository {
     required double latitude,
     required double longitude,
     double radiusKm = 2,
-  }) async =>
-      [];
+  }) async => [];
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

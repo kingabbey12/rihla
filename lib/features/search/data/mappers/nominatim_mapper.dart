@@ -1,4 +1,4 @@
-import 'package:rihla/features/search/data/datasources/mock_search_places_catalog.dart';
+import 'package:rihla/features/search/data/datasources/uae_search_places_catalog.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 
 /// Maps Nominatim JSON responses to [SearchPlace].
@@ -12,7 +12,8 @@ abstract final class NominatimMapper {
     final osmId = json['osm_id']?.toString() ?? json['place_id']?.toString();
     if (osmId == null) return null;
 
-    final name = json['name'] as String? ??
+    final name =
+        json['name'] as String? ??
         json['display_name'] as String? ??
         'Unknown place';
     final address = json['display_name'] as String? ?? name;
@@ -29,18 +30,34 @@ abstract final class NominatimMapper {
   }
 
   static List<SearchPlace> fromList(List<Map<String, dynamic>> items) {
-    return items.map(fromJson).whereType<SearchPlace>().toList();
+    final places = items.map(fromJson).whereType<SearchPlace>().toList();
+    places.sort((a, b) {
+      final aUae = _looksUae(a.address);
+      final bUae = _looksUae(b.address);
+      if (aUae == bUae) return 0;
+      return aUae ? -1 : 1;
+    });
+    return places;
   }
 
   static List<SearchPlace> offlineFallback(String query) {
-    final trimmed = query.trim().toLowerCase();
-    if (trimmed.isEmpty) return MockSearchPlacesCatalog.popular;
-    return MockSearchPlacesCatalog.all
-        .where(
-          (place) =>
-              place.name.toLowerCase().contains(trimmed) ||
-              place.address.toLowerCase().contains(trimmed),
-        )
-        .toList();
+    return UaeSearchPlacesCatalog.search(query);
+  }
+
+  static bool _looksUae(String address) {
+    final lower = address.toLowerCase();
+    const markers = [
+      'united arab emirates',
+      'uae',
+      'dubai',
+      'abu dhabi',
+      'sharjah',
+      'ajman',
+      'ras al khaimah',
+      'fujairah',
+      'umm al quwain',
+      'al ain',
+    ];
+    return markers.any(lower.contains);
   }
 }

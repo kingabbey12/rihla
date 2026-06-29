@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rihla/features/live_journey/data/services/mock_journey_metrics_engine.dart';
 import 'package:rihla/features/live_journey/domain/entities/dashboard_display_mode.dart';
 import 'package:rihla/features/live_journey/domain/models/live_journey_state.dart';
-import 'package:rihla/features/live_journey/domain/services/journey_metrics_engine.dart';
 import 'package:rihla/features/live_journey/presentation/providers/live_journey_providers.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
 import 'package:rihla/features/safety/data/services/mock_safety_service.dart';
@@ -12,11 +11,14 @@ import 'package:rihla/features/safety/presentation/providers/safety_providers.da
 import '../navigation/navigation_test_helpers.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late ProviderContainer container;
 
   setUp(() {
     container = ProviderContainer(
       overrides: [
+        ...navigationTestOverrides(),
         safetyServiceProvider.overrideWith((ref) => MockSafetyService()),
         journeyMetricsEngineProvider.overrideWith(
           (ref) => MockJourneyMetricsEngine(),

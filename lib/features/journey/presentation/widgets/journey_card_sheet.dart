@@ -8,6 +8,7 @@ import 'package:rihla/features/ai_copilot/presentation/widgets/ai_journey_adviso
 import 'package:rihla/features/journey/presentation/widgets/journey_departure_suggestions.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_metric_tile.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_score_badge.dart';
+import 'package:rihla/features/journey/presentation/widgets/journey_route_details_section.dart';
 import 'package:rihla/shared/widgets/premium_buttons.dart';
 
 /// Premium journey preview card shown over the map before navigation.
@@ -63,6 +64,8 @@ class JourneyCardSheet extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                   children: [
                     _DestinationHeader(destination: summary.destination),
+                    const SizedBox(height: 20),
+                    const JourneyRouteDetailsSection(),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -1,8 +1,8 @@
-import 'package:rihla/features/search/data/datasources/mock_search_places_catalog.dart';
+import 'package:rihla/features/search/data/datasources/uae_search_places_catalog.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 import 'package:rihla/features/search/domain/services/search_service.dart';
 
-/// Offline search backed by the static mock catalog.
+/// Offline/dev search backed by the UAE seed catalog.
 class MockSearchService implements SearchService {
   MockSearchService({
     this.simulatedDelay = const Duration(milliseconds: 350),
@@ -24,10 +24,10 @@ class MockSearchService implements SearchService {
 
     final trimmed = query.trim().toLowerCase();
     if (trimmed.isEmpty) {
-      return MockSearchPlacesCatalog.popular;
+      return UaeSearchPlacesCatalog.popular;
     }
 
-    return MockSearchPlacesCatalog.all
+    return UaeSearchPlacesCatalog.all
         .where(
           (place) =>
               place.name.toLowerCase().contains(trimmed) ||
@@ -52,7 +52,8 @@ class MockSearchService implements SearchService {
     return SearchPlace(
       id: 'mock_reverse',
       name: 'Resolved location',
-      address: '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
+      address:
+          '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
       latitude: latitude,
       longitude: longitude,
     );
@@ -61,7 +62,7 @@ class MockSearchService implements SearchService {
   @override
   Future<SearchPlace?> placeDetails(String placeId) async {
     await Future<void>.delayed(simulatedDelay);
-    for (final place in MockSearchPlacesCatalog.all) {
+    for (final place in UaeSearchPlacesCatalog.all) {
       if (place.id == placeId) return place;
     }
     return null;

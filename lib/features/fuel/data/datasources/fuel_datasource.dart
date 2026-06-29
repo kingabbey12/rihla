@@ -28,22 +28,33 @@ class FuelDatasource {
     double lon,
     double radiusKm,
   ) async {
-    final uri = Uri.parse('$baseUrl/stations').replace(queryParameters: {
-      'lat': '$lat',
-      'lon': '$lon',
-      'radius': '${(radiusKm * 1000).round()}',
-      if (ApiConfig.fuelApiKey != null) 'key': ApiConfig.fuelApiKey!,
-    });
+    final uri = Uri.parse('$baseUrl/stations').replace(
+      queryParameters: {
+        'lat': '$lat',
+        'lon': '$lon',
+        'radius': '${(radiusKm * 1000).round()}',
+        if (ApiConfig.fuelApiKey != null) 'key': ApiConfig.fuelApiKey!,
+      },
+    );
     try {
-      final response = await _client.get(uri, cacheTtl: const Duration(hours: 1));
+      final response = await _client.get(
+        uri,
+        cacheTtl: const Duration(hours: 1),
+      );
       final list = response.jsonList();
-      return list.map((e) => _fromApiJson(e as Map<String, dynamic>, lat, lon)).toList();
+      return list
+          .map((e) => _fromApiJson(e as Map<String, dynamic>, lat, lon))
+          .toList();
     } on ApiException catch (e) {
       throw FuelServiceFailure(e.message);
     }
   }
 
-  FuelStation _fromApiJson(Map<String, dynamic> json, double refLat, double refLon) {
+  FuelStation _fromApiJson(
+    Map<String, dynamic> json,
+    double refLat,
+    double refLon,
+  ) {
     return FuelStation(
       id: json['id']?.toString() ?? '',
       name: json['name'] as String? ?? 'Fuel station',
@@ -51,7 +62,7 @@ class FuelDatasource {
       longitude: (json['longitude'] as num?)?.toDouble() ?? refLon,
       fuelType: json['fuel_type'] as String? ?? 'petrol',
       pricePerLiter: (json['price'] as num?)?.toDouble() ?? 0,
-      currency: json['currency'] as String? ?? 'SAR',
+      currency: json['currency'] as String? ?? 'AED',
       distanceKm: (json['distance_km'] as num?)?.toDouble() ?? 0,
       isOpen: json['is_open'] as bool? ?? true,
     );
@@ -63,12 +74,14 @@ class FuelDatasource {
     double radiusKm,
   ) async {
     final radiusM = (radiusKm * 1000).round();
-    final query = '''
+    final query =
+        '''
 [out:json][timeout:20];
 (
-  node["amenity"="fuel"](around:$radiusM,$lat,$lon);
+  node["amenity"="fuel"]["brand"~"ADNOC|ENOC|Emarat|EPPCO",i](around:$radiusM,$lat,$lon);
+  node["amenity"="fuel"]["operator"~"ADNOC|ENOC|Emarat|EPPCO",i](around:$radiusM,$lat,$lon);
 );
-out 15;
+out 20;
 ''';
     try {
       final uri = Uri.parse(ApiConfig.overpassBaseUrl);
@@ -78,7 +91,8 @@ out 15;
         body: 'data=${Uri.encodeComponent(query)}',
         cacheTtl: const Duration(hours: 2),
       );
-      final elements = (response.jsonObject()['elements'] as List<dynamic>?) ?? [];
+      final elements =
+          (response.jsonObject()['elements'] as List<dynamic>?) ?? [];
       return elements.map((e) {
         final m = e as Map<String, dynamic>;
         final tags = m['tags'] as Map<String, dynamic>? ?? {};
@@ -86,12 +100,16 @@ out 15;
         final stationLon = (m['lon'] as num?)?.toDouble() ?? lon;
         return FuelStation(
           id: 'fuel_${m['id']}',
-          name: tags['name'] as String? ?? tags['brand'] as String? ?? 'Fuel station',
+          name:
+              tags['name'] as String? ??
+              tags['brand'] as String? ??
+              tags['operator'] as String? ??
+              'Fuel station',
           latitude: stationLat,
           longitude: stationLon,
           fuelType: tags['fuel:octane_95'] != null ? 'petrol_95' : 'petrol',
           pricePerLiter: 0,
-          currency: 'SAR',
+          currency: 'AED',
           distanceKm: 0,
           isOpen: true,
         );

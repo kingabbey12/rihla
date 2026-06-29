@@ -31,9 +31,23 @@ final mapCameraProvider =
 
 class MapCameraNotifier extends Notifier<MapCamera> {
   @override
-  MapCamera build() => MapCamera.initial;
+  MapCamera build() => MapCamera.pending;
 
   void update(MapCamera camera) => state = camera;
+}
+
+/// True once the map has centered on the user's real GPS fix at least once.
+final mapUserLocationResolvedProvider =
+    NotifierProvider<MapUserLocationResolvedNotifier, bool>(
+  MapUserLocationResolvedNotifier.new,
+);
+
+class MapUserLocationResolvedNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void resolve() => state = true;
+  void reset() => state = false;
 }
 
 /// Lifecycle status of the map view.
@@ -82,6 +96,34 @@ final mapLocationRetryProvider =
 );
 
 class MapLocationRetryNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void request() => state = state + 1;
+}
+
+/// Incremented to ask the map to resume follow-mode and recenter on the user
+/// (e.g. double-tap during navigation, or the "recenter" control).
+final navigationFollowRecenterProvider =
+    NotifierProvider<NavigationFollowRecenterNotifier, int>(
+  NavigationFollowRecenterNotifier.new,
+);
+
+class NavigationFollowRecenterNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void request() => state = state + 1;
+}
+
+/// Incremented to ask the map to frame the whole active route ("overview").
+/// Framing pauses follow-mode until the user recenters.
+final navigationOverviewRequestProvider =
+    NotifierProvider<NavigationOverviewRequestNotifier, int>(
+  NavigationOverviewRequestNotifier.new,
+);
+
+class NavigationOverviewRequestNotifier extends Notifier<int> {
   @override
   int build() => 0;
 

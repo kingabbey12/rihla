@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/observability/breadcrumb.dart';
 import 'package:rihla/core/observability/observability_providers.dart';
 import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/journey/domain/entities/journey_endpoint.dart';
@@ -75,12 +76,61 @@ class RouteController extends Notifier<RouteState> {
   Future<void> fetchRoutes(RouteRequest request) async {
     _lastRequest = request;
     state = const RouteLoading();
+    final logger = ref.read(appLoggerProvider);
+    logger.log(
+      'route_fetch_request',
+      category: ObservabilityCategory.navigation,
+      data: {
+        'origin': '${request.origin.latitude.toStringAsFixed(6)},'
+            '${request.origin.longitude.toStringAsFixed(6)}',
+        'destination': '${request.destination.latitude.toStringAsFixed(6)},'
+            '${request.destination.longitude.toStringAsFixed(6)}',
+        'provider': ref.read(isOfflineModeProvider) ? 'offline' : 'valhalla',
+      },
+    );
     try {
       final result = await ref.read(routeRepositoryProvider).getRoutes(request);
+      logger.log(
+        'route_received',
+        category: ObservabilityCategory.navigation,
+        data: {
+          'routes': result.routes.length.toString(),
+          if (result.primary != null)
+            'primary_distance_km':
+                result.primary!.distanceKm.toStringAsFixed(2),
+          if (result.primary != null)
+            'primary_duration_s': result.primary!.durationSeconds.toString(),
+        },
+      );
       state = RouteReady(result);
+
+      // Auto-select the primary route so the polyline draws immediately and the
+      // Start Navigation (Confirm) button is enabled — no extra tap required.
+      final primaryId = result.primaryRouteId ?? result.routes.firstOrNull?.id;
+      if (primaryId != null) {
+        selectRoute(primaryId);
+        logger.log(
+          'route_primary_selected',
+          category: ObservabilityCategory.navigation,
+          data: {'route_id': primaryId},
+        );
+      }
     } on RouteFailure catch (failure) {
+      logger.log(
+        'route_fetch_failed',
+        category: ObservabilityCategory.navigation,
+        data: {
+          'type': failure.runtimeType.toString(),
+          'message': failure.message,
+        },
+      );
       state = RouteError(failure);
     } catch (e) {
+      logger.log(
+        'route_fetch_exception',
+        category: ObservabilityCategory.navigation,
+        data: {'error': e.toString()},
+      );
       state = RouteError(RouteUnknownFailure(e.toString()));
     }
   }
@@ -145,3 +195,12 @@ class RouteController extends Notifier<RouteState> {
         longitude: endpoint.longitude,
       );
 }
+
+/// True while the route preview / selection sheet should own the bottom of the
+/// screen (hide the home tab bar so Start Navigation is never covered).
+final routePreviewActiveProvider = Provider<bool>((ref) {
+  return switch (ref.watch(routeControllerProvider)) {
+    RouteLoading() || RouteReady() || RouteSelected() || RouteError() => true,
+    _ => false,
+  };
+});

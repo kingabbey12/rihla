@@ -1,4 +1,5 @@
 import 'package:rihla/features/journey/domain/models/journey_summary.dart';
+import 'package:rihla/features/location/domain/entities/location_position.dart';
 import 'package:rihla/features/navigation/domain/entities/navigation_session.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
 
@@ -15,6 +16,7 @@ abstract class NavigationSessionEngine {
   NavigationSession advance({
     required NavigationSession session,
     required int tickCount,
-    bool simulateOffRoute,
+    LocationPosition? gpsFix,
+    bool simulateOffRoute = false,
   });
 }

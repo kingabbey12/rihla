@@ -10,6 +10,9 @@ import 'package:rihla/features/navigation/domain/entities/navigation_status.dart
 import 'package:rihla/features/navigation/domain/models/navigation_session_state.dart';
 import 'package:rihla/features/navigation/domain/models/reroute_state.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_infra.dart';
+import 'package:rihla/features/location/domain/entities/location_position.dart';
+import 'package:rihla/features/location/domain/entities/location_state.dart';
+import 'package:rihla/features/location/presentation/providers/location_providers.dart';
 import 'package:rihla/features/navigation/presentation/providers/reroute_providers.dart';
 import 'package:rihla/features/navigation/presentation/providers/voice_guidance_providers.dart';
 import 'package:rihla/features/navigation/presentation/services/navigation_polyline_sync.dart';
@@ -77,7 +80,7 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
   Future<void> startSession({
     required JourneySummary journey,
     required RouteSummary route,
-    bool simulationMode = true,
+    bool simulationMode = false,
     bool voiceEnabled = false,
   }) async {
     _stopTicking();
@@ -85,6 +88,8 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     _simulateOffRoute = false;
     _pausedForLifecycle = false;
     _voice.reset();
+    // Continuous GPS updates for live navigation puck and turn-by-turn.
+    await ref.read(locationControllerProvider.notifier).startForegroundStream();
     final sessionId = 'nav_${DateTime.now().millisecondsSinceEpoch}';
     final engine = ref.read(navigationSessionEngineProvider);
     var session = engine.createInitial(
@@ -121,6 +126,7 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     var updated = engine.advance(
       session: session,
       tickCount: _tickCount,
+      gpsFix: session.simulationMode ? null : _currentGpsFix(),
       simulateOffRoute: _simulateOffRoute,
     );
 
@@ -351,6 +357,14 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
       lastUpdatedAt: DateTime.now(),
     );
     await _persist(updated);
+  }
+
+  LocationPosition? _currentGpsFix() {
+    final loc = ref.read(locationControllerProvider);
+    return switch (loc) {
+      LocationActive(:final position) => position,
+      _ => null,
+    };
   }
 
   NavigationSession? get activeSession => switch (state) {

@@ -100,6 +100,7 @@ class MockNavigationSessionEngine implements NavigationSessionEngine {
   NavigationSession advance({
     required NavigationSession session,
     required int tickCount,
+    LocationPosition? gpsFix,
     bool simulateOffRoute = false,
   }) {
     if (session.status == NavigationStatus.arrived) return session;

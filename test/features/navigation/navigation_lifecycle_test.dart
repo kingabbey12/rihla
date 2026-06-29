@@ -15,6 +15,7 @@ void main() {
     container = ProviderContainer(
       overrides: [
         safetyServiceProvider.overrideWith((ref) => MockSafetyService()),
+        ...navigationTestOverrides(),
       ],
     );
   });

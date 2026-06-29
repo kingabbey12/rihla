@@ -4,6 +4,8 @@ import 'package:rihla/features/emergency/presentation/widgets/emergency_map_over
 import 'package:rihla/features/explore/presentation/widgets/explore_map_overlay.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_map_overlay.dart';
 import 'package:rihla/features/live_journey/presentation/widgets/journey_dashboard_map_overlay.dart';
+import 'package:rihla/features/navigation/presentation/widgets/navigation_controls_overlay.dart';
+import 'package:rihla/features/navigation/presentation/widgets/navigation_speed_limit_overlay.dart';
 import 'package:rihla/features/navigation/presentation/widgets/navigation_turn_banner_overlay.dart';
 import 'package:rihla/features/routing/presentation/widgets/route_map_overlay.dart';
 import 'package:rihla/features/safety/presentation/widgets/safety_alert_banner_overlay.dart';
@@ -24,8 +26,10 @@ class MapOverlaysStack extends StatelessWidget {
         Positioned.fill(child: ExploreMapOverlay()),
         Positioned.fill(child: EmergencyMapOverlay()),
         Positioned.fill(child: RouteMapOverlay()),
+        Positioned.fill(child: NavigationControlsOverlay()),
         NavigationTurnBannerOverlay(),
-        const Positioned(
+        Positioned.fill(child: NavigationSpeedLimitOverlay()),
+        Positioned(
           left: 0,
           right: 0,
           bottom: 120,

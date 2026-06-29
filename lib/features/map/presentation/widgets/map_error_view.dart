@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rihla/core/extensions/context_extensions.dart';
+import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
 
-/// Full-bleed error state shown when the map engine fails to load.
+/// Full-bleed friendly error state shown when the map engine fails to load.
 class MapErrorView extends StatelessWidget {
   const MapErrorView({required this.onRetry, super.key});
 
@@ -9,39 +10,74 @@ class MapErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
+
     return ColoredBox(
-      color: context.colorScheme.surface,
+      color: scheme.surface,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.map_outlined,
-                size: 56,
-                color: context.colorScheme.onSurfaceVariant,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 360),
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(
+                RihlaReferenceTokens.cardRadius,
               ),
-              const SizedBox(height: 20),
-              Text(
-                context.l10n.mapErrorTitle,
-                textAlign: TextAlign.center,
-                style: context.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                context.l10n.mapErrorMessage,
-                textAlign: TextAlign.center,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
+              boxShadow: RihlaReferenceTokens.floatingShadow(),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: RihlaReferenceTokens.mapTeal.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.map_outlined,
+                    size: 36,
+                    color: RihlaReferenceTokens.mapTeal,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: onRetry,
-                child: Text(context.l10n.mapRetry),
-              ),
-            ],
+                const SizedBox(height: 20),
+                Text(
+                  context.l10n.mapErrorTitle,
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.l10n.mapErrorMessage,
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onRetry,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: RihlaReferenceTokens.mapTeal,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    icon: const Icon(Icons.refresh_rounded, size: 20),
+                    label: Text(context.l10n.mapRetry),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

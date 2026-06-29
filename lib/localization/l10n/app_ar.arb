@@ -99,6 +99,17 @@
   "searchRemoveFromFavorites": "إزالة من المفضلة",
   "searchOpenMap": "عرض على الخريطة",
   "searchWhereTo": "إلى أين؟",
+  "searchVoiceLabel": "البحث الصوتي",
+  "homeMenuLabel": "القائمة",
+  "homeAiRouteTitle": "أأمن طريق",
+  "homeAiExplanation": "أفضل تقييم للسلامة، وحركة مرور خفيفة على طريقك المعتاد.",
+  "homeWhereToGreeting": "إلى أين تتجه؟",
+  "homeLetsGo": "هيا بنا",
+  "homeCurrentLocationLabel": "الموقع الحالي",
+  "homeLocatingLabel": "جارٍ تحديد موقعك…",
+  "homeGreetingMorning": "صباح الخير",
+  "homeGreetingAfternoon": "مساء الخير",
+  "homeGreetingEvening": "مساء الخير",
   "journeyPlanning": "جارٍ تخطيط رحلتك…",
   "journeyDestination": "الوجهة",
   "journeyDistance": "المسافة",
@@ -133,7 +144,7 @@
   "routeCalculating": "جارٍ حساب المسارات…",
   "routeChooseTitle": "اختر مسارك",
   "routeChooseSubtitle": "اختر أسلوب الرحلة الأنسب لك",
-  "routeConfirm": "تأكيد المسار",
+  "routeConfirm": "بدء الملاحة",
   "routeCancel": "إلغاء",
   "routeErrorTitle": "التوجيه غير متاح",
   "routeErrorMessage": "تعذّر حساب المسارات. حاول مرة أخرى.",
@@ -171,6 +182,35 @@
   "navOffRoute": "خارج المسار — إعادة التوجيه",
   "navVoiceMute": "كتم الإرشاد الصوتي",
   "navVoiceUnmute": "تشغيل الإرشاد الصوتي",
+  "navEtaLabel": "الوصول",
+  "navTimeLeft": "الوقت المتبقي",
+  "navDistanceLeft": "المسافة المتبقية",
+  "navSpeedLabel": "السرعة",
+  "navLimitLabel": "الحد",
+  "navControlEnd": "إنهاء الرحلة",
+  "navControlMute": "كتم",
+  "navControlUnmute": "إلغاء الكتم",
+  "navControlReport": "إبلاغ",
+  "navControlOverview": "نظرة عامة",
+  "navControlRecenter": "إعادة التمركز",
+  "navEndConfirmTitle": "إنهاء هذه الرحلة؟",
+  "navEndConfirmMessage": "سيتم مسح مسارك الحالي.",
+  "navEndConfirmAction": "إنهاء الرحلة",
+  "navKeepDriving": "متابعة الملاحة",
+  "navArrivedTitle": "لقد وصلت",
+  "navArrivedSubtitle": "مرحبًا بك في وجهتك",
+  "navArrivedDistance": "{distance} كم مقطوعة",
+  "@navArrivedDistance": {
+    "placeholders": {
+      "distance": { "type": "String" }
+    }
+  },
+  "navArrivedDuration": "{minutes} دقيقة رحلة",
+  "@navArrivedDuration": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
   "navDistanceMeters": "{meters} م",
   "@navDistanceMeters": {
     "placeholders": {

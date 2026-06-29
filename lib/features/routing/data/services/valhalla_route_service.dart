@@ -11,9 +11,8 @@ import 'package:rihla/features/routing/domain/services/route_service.dart';
 
 /// Production route service backed by the Valhalla HTTP API.
 class ValhallaRouteService implements RouteService {
-  // ignore: prefer_initializing_formals — named params cannot be private.
-  ValhallaRouteService(this._datasource, {AppLogger? logger})
-      : _logger = logger;
+  // ignore: prefer_initializing_formals
+  ValhallaRouteService(this._datasource, {AppLogger? logger}) : _logger = logger;
 
   final ValhallaRouteDatasource _datasource;
   final AppLogger? _logger;

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rihla/features/search/data/datasources/mock_search_places_catalog.dart';
+import 'package:rihla/features/search/data/datasources/uae_search_places_catalog.dart';
 import 'package:rihla/features/search/data/services/mock_search_service.dart';
 
 void main() {
@@ -8,19 +8,19 @@ void main() {
 
     test('empty query returns popular suggestions', () async {
       final results = await service.suggest('');
-      expect(results, MockSearchPlacesCatalog.popular);
+      expect(results, UaeSearchPlacesCatalog.popular);
     });
 
     test('filters by name', () async {
-      final results = await service.suggest('kingdom');
+      final results = await service.suggest('burj');
       expect(results.length, 1);
-      expect(results.first.id, 'kingdom_centre');
+      expect(results.first.id, 'uae_burj_khalifa');
     });
 
     test('filters by address', () async {
-      final results = await service.suggest('diplomatic');
+      final results = await service.suggest('al barsha');
       expect(results, isNotEmpty);
-      expect(results.first.id, 'diplomatic_quarter');
+      expect(results.first.id, 'uae_mall_of_emirates');
     });
 
     test('returns empty for unknown query', () async {

@@ -10,8 +10,9 @@ abstract class LiveLocationShareProvider {
   });
 }
 
-/// Stub provider for Phase 14.
-class StubLiveLocationShareProvider implements LiveLocationShareProvider {
+/// Fails explicitly when no real backend-issued share-link service exists.
+class UnconfiguredLiveLocationShareProvider
+    implements LiveLocationShareProvider {
   @override
   Future<String> createShareLink({
     required EmergencyLocation location,
@@ -19,8 +20,9 @@ class StubLiveLocationShareProvider implements LiveLocationShareProvider {
     int? etaMinutes,
     String? journeyDestination,
   }) async {
-    final token = expiresAt.millisecondsSinceEpoch.toRadixString(36);
-    return 'https://rihla.app/share/$token'
-        '?lat=${location.latitude}&lng=${location.longitude}';
+    throw StateError(
+      'Live location sharing is not configured. '
+      'Configure a backend-issued, time-limited share-link service first.',
+    );
   }
 }

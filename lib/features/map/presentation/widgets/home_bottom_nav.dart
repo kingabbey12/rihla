@@ -1,102 +1,140 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rihla/core/extensions/context_extensions.dart';
 import 'package:rihla/features/emergency/presentation/providers/emergency_providers.dart';
 import 'package:rihla/features/explore/presentation/providers/explore_providers.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_selectors.dart';
+import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/routes/route_paths.dart';
+import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
+import 'package:rihla/theme/app_colors.dart';
 
-/// Primary bottom navigation for the home experience. The selected tab is
-/// derived from the existing explore/emergency activation providers so the bar
-/// stays in sync with whatever surface is showing on the map. Hidden during
-/// active turn-by-turn navigation.
+/// Primary bottom navigation matching the production reference.
 class HomeBottomNav extends ConsumerWidget {
   const HomeBottomNav({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isNavigating = ref.watch(navigationIsActiveProvider);
-    if (isNavigating) return const SizedBox.shrink();
+    final routePreviewActive = ref.watch(routePreviewActiveProvider);
+    if (isNavigating || routePreviewActive) return const SizedBox.shrink();
 
     final exploreActive = ref.watch(exploreActiveProvider);
     final emergencyActive = ref.watch(emergencyActiveProvider);
     final selected = emergencyActive ? 2 : (exploreActive ? 1 : 0);
 
-    final scheme = context.colorScheme;
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     void onTap(int index) {
+      HapticFeedback.selectionClick();
       switch (index) {
         case 0:
           ref.read(exploreControllerProvider.notifier).deactivate();
           ref.read(emergencyControllerProvider.notifier).deactivate();
         case 1:
           ref.read(emergencyControllerProvider.notifier).deactivate();
-          ref.read(exploreControllerProvider.notifier).activate();
+          context.push(RoutePaths.exploreNearby);
         case 2:
           ref.read(exploreControllerProvider.notifier).deactivate();
-          ref.read(emergencyControllerProvider.notifier).activate();
+          context.push(RoutePaths.emergencyDashboard);
         case 3:
-          context.push(RoutePaths.settings);
+          context.push(RoutePaths.profile);
       }
     }
 
     return Align(
       alignment: Alignment.bottomCenter,
-      child: DecoratedBox(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 560),
+        margin: EdgeInsets.fromLTRB(
+          12,
+          0,
+          12,
+          8 + MediaQuery.paddingOf(context).bottom * 0.5,
+        ),
         decoration: BoxDecoration(
-          color: scheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.10),
-              blurRadius: 16,
-              offset: const Offset(0, -2),
-            ),
-          ],
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          color:
+              isDark ? RihlaReferenceTokens.darkSurface : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(RihlaReferenceTokens.navBarRadius),
+          boxShadow: RihlaReferenceTokens.floatingShadow(opacity: 0.16),
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.circular(RihlaReferenceTokens.navBarRadius),
           child: NavigationBarTheme(
             data: NavigationBarThemeData(
-              backgroundColor: scheme.surface,
-              indicatorColor: scheme.primaryContainer,
-              labelTextStyle: WidgetStateProperty.all(
-                context.textTheme.labelMedium,
-              ),
+              labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                final selected = states.contains(WidgetState.selected);
+                return context.textTheme.labelMedium?.copyWith(
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: selected
+                      ? RihlaReferenceTokens.mapTeal
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                );
+              }),
             ),
             child: NavigationBar(
               selectedIndex: selected,
-              height: 68,
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
+              height: 64,
+              backgroundColor: Colors.transparent,
+              animationDuration: const Duration(milliseconds: 500),
+              indicatorColor:
+                  RihlaReferenceTokens.mapTeal.withValues(alpha: 0.16),
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
               onDestinationSelected: onTap,
               destinations: [
-                NavigationDestination(
-                  icon: const Icon(Icons.map_outlined),
-                  selectedIcon: const Icon(Icons.map_rounded),
+                _animatedDestination(
+                  outlined: Icons.home_outlined,
+                  filled: Icons.home_rounded,
                   label: l10n.homeTitle,
+                  active: selected == 0,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.explore_outlined),
-                  selectedIcon: const Icon(Icons.explore_rounded),
+                _animatedDestination(
+                  outlined: Icons.explore_outlined,
+                  filled: Icons.explore_rounded,
                   label: l10n.featureExplore,
+                  active: selected == 1,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.emergency_outlined),
-                  selectedIcon: const Icon(Icons.emergency_rounded),
+                _animatedDestination(
+                  outlined: Icons.emergency_outlined,
+                  filled: Icons.emergency_rounded,
                   label: l10n.featureEmergency,
+                  active: selected == 2,
+                  activeColor: RihlaReferenceTokens.emergencyRed,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.person_outline_rounded),
-                  selectedIcon: const Icon(Icons.person_rounded),
+                _animatedDestination(
+                  outlined: Icons.person_outline_rounded,
+                  filled: Icons.person_rounded,
                   label: l10n.featureProfile,
+                  active: selected == 3,
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// A destination whose selected icon gently scales for a premium transition.
+  NavigationDestination _animatedDestination({
+    required IconData outlined,
+    required IconData filled,
+    required String label,
+    required bool active,
+    Color? activeColor,
+  }) {
+    final color = activeColor ?? RihlaReferenceTokens.mapTeal;
+    return NavigationDestination(
+      label: label,
+      icon: Icon(outlined),
+      selectedIcon: AnimatedScale(
+        scale: active ? 1.12 : 1,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutBack,
+        child: Icon(filled, color: color),
       ),
     );
   }

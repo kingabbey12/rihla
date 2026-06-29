@@ -18,10 +18,17 @@ class SimulatedDrivingLocationService implements LocationService {
     List<({double lat, double lng})>? route,
     this.updateInterval = const Duration(milliseconds: 1000),
     this.speedMetersPerSecond = 16, // ~58 km/h city driving
+    this.isDriving,
   }) : _route = route ?? _defaultDubaiRoute;
 
   /// Ordered waypoints the simulated vehicle drives through, looping at the end.
   final List<({double lat, double lng})> _route;
+
+  /// Whether the simulated vehicle should currently be moving. When this returns
+  /// false (the default-null case treats it as always driving) the marker stays
+  /// parked instead of gliding around on its own — so it only moves once the
+  /// user actually starts a journey, not while they are standing still.
+  final bool Function()? isDriving;
 
   /// How often a new position is emitted.
   final Duration updateInterval;
@@ -80,17 +87,25 @@ class SimulatedDrivingLocationService implements LocationService {
     while (true) {
       await Future<void>.delayed(updateInterval);
 
-      final from = _route[segment % _route.length];
-      final to = _route[(segment + 1) % _route.length];
-      final segmentMeters = _distanceMeters(from.lat, from.lng, to.lat, to.lng);
-      final stepMeters = speedMetersPerSecond *
-          (updateInterval.inMilliseconds / 1000);
-      final stepFraction = segmentMeters == 0 ? 1.0 : stepMeters / segmentMeters;
+      final driving = isDriving?.call() ?? true;
 
-      t += stepFraction;
-      while (t >= 1.0) {
-        t -= 1.0;
-        segment = (segment + 1) % _route.length;
+      // Only advance along the route while actively driving. When parked the
+      // marker holds its current position so it never wanders on its own.
+      if (driving) {
+        final from = _route[segment % _route.length];
+        final to = _route[(segment + 1) % _route.length];
+        final segmentMeters =
+            _distanceMeters(from.lat, from.lng, to.lat, to.lng);
+        final stepMeters = speedMetersPerSecond *
+            (updateInterval.inMilliseconds / 1000);
+        final stepFraction =
+            segmentMeters == 0 ? 1.0 : stepMeters / segmentMeters;
+
+        t += stepFraction;
+        while (t >= 1.0) {
+          t -= 1.0;
+          segment = (segment + 1) % _route.length;
+        }
       }
 
       final a = _route[segment % _route.length];
@@ -103,7 +118,7 @@ class SimulatedDrivingLocationService implements LocationService {
         longitude: lng,
         accuracy: 5,
         timestamp: DateTime.now(),
-        speed: speedMetersPerSecond,
+        speed: driving ? speedMetersPerSecond : 0,
         heading: _bearing(a.lat, a.lng, b.lat, b.lng),
       );
     }

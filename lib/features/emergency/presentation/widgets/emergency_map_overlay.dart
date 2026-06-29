@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/emergency/domain/entities/emergency_state.dart';
-import 'package:rihla/features/emergency/domain/entities/emergency_type.dart';
 import 'package:rihla/features/emergency/domain/entities/roadside_request.dart';
 import 'package:rihla/features/emergency/presentation/providers/emergency_providers.dart';
 import 'package:rihla/features/emergency/presentation/widgets/emergency_sos_countdown_sheet.dart';
+import 'package:rihla/features/emergency/presentation/widgets/roadside_request_sheet.dart';
 
 /// Map overlay with emergency actions and SOS flow.
 class EmergencyMapOverlay extends ConsumerWidget {
@@ -69,14 +68,12 @@ class EmergencyMapOverlay extends ConsumerWidget {
   void _showRoadsideSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet<void>(
       context: context,
-      builder: (ctx) => _RoadsideSheet(
-        onSelect: (type) async {
-          Navigator.of(ctx).pop();
-          await ref
-              .read(emergencyControllerProvider.notifier)
-              .requestRoadside(type);
-        },
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
+      builder: (_) => const RoadsideRequestSheet(),
     );
   }
 }
@@ -182,34 +179,6 @@ class _StatusBanner extends StatelessWidget {
             onPressed: onDismiss,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _RoadsideSheet extends StatelessWidget {
-  const _RoadsideSheet({required this.onSelect});
-
-  final ValueChanged<RoadsideRequestType> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Roadside Assistance', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 16),
-          ...RoadsideRequestType.values.map(
-            (type) => ListTile(
-              leading: const Icon(Icons.build_circle_outlined),
-              title: Text(type.displayName),
-              onTap: () => onSelect(type),
-            ),
-          ),
-        ],
       ),
     );
   }

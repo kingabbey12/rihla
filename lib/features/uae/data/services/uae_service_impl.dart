@@ -1,3 +1,5 @@
+import 'package:rihla/features/fuel/domain/entities/fuel_station.dart';
+import 'package:rihla/features/fuel/domain/repositories/fuel_repository.dart';
 import 'package:rihla/features/uae/data/catalog/uae_catalog.dart';
 import 'package:rihla/features/uae/data/services/uae_compliance_service_impl.dart';
 import 'package:rihla/features/uae/data/services/uae_intelligence_engine.dart';
@@ -16,11 +18,14 @@ class UaeServiceImpl implements UaeService {
   UaeServiceImpl({
     UaeIntelligenceEngine? engine,
     UaeComplianceService? compliance,
+    FuelRepository? fuelRepository,
   })  : _engine = engine ?? UaeIntelligenceEngine(),
-        _compliance = compliance ?? UaeComplianceServiceImpl();
+        _compliance = compliance ?? UaeComplianceServiceImpl(),
+        _fuelRepository = fuelRepository;
 
   final UaeIntelligenceEngine _engine;
   final UaeComplianceService _compliance;
+  final FuelRepository? _fuelRepository;
 
   @override
   UaeRegion detectRegion(double latitude, double longitude) =>
@@ -120,11 +125,65 @@ class UaeServiceImpl implements UaeService {
       weatherAlerts: weatherAlerts,
       holidayTraffic: holidayTraffic,
       salikSummary: salikSummary,
-      regionalServices: _engine.nearbyServices(latitude, longitude),
+      regionalServices: await _regionalServices(latitude, longitude),
       emergencyContacts: UaeCatalog.emergencyDirectory(region),
       evaluatedAt: DateTime.now(),
     );
 
     return _compliance.sanitizeSnapshot(snapshot);
+  }
+
+  /// Static catalog services merged with live ADNOC/ENOC/Emarat/EPPCO stations.
+  Future<List<UaeRegionalService>> _regionalServices(
+    double latitude,
+    double longitude,
+  ) async {
+    final static = _engine.nearbyServices(latitude, longitude);
+    final fuelRepo = _fuelRepository;
+    if (fuelRepo == null) return static;
+
+    try {
+      final liveFuel = await fuelRepo.findNearby(
+        latitude: latitude,
+        longitude: longitude,
+        radiusKm: 15,
+      );
+      final liveServices = liveFuel.map(_fuelToRegional).toList();
+      final merged = <UaeRegionalService>[...liveServices];
+      for (final s in static) {
+        final dup = merged.any(
+          (m) =>
+              m.name.toLowerCase() == s.name.toLowerCase() ||
+              (m.latitude - s.latitude).abs() < 0.001 &&
+                  (m.longitude - s.longitude).abs() < 0.001,
+        );
+        if (!dup) merged.add(s);
+      }
+      merged.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+      return merged.take(8).toList();
+    } catch (_) {
+      return static;
+    }
+  }
+
+  UaeRegionalService _fuelToRegional(FuelStation station) {
+    final brand = station.name.toLowerCase();
+    final category = brand.contains('adnoc')
+        ? 'fuel_adnoc'
+        : brand.contains('enoc')
+            ? 'fuel_enoc'
+            : brand.contains('emarat')
+                ? 'fuel_emarat'
+                : brand.contains('eppco')
+                    ? 'fuel_eppco'
+                    : 'fuel';
+    return UaeRegionalService(
+      id: station.id,
+      name: station.name,
+      category: category,
+      latitude: station.latitude,
+      longitude: station.longitude,
+      distanceKm: station.distanceKm,
+    );
   }
 }

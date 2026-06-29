@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rihla/core/constants/launch_constants.dart';
+import 'package:rihla/shared/design/rihla_motion.dart';
 
 /// Premium fade + slide page transition for first-launch routes.
 CustomTransitionPage<T> fadeSlidePage<T>({
@@ -10,13 +10,13 @@ CustomTransitionPage<T> fadeSlidePage<T>({
   return CustomTransitionPage<T>(
     key: key,
     child: child,
-    transitionDuration: LaunchConstants.pageTransitionDuration,
-    reverseTransitionDuration: LaunchConstants.pageTransitionDuration,
+    transitionDuration: RihlaMotion.page,
+    reverseTransitionDuration: RihlaMotion.page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       final curved = CurvedAnimation(
         parent: animation,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
+        curve: RihlaMotion.standard,
+        reverseCurve: RihlaMotion.exit,
       );
       return FadeTransition(
         opacity: curved,

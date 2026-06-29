@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/core/observability/logging_navigator_observer.dart';
 import 'package:rihla/core/router/page_transitions.dart';
 import 'package:rihla/features/authentication/presentation/pages/auth_entry_page.dart';
 import 'package:rihla/features/launch/presentation/pages/brand_splash_page.dart';
@@ -9,8 +10,15 @@ import 'package:rihla/features/launch/presentation/pages/onboarding_page.dart';
 import 'package:rihla/features/launch/presentation/pages/permission_flow_page.dart';
 import 'package:rihla/features/launch/presentation/pages/welcome_page.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
+import 'package:rihla/features/ai_copilot/presentation/pages/ai_home_page.dart';
 import 'package:rihla/features/emergency/presentation/pages/emergency_launcher_page.dart';
+import 'package:rihla/features/emergency/presentation/pages/emergency_dashboard_page.dart';
+import 'package:rihla/features/emergency/presentation/pages/report_incident_page.dart';
 import 'package:rihla/features/explore/presentation/pages/explore_launcher_page.dart';
+import 'package:rihla/features/explore/presentation/pages/explore_nearby_page.dart';
+import 'package:rihla/features/driving/presentation/pages/rihla_drive_page.dart';
+import 'package:rihla/features/profile/presentation/pages/profile_page.dart';
+import 'package:rihla/features/traffic/presentation/pages/traffic_incidents_page.dart';
 import 'package:rihla/features/map/presentation/pages/map_page.dart';
 import 'package:rihla/features/offline/presentation/pages/offline_center_page.dart';
 import 'package:rihla/features/search/presentation/pages/search_page.dart';
@@ -25,6 +33,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: RoutePaths.splash,
     debugLogDiagnostics: false,
+    observers: [LoggingNavigatorObserver()],
     redirect: (context, state) {
       final launchComplete =
           ref.read(appPreferencesRepositoryProvider).launchFlowCompleted;
@@ -107,9 +116,65 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ExploreLauncherPage(),
       ),
       GoRoute(
+        path: RoutePaths.exploreNearby,
+        name: RoutePaths.exploreNearby,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const ExploreNearbyPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.aiHome,
+        name: RoutePaths.aiHome,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const AiHomePage(),
+        ),
+      ),
+      GoRoute(
         path: RoutePaths.emergency,
         name: RoutePaths.emergency,
         builder: (context, state) => const EmergencyLauncherPage(),
+      ),
+      GoRoute(
+        path: RoutePaths.emergencyDashboard,
+        name: RoutePaths.emergencyDashboard,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const EmergencyDashboardPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.reportIncident,
+        name: RoutePaths.reportIncident,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const ReportIncidentPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.traffic,
+        name: RoutePaths.traffic,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const TrafficIncidentsPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.drive,
+        name: RoutePaths.drive,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const RihlaDrivePage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.profile,
+        name: RoutePaths.profile,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const ProfilePage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.settings,

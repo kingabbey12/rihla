@@ -7,10 +7,13 @@ import 'package:rihla/features/journey/presentation/providers/journey_providers.
 import 'package:rihla/features/routing/data/services/mock_route_service.dart';
 import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
+import 'package:rihla/features/location/presentation/providers/location_providers.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 import 'package:rihla/features/search/presentation/providers/search_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../location/fakes/fake_location_service.dart';
 
 void main() {
   const place = SearchPlace(
@@ -22,13 +25,20 @@ void main() {
   );
 
   late ProviderContainer container;
+  late FakeLocationService fakeLocation;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
+    fakeLocation = FakeLocationService()
+      ..currentPosition = samplePosition(
+        latitude: 24.7136,
+        longitude: 46.6753,
+      );
     container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
+        locationServiceProvider.overrideWithValue(fakeLocation),
         journeyPlanningServiceProvider.overrideWith(
           (ref) => MockJourneyPlanningService(
             ref.watch(aiRecommendationServiceProvider),
@@ -42,7 +52,12 @@ void main() {
 
   tearDown(() => container.dispose());
 
+  Future<void> _ensureGpsFix() async {
+    await container.read(locationControllerProvider.notifier).fetchCurrentPosition();
+  }
+
   test('planToDestination transitions to preview', () async {
+    await _ensureGpsFix();
     await container
         .read(journeyControllerProvider.notifier)
         .planToDestination(place);
@@ -53,6 +68,7 @@ void main() {
   });
 
   test('selection triggers journey preview', () async {
+    await _ensureGpsFix();
     await container.read(searchSelectionProvider).select(place);
     expect(
       container.read(journeyControllerProvider),
@@ -63,6 +79,7 @@ void main() {
   });
 
   test('cancel returns to idle', () async {
+    await _ensureGpsFix();
     await container
         .read(journeyControllerProvider.notifier)
         .planToDestination(place);
@@ -71,6 +88,7 @@ void main() {
   });
 
   test('startJourney transitions to started and triggers routing', () async {
+    await _ensureGpsFix();
     await container
         .read(journeyControllerProvider.notifier)
         .planToDestination(place);
@@ -79,6 +97,7 @@ void main() {
       container.read(journeyControllerProvider),
       isA<JourneyStarted>(),
     );
-    expect(container.read(routeControllerProvider), isA<RouteReady>());
+    // Routes are auto-selected after fetch so the polyline draws immediately.
+    expect(container.read(routeControllerProvider), isA<RouteSelected>());
   });
 }

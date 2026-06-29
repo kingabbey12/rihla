@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/navigation/data/repositories/navigation_session_repository_impl.dart';
+import 'package:rihla/features/navigation/data/services/gps_navigation_session_engine.dart';
 import 'package:rihla/features/navigation/data/services/mock_navigation_session_engine.dart';
 import 'package:rihla/features/navigation/data/services/polyline_maneuver_engine.dart';
 import 'package:rihla/features/navigation/data/services/polyline_route_deviation_detector.dart';
@@ -18,6 +19,14 @@ final routeDeviationDetectorProvider = Provider<RouteDeviationDetector>(
 );
 
 final navigationSessionEngineProvider = Provider<NavigationSessionEngine>(
+  (ref) => GpsNavigationSessionEngine(
+    maneuverEngine: ref.watch(maneuverEngineProvider),
+    deviationDetector: ref.watch(routeDeviationDetectorProvider),
+  ),
+);
+
+/// Simulated engine for debug pages and tests only.
+final mockNavigationSessionEngineProvider = Provider<NavigationSessionEngine>(
   (ref) => MockNavigationSessionEngine(
     maneuverEngine: ref.watch(maneuverEngineProvider),
     deviationDetector: ref.watch(routeDeviationDetectorProvider),

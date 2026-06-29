@@ -29,11 +29,12 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  test('fetchRoutes transitions to ready', () async {
+  test('fetchRoutes auto-selects the primary route', () async {
     await container.read(routeControllerProvider.notifier).fetchRoutes(
           const RouteRequest(origin: origin, destination: destination),
         );
-    expect(container.read(routeControllerProvider), isA<RouteReady>());
+    // Routes are auto-selected so the polyline draws without an extra tap.
+    expect(container.read(routeControllerProvider), isA<RouteSelected>());
   });
 
   test('selectRoute transitions to selected', () async {
@@ -41,8 +42,8 @@ void main() {
     await notifier.fetchRoutes(
       const RouteRequest(origin: origin, destination: destination),
     );
-    final ready = container.read(routeControllerProvider) as RouteReady;
-    notifier.selectRoute(ready.result.routes.first.id);
+    final selected = container.read(routeControllerProvider) as RouteSelected;
+    notifier.selectRoute(selected.result.routes.first.id);
     expect(container.read(routeControllerProvider), isA<RouteSelected>());
   });
 
@@ -51,8 +52,8 @@ void main() {
     await notifier.fetchRoutes(
       const RouteRequest(origin: origin, destination: destination),
     );
-    final ready = container.read(routeControllerProvider) as RouteReady;
-    notifier.selectRoute(ready.result.routes.first.id);
+    final selected = container.read(routeControllerProvider) as RouteSelected;
+    notifier.selectRoute(selected.result.routes.first.id);
     notifier.confirmSelection();
     expect(container.read(routeControllerProvider), isA<RouteConfirmed>());
   });
@@ -77,7 +78,7 @@ void main() {
     );
     expect(retryContainer.read(routeControllerProvider), isA<RouteError>());
     await notifier.retry();
-    expect(retryContainer.read(routeControllerProvider), isA<RouteReady>());
+    expect(retryContainer.read(routeControllerProvider), isA<RouteSelected>());
     expect(calls, 2);
   });
 }

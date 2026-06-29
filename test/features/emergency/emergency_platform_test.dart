@@ -50,12 +50,12 @@ void main() {
         secure: EmergencySecureStorage(memoryStore: {}),
       ),
       EmergencyQueueLocalDatasource(prefs),
-      StubRoadsideProvider(),
+      _TestRoadsideProvider(),
     );
     service = EmergencyServiceImpl(
       repository: repository,
-      roadsideProvider: StubRoadsideProvider(),
-      shareProvider: StubLiveLocationShareProvider(),
+      roadsideProvider: _TestRoadsideProvider(),
+      shareProvider: _TestLiveLocationShareProvider(),
       locationCapture: () async => location,
     );
   });
@@ -208,8 +208,33 @@ void main() {
         etaMinutes: 15,
         journeyDestination: 'Dubai',
       );
-      expect(link.url, contains('rihla.app/share'));
+      expect(link.url, contains('rihla.test/share'));
       expect(link.expiresAt.isAfter(DateTime.now()), isTrue);
     });
   });
+}
+
+class _TestRoadsideProvider implements RoadsideProvider {
+  @override
+  Future<String> submitRequest(RoadsideRequest request) async {
+    return 'test_${request.id}';
+  }
+
+  @override
+  Future<RoadsideRequestStatus> checkStatus(String providerReference) async {
+    return RoadsideRequestStatus.submitted;
+  }
+}
+
+class _TestLiveLocationShareProvider implements LiveLocationShareProvider {
+  @override
+  Future<String> createShareLink({
+    required EmergencyLocation location,
+    required DateTime expiresAt,
+    int? etaMinutes,
+    String? journeyDestination,
+  }) async {
+    return 'https://rihla.test/share/${expiresAt.millisecondsSinceEpoch}'
+        '?lat=${location.latitude}&lng=${location.longitude}';
+  }
 }

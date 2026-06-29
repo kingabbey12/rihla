@@ -321,6 +321,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchWhereTo => 'Where to?';
 
   @override
+  String get searchVoiceLabel => 'Voice search';
+
+  @override
+  String get homeMenuLabel => 'Menu';
+
+  @override
+  String get homeAiRouteTitle => 'Safest Route';
+
+  @override
+  String get homeAiExplanation =>
+      'Best safety score, light traffic on your usual route.';
+
+  @override
+  String get homeWhereToGreeting => 'Where are you going?';
+
+  @override
+  String get homeLetsGo => 'Let\'s Go';
+
+  @override
+  String get homeCurrentLocationLabel => 'Current location';
+
+  @override
+  String get homeLocatingLabel => 'Locating you…';
+
+  @override
+  String get homeGreetingMorning => 'Good morning';
+
+  @override
+  String get homeGreetingAfternoon => 'Good afternoon';
+
+  @override
+  String get homeGreetingEvening => 'Good evening';
+
+  @override
   String get journeyPlanning => 'Planning your journey…';
 
   @override
@@ -436,7 +470,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Select the journey style that fits you best';
 
   @override
-  String get routeConfirm => 'Confirm Route';
+  String get routeConfirm => 'Start Navigation';
 
   @override
   String get routeCancel => 'Cancel';
@@ -537,6 +571,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navVoiceUnmute => 'Unmute voice guidance';
+
+  @override
+  String get navEtaLabel => 'ETA';
+
+  @override
+  String get navTimeLeft => 'Time left';
+
+  @override
+  String get navDistanceLeft => 'Distance left';
+
+  @override
+  String get navSpeedLabel => 'Speed';
+
+  @override
+  String get navLimitLabel => 'LIMIT';
+
+  @override
+  String get navControlEnd => 'End Trip';
+
+  @override
+  String get navControlMute => 'Mute';
+
+  @override
+  String get navControlUnmute => 'Unmute';
+
+  @override
+  String get navControlReport => 'Report';
+
+  @override
+  String get navControlOverview => 'Overview';
+
+  @override
+  String get navControlRecenter => 'Recenter';
+
+  @override
+  String get navEndConfirmTitle => 'End this journey?';
+
+  @override
+  String get navEndConfirmMessage => 'Your current route will be cleared.';
+
+  @override
+  String get navEndConfirmAction => 'End Trip';
+
+  @override
+  String get navKeepDriving => 'Continue Navigation';
+
+  @override
+  String get navArrivedTitle => 'You\'ve arrived';
+
+  @override
+  String get navArrivedSubtitle => 'Welcome to your destination';
+
+  @override
+  String navArrivedDistance(String distance) {
+    return '$distance km driven';
+  }
+
+  @override
+  String navArrivedDuration(int minutes) {
+    return '$minutes min trip';
+  }
 
   @override
   String navDistanceMeters(int meters) {

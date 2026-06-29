@@ -8,11 +8,14 @@ import 'package:rihla/features/safety/presentation/providers/safety_providers.da
 import '../navigation/navigation_test_helpers.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late ProviderContainer container;
 
   setUp(() {
     container = ProviderContainer(
       overrides: [
+        ...navigationTestOverrides(),
         safetyServiceProvider.overrideWith(
           (ref) => MockSafetyService(),
         ),

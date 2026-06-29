@@ -162,6 +162,9 @@ class LocationController extends Notifier<LocationState> {
 
     final permission = await _repository.getPermissionStatus();
     final gps = await _repository.getGpsStatus();
+    // The provider may have been disposed during the awaits above (e.g. the
+    // user left the screen or, in tests, the container was torn down).
+    if (!ref.mounted) return;
     state = LocationLoading(permissionStatus: permission, gpsStatus: gps);
 
     final accuracy = ref.read(locationAccuracyProvider);
@@ -169,6 +172,7 @@ class LocationController extends Notifier<LocationState> {
         .watchPosition(accuracy: accuracy, distanceFilterMeters: 5)
         .listen(
       (result) {
+        if (!ref.mounted) return;
         switch (result) {
           case LocationOk(:final value):
             final haveFix = state is LocationActive;

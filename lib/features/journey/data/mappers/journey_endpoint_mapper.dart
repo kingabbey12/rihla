@@ -11,12 +11,3 @@ extension SearchPlaceJourneyX on SearchPlace {
         longitude: longitude,
       );
 }
-
-/// Default mock origin when GPS is unavailable (central Riyadh).
-const JourneyEndpoint kDefaultJourneyOrigin = JourneyEndpoint(
-  id: 'current_location',
-  name: 'Current Location',
-  address: 'Riyadh, Saudi Arabia',
-  latitude: 24.7136,
-  longitude: 46.6753,
-);

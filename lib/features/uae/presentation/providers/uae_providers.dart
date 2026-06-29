@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/features/fuel/presentation/providers/fuel_providers.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_selectors.dart';
 import 'package:rihla/features/safety/domain/entities/hazard.dart';
 import 'package:rihla/features/uae/data/datasources/uae_local_datasource.dart';
@@ -22,7 +23,7 @@ final uaeRepositoryProvider = Provider<UaeRepository>(
 );
 
 final uaeServiceProvider = Provider<UaeService>(
-  (ref) => UaeServiceImpl(),
+  (ref) => UaeServiceImpl(fuelRepository: ref.watch(fuelRepositoryProvider)),
 );
 
 final uaePreferencesProvider = Provider<UaePreferences>(

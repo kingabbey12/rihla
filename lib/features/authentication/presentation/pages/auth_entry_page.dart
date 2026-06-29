@@ -9,8 +9,10 @@ import 'package:rihla/features/authentication/presentation/widgets/auth_legal_fo
 import 'package:rihla/features/authentication/presentation/widgets/auth_social_button.dart';
 import 'package:rihla/features/launch/presentation/providers/launch_providers.dart';
 import 'package:rihla/routes/route_paths.dart';
+import 'package:rihla/shared/ui/rihla_dark_hero_background.dart';
 import 'package:rihla/shared/widgets/premium_buttons.dart';
 import 'package:rihla/shared/widgets/rihla_logo.dart';
+import 'package:rihla/theme/app_colors.dart';
 
 /// Authentication entry screen wired to [AccountController].
 class AuthEntryPage extends ConsumerWidget {
@@ -47,37 +49,43 @@ class AuthEntryPage extends ConsumerWidget {
     final controller = ref.read(accountControllerProvider.notifier);
 
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppConstants.defaultPadding * 1.5,
-          ),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-              const RihlaLogo(
-                variant: RihlaLogoVariant.iconOnly,
-                iconSize: 72,
-              ),
-              const SizedBox(height: 32),
-              Text(
-                l10n.authEntryTitle,
-                style: context.textTheme.headlineLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l10n.authEntrySubtitle,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colorScheme.onSurface.withValues(alpha: 0.7),
+      backgroundColor: AppColors.backgroundDark,
+      body: RihlaDarkHeroBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.defaultPadding * 1.5,
+            ),
+            child: Column(
+              children: [
+                const Spacer(flex: 2),
+                const RihlaLogo(
+                  variant: RihlaLogoVariant.iconOnly,
+                  iconSize: 72,
+                  color: AppColors.textPrimaryDark,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const Spacer(flex: 2),
-              PremiumPrimaryButton(
-                label: l10n.continueWithEmail,
-                onPressed: () => _showEmailSheet(context, ref),
-              ),
+                const SizedBox(height: 32),
+                Text(
+                  l10n.authEntryTitle,
+                  style: context.textTheme.headlineLarge?.copyWith(
+                    color: AppColors.textPrimaryDark,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  l10n.authEntrySubtitle,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondaryDark,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(flex: 2),
+                PremiumPrimaryButton(
+                  label: l10n.continueWithEmail,
+                  gold: true,
+                  onPressed: () => _showEmailSheet(context, ref),
+                ),
               const SizedBox(height: 12),
               AuthSocialButton(
                 label: l10n.continueWithGoogle,
@@ -114,6 +122,7 @@ class AuthEntryPage extends ConsumerWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -692,6 +692,72 @@ abstract class AppLocalizations {
   /// **'Where to?'**
   String get searchWhereTo;
 
+  /// No description provided for @searchVoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice search'**
+  String get searchVoiceLabel;
+
+  /// No description provided for @homeMenuLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get homeMenuLabel;
+
+  /// No description provided for @homeAiRouteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Safest Route'**
+  String get homeAiRouteTitle;
+
+  /// No description provided for @homeAiExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Best safety score, light traffic on your usual route.'**
+  String get homeAiExplanation;
+
+  /// No description provided for @homeWhereToGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Where are you going?'**
+  String get homeWhereToGreeting;
+
+  /// No description provided for @homeLetsGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Go'**
+  String get homeLetsGo;
+
+  /// No description provided for @homeCurrentLocationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current location'**
+  String get homeCurrentLocationLabel;
+
+  /// No description provided for @homeLocatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Locating you…'**
+  String get homeLocatingLabel;
+
+  /// No description provided for @homeGreetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get homeGreetingMorning;
+
+  /// No description provided for @homeGreetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get homeGreetingAfternoon;
+
+  /// No description provided for @homeGreetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get homeGreetingEvening;
+
   /// No description provided for @journeyPlanning.
   ///
   /// In en, this message translates to:
@@ -899,7 +965,7 @@ abstract class AppLocalizations {
   /// No description provided for @routeConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Confirm Route'**
+  /// **'Start Navigation'**
   String get routeConfirm;
 
   /// No description provided for @routeCancel.
@@ -1093,6 +1159,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unmute voice guidance'**
   String get navVoiceUnmute;
+
+  /// No description provided for @navEtaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ETA'**
+  String get navEtaLabel;
+
+  /// No description provided for @navTimeLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Time left'**
+  String get navTimeLeft;
+
+  /// No description provided for @navDistanceLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance left'**
+  String get navDistanceLeft;
+
+  /// No description provided for @navSpeedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get navSpeedLabel;
+
+  /// No description provided for @navLimitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'LIMIT'**
+  String get navLimitLabel;
+
+  /// No description provided for @navControlEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End Trip'**
+  String get navControlEnd;
+
+  /// No description provided for @navControlMute.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get navControlMute;
+
+  /// No description provided for @navControlUnmute.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get navControlUnmute;
+
+  /// No description provided for @navControlReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get navControlReport;
+
+  /// No description provided for @navControlOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get navControlOverview;
+
+  /// No description provided for @navControlRecenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Recenter'**
+  String get navControlRecenter;
+
+  /// No description provided for @navEndConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End this journey?'**
+  String get navEndConfirmTitle;
+
+  /// No description provided for @navEndConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current route will be cleared.'**
+  String get navEndConfirmMessage;
+
+  /// No description provided for @navEndConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'End Trip'**
+  String get navEndConfirmAction;
+
+  /// No description provided for @navKeepDriving.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Navigation'**
+  String get navKeepDriving;
+
+  /// No description provided for @navArrivedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve arrived'**
+  String get navArrivedTitle;
+
+  /// No description provided for @navArrivedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to your destination'**
+  String get navArrivedSubtitle;
+
+  /// No description provided for @navArrivedDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km driven'**
+  String navArrivedDistance(String distance);
+
+  /// No description provided for @navArrivedDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min trip'**
+  String navArrivedDuration(int minutes);
 
   /// No description provided for @navDistanceMeters.
   ///

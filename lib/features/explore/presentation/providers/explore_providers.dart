@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/observability/analytics_event.dart';
 import 'package:rihla/core/observability/product_analytics.dart';
 import 'package:rihla/core/providers/app_providers.dart';
+import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/ev_charging/presentation/providers/ev_charging_providers.dart';
+import 'package:rihla/features/explore/data/datasources/overpass_poi_datasource.dart';
 import 'package:rihla/features/explore/data/datasources/explore_favorites_local_datasource.dart';
 import 'package:rihla/features/explore/data/repositories/explore_favorites_repository_impl.dart';
 import 'package:rihla/features/explore/data/repositories/explore_repository_impl.dart';
@@ -31,13 +33,18 @@ import 'package:rihla/features/search/domain/entities/search_place.dart';
 
 final exploreFavoritesLocalDatasourceProvider =
     Provider<ExploreFavoritesLocalDatasource>(
-  (ref) => ExploreFavoritesLocalDatasource(ref.watch(sharedPreferencesProvider)),
-);
+      (ref) =>
+          ExploreFavoritesLocalDatasource(ref.watch(sharedPreferencesProvider)),
+    );
 
 final exploreFavoritesRepositoryProvider = Provider<ExploreFavoritesRepository>(
   (ref) => ExploreFavoritesRepositoryImpl(
     ref.watch(exploreFavoritesLocalDatasourceProvider),
   ),
+);
+
+final overpassPoiDatasourceProvider = Provider<OverpassPoiDatasource>(
+  (ref) => OverpassPoiDatasource(ref.watch(apiClientProvider)),
 );
 
 final exploreServiceProvider = Provider<ExploreService>(
@@ -46,6 +53,7 @@ final exploreServiceProvider = Provider<ExploreService>(
     fuelRepository: ref.watch(fuelRepositoryProvider),
     evChargingRepository: ref.watch(evChargingRepositoryProvider),
     parkingRepository: ref.watch(parkingRepositoryProvider),
+    poiDatasource: ref.watch(overpassPoiDatasourceProvider),
     isOffline: () => ref.read(isOfflineModeProvider),
   ),
 );
@@ -71,9 +79,7 @@ class ExploreActiveNotifier extends Notifier<bool> {
 // —— Controller ———————————————————————————————————————————————————————————————
 
 final exploreControllerProvider =
-    NotifierProvider<ExploreController, ExploreState>(
-  ExploreController.new,
-);
+    NotifierProvider<ExploreController, ExploreState>(ExploreController.new);
 
 class ExploreController extends Notifier<ExploreState> {
   ExploreCategory? _category;
@@ -100,10 +106,21 @@ class ExploreController extends Notifier<ExploreState> {
     _page = 0;
   }
 
+  /// Returns to the discovery landing (no category selected).
+  Future<void> showDiscovery() async {
+    _category = null;
+    _filter = ExploreFilter.defaults;
+    _page = 0;
+    state = const ExploreLoading();
+    await _load();
+  }
+
   Future<void> selectCategory(ExploreCategory category) async {
-    trackProductEvent(ref, AnalyticsEvent.exploreUsed, properties: {
-      'category': category.name,
-    });
+    trackProductEvent(
+      ref,
+      AnalyticsEvent.exploreUsed,
+      properties: {'category': category.name},
+    );
     _category = category;
     _page = 0;
     _filter = _filter.copyWith(category: category);
@@ -128,7 +145,9 @@ class ExploreController extends Notifier<ExploreState> {
     if (current is! ExploreReady || !current.hasMore) return;
     _page++;
     final camera = ref.read(mapCameraProvider);
-    final result = await ref.read(exploreRepositoryProvider).search(
+    final result = await ref
+        .read(exploreRepositoryProvider)
+        .search(
           ExploreSearch(
             category: _category,
             filter: _filter,
@@ -153,7 +172,9 @@ class ExploreController extends Notifier<ExploreState> {
     if (current is ExploreReady) {
       ref.read(exploreFavoritesRepositoryProvider).recordRecent(place);
       state = ExplorePlaceSelected(place: place, previous: current);
-      ref.read(mapFlyToTargetProvider.notifier).flyTo(
+      ref
+          .read(mapFlyToTargetProvider.notifier)
+          .flyTo(
             latitude: place.latitude,
             longitude: place.longitude,
             zoom: 15,
@@ -183,7 +204,9 @@ class ExploreController extends Notifier<ExploreState> {
   Future<void> _load() async {
     try {
       final camera = ref.read(mapCameraProvider);
-      final result = await ref.read(exploreRepositoryProvider).search(
+      final result = await ref
+          .read(exploreRepositoryProvider)
+          .search(
             ExploreSearch(
               category: _category,
               filter: _filter,
@@ -221,51 +244,53 @@ final exploreMapMarkersProvider = Provider<List<ExploreMarker>>((ref) {
     _ => const <ExplorePlace>[],
   };
 
-  return ref.read(exploreServiceProvider).clusterMarkers(
-        places: places,
-        zoom: camera.zoom,
-      );
+  return ref
+      .read(exploreServiceProvider)
+      .clusterMarkers(places: places, zoom: camera.zoom);
 });
 
 // —— Journey recommendations ——————————————————————————————————————————————————
 
 final exploreJourneyRecommendationsProvider =
     FutureProvider<List<ExploreJourneyRecommendation>>((ref) async {
-  final journeyState = ref.watch(journeyControllerProvider);
-  final liveState = ref.watch(liveJourneyControllerProvider);
-  final camera = ref.watch(mapCameraProvider);
+      final journeyState = ref.watch(journeyControllerProvider);
+      final liveState = ref.watch(liveJourneyControllerProvider);
+      final camera = ref.watch(mapCameraProvider);
 
-  JourneyMetrics? metrics;
-  var trafficHeavy = false;
-  var weatherAdverse = false;
+      JourneyMetrics? metrics;
+      var trafficHeavy = false;
+      var weatherAdverse = false;
 
-  if (journeyState is JourneyPreview) {
-    metrics = journeyState.summary.metrics;
-    trafficHeavy = metrics.trafficLevel == TrafficLevel.heavy;
-    weatherAdverse = metrics.temperatureCelsius > 42 ||
-        metrics.weatherSummary.toLowerCase().contains('rain');
-  } else if (liveState is LiveJourneyActive) {
-    trafficHeavy = true;
-  }
+      if (journeyState is JourneyPreview) {
+        metrics = journeyState.summary.metrics;
+        trafficHeavy = metrics.trafficLevel == TrafficLevel.heavy;
+        weatherAdverse =
+            metrics.temperatureCelsius > 42 ||
+            metrics.weatherSummary.toLowerCase().contains('rain');
+      } else if (liveState is LiveJourneyActive) {
+        trafficHeavy = true;
+      }
 
-  if (metrics == null && liveState is! LiveJourneyActive) {
-    return [];
-  }
+      if (metrics == null && liveState is! LiveJourneyActive) {
+        return [];
+      }
 
-  final fuelPercent = metrics != null
-      ? (100 - metrics.fuelEstimateLiters * 2).clamp(0, 100).toDouble()
-      : 50.0;
-  final batteryPercent = metrics != null
-      ? (100 - metrics.batteryEstimatePercent).clamp(0, 100).toDouble()
-      : 60.0;
+      final fuelPercent = metrics != null
+          ? (100 - metrics.fuelEstimateLiters * 2).clamp(0, 100).toDouble()
+          : 50.0;
+      final batteryPercent = metrics != null
+          ? (100 - metrics.batteryEstimatePercent).clamp(0, 100).toDouble()
+          : 60.0;
 
-  return ref.read(exploreRepositoryProvider).getJourneyRecommendations(
-        latitude: camera.latitude,
-        longitude: camera.longitude,
-        remainingFuelPercent: fuelPercent,
-        remainingBatteryPercent: batteryPercent,
-        journeyDurationMinutes: metrics?.durationMinutes,
-        trafficHeavy: trafficHeavy,
-        weatherAdverse: weatherAdverse,
-      );
-});
+      return ref
+          .read(exploreRepositoryProvider)
+          .getJourneyRecommendations(
+            latitude: camera.latitude,
+            longitude: camera.longitude,
+            remainingFuelPercent: fuelPercent,
+            remainingBatteryPercent: batteryPercent,
+            journeyDurationMinutes: metrics?.durationMinutes,
+            trafficHeavy: trafficHeavy,
+            weatherAdverse: weatherAdverse,
+          );
+    });

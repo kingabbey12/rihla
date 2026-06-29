@@ -47,9 +47,44 @@ abstract final class UaeCatalog {
     ),
     UaeTollGate(
       id: 'salik_mamzar',
-      name: 'Mamzar',
+      name: 'Al Mamzar South',
       latitude: 25.2831,
       longitude: 55.3542,
+      region: UaeRegion.dubai,
+    ),
+    UaeTollGate(
+      id: 'salik_mamzar_north',
+      name: 'Al Mamzar North',
+      latitude: 25.2918,
+      longitude: 55.3528,
+      region: UaeRegion.dubai,
+    ),
+    UaeTollGate(
+      id: 'salik_jebel_ali',
+      name: 'Jebel Ali',
+      latitude: 24.9854,
+      longitude: 55.0915,
+      region: UaeRegion.dubai,
+    ),
+    UaeTollGate(
+      id: 'salik_al_safa_north',
+      name: 'Al Safa North',
+      latitude: 25.1784,
+      longitude: 55.2468,
+      region: UaeRegion.dubai,
+    ),
+    UaeTollGate(
+      id: 'salik_business_bay_crossing',
+      name: 'Business Bay Crossing',
+      latitude: 25.2304,
+      longitude: 55.3336,
+      region: UaeRegion.dubai,
+    ),
+    UaeTollGate(
+      id: 'salik_al_yalayis',
+      name: 'Al Yalayis',
+      latitude: 24.9306,
+      longitude: 55.1710,
       region: UaeRegion.dubai,
     ),
   ];
@@ -222,52 +257,58 @@ abstract final class UaeCatalog {
   ];
 
   static List<UaeEmergencyContact> emergencyDirectory(UaeRegion region) => [
-        const UaeEmergencyContact(
-          id: 'em_police',
-          name: 'Police',
-          number: '999',
-          category: 'police',
-        ),
-        const UaeEmergencyContact(
-          id: 'em_ambulance',
-          name: 'Ambulance',
-          number: '998',
-          category: 'ambulance',
-        ),
-        const UaeEmergencyContact(
-          id: 'em_fire',
-          name: 'Fire / Civil Defence',
-          number: '997',
-          category: 'fire',
-        ),
-        UaeEmergencyContact(
-          id: 'em_roadside',
-          name: 'Roadside Assistance',
-          number: '800 4357',
-          category: 'roadside',
-          region: region,
-        ),
-        const UaeEmergencyContact(
-          id: 'em_poison',
-          name: 'Poison Information',
-          number: '800 424',
-          category: 'poison',
-        ),
-        UaeEmergencyContact(
-          id: 'em_rta',
-          name: 'Road Authority (RTA)',
-          number: '800 9090',
-          category: 'road_authority',
-          region: UaeRegion.dubai,
-        ),
-        UaeEmergencyContact(
-          id: 'em_ad_police',
-          name: 'Abu Dhabi Police',
-          number: '999',
-          category: 'police',
-          region: UaeRegion.abuDhabi,
-        ),
-      ];
+    const UaeEmergencyContact(
+      id: 'em_police',
+      name: 'Police',
+      number: '999',
+      category: 'police',
+    ),
+    const UaeEmergencyContact(
+      id: 'em_ambulance',
+      name: 'Ambulance',
+      number: '998',
+      category: 'ambulance',
+    ),
+    const UaeEmergencyContact(
+      id: 'em_fire',
+      name: 'Fire / Civil Defence',
+      number: '997',
+      category: 'fire',
+    ),
+    UaeEmergencyContact(
+      id: 'em_roadside',
+      name: 'Roadside Assistance',
+      number: '800 4357',
+      category: 'roadside',
+      region: region,
+    ),
+    const UaeEmergencyContact(
+      id: 'em_poison',
+      name: 'Poison Information',
+      number: '800 424',
+      category: 'poison',
+    ),
+    const UaeEmergencyContact(
+      id: 'em_coast_guard',
+      name: 'Coast Guard',
+      number: '996',
+      category: 'coast_guard',
+    ),
+    UaeEmergencyContact(
+      id: 'em_rta',
+      name: 'Road Authority (RTA)',
+      number: '800 9090',
+      category: 'road_authority',
+      region: UaeRegion.dubai,
+    ),
+    UaeEmergencyContact(
+      id: 'em_ad_police',
+      name: 'Abu Dhabi Police',
+      number: '999',
+      category: 'police',
+      region: UaeRegion.abuDhabi,
+    ),
+  ];
 
   static List<UaeHolidayTraffic> activeHolidayTraffic(DateTime now) {
     final month = now.month;
@@ -307,7 +348,8 @@ abstract final class UaeCatalog {
     const r = 6371.0;
     final dLat = _rad(lat2 - lat1);
     final dLon = _rad(lon2 - lon1);
-    final a = sin(dLat / 2) * sin(dLat / 2) +
+    final a =
+        sin(dLat / 2) * sin(dLat / 2) +
         cos(_rad(lat1)) * cos(_rad(lat2)) * sin(dLon / 2) * sin(dLon / 2);
     return r * 2 * atan2(sqrt(a), sqrt(1 - a));
   }

@@ -318,6 +318,40 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchWhereTo => 'إلى أين؟';
 
   @override
+  String get searchVoiceLabel => 'البحث الصوتي';
+
+  @override
+  String get homeMenuLabel => 'القائمة';
+
+  @override
+  String get homeAiRouteTitle => 'أأمن طريق';
+
+  @override
+  String get homeAiExplanation =>
+      'أفضل تقييم للسلامة، وحركة مرور خفيفة على طريقك المعتاد.';
+
+  @override
+  String get homeWhereToGreeting => 'إلى أين تتجه؟';
+
+  @override
+  String get homeLetsGo => 'هيا بنا';
+
+  @override
+  String get homeCurrentLocationLabel => 'الموقع الحالي';
+
+  @override
+  String get homeLocatingLabel => 'جارٍ تحديد موقعك…';
+
+  @override
+  String get homeGreetingMorning => 'صباح الخير';
+
+  @override
+  String get homeGreetingAfternoon => 'مساء الخير';
+
+  @override
+  String get homeGreetingEvening => 'مساء الخير';
+
+  @override
   String get journeyPlanning => 'جارٍ تخطيط رحلتك…';
 
   @override
@@ -431,7 +465,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get routeChooseSubtitle => 'اختر أسلوب الرحلة الأنسب لك';
 
   @override
-  String get routeConfirm => 'تأكيد المسار';
+  String get routeConfirm => 'بدء الملاحة';
 
   @override
   String get routeCancel => 'إلغاء';
@@ -531,6 +565,67 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get navVoiceUnmute => 'تشغيل الإرشاد الصوتي';
+
+  @override
+  String get navEtaLabel => 'الوصول';
+
+  @override
+  String get navTimeLeft => 'الوقت المتبقي';
+
+  @override
+  String get navDistanceLeft => 'المسافة المتبقية';
+
+  @override
+  String get navSpeedLabel => 'السرعة';
+
+  @override
+  String get navLimitLabel => 'الحد';
+
+  @override
+  String get navControlEnd => 'إنهاء الرحلة';
+
+  @override
+  String get navControlMute => 'كتم';
+
+  @override
+  String get navControlUnmute => 'إلغاء الكتم';
+
+  @override
+  String get navControlReport => 'إبلاغ';
+
+  @override
+  String get navControlOverview => 'نظرة عامة';
+
+  @override
+  String get navControlRecenter => 'إعادة التمركز';
+
+  @override
+  String get navEndConfirmTitle => 'إنهاء هذه الرحلة؟';
+
+  @override
+  String get navEndConfirmMessage => 'سيتم مسح مسارك الحالي.';
+
+  @override
+  String get navEndConfirmAction => 'إنهاء الرحلة';
+
+  @override
+  String get navKeepDriving => 'متابعة الملاحة';
+
+  @override
+  String get navArrivedTitle => 'لقد وصلت';
+
+  @override
+  String get navArrivedSubtitle => 'مرحبًا بك في وجهتك';
+
+  @override
+  String navArrivedDistance(String distance) {
+    return '$distance كم مقطوعة';
+  }
+
+  @override
+  String navArrivedDuration(int minutes) {
+    return '$minutes دقيقة رحلة';
+  }
 
   @override
   String navDistanceMeters(int meters) {

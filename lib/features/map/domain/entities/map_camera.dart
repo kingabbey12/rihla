@@ -18,14 +18,16 @@ class MapCamera {
   /// Camera pitch in degrees (0 = top-down).
   final double tilt;
 
-  /// Default camera centered on Dubai when the user's location is not yet
-  /// available (e.g. permission not granted). Replaced with the live position
-  /// as soon as it resolves.
-  static const MapCamera initial = MapCamera(
-    latitude: 25.2048,
-    longitude: 55.2708,
-    zoom: 12,
+  /// Sentinel before the first GPS fix. The map stays in a loading state until
+  /// the user's real position resolves — never a fixed city coordinate.
+  static const MapCamera pending = MapCamera(
+    latitude: 0,
+    longitude: 0,
+    zoom: 2,
   );
+
+  /// @deprecated Use [pending]. Kept for call-site migration.
+  static const MapCamera initial = pending;
 
   MapCamera copyWith({
     double? latitude,

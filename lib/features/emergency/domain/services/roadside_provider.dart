@@ -1,20 +1,23 @@
 import 'package:rihla/features/emergency/domain/entities/roadside_request.dart';
 
-/// Abstraction for roadside assistance providers (future integration).
+/// Abstraction for roadside assistance providers.
 abstract class RoadsideProvider {
   Future<String> submitRequest(RoadsideRequest request);
   Future<RoadsideRequestStatus> checkStatus(String providerReference);
 }
 
-/// Stub provider for Phase 14 — returns a local reference.
-class StubRoadsideProvider implements RoadsideProvider {
+/// Fails explicitly when no real UAE roadside provider is configured.
+class UnconfiguredRoadsideProvider implements RoadsideProvider {
   @override
   Future<String> submitRequest(RoadsideRequest request) async {
-    return 'stub_${request.id}';
+    throw StateError(
+      'Roadside assistance provider is not configured. '
+      'Configure a UAE dispatch integration before submitting requests.',
+    );
   }
 
   @override
   Future<RoadsideRequestStatus> checkStatus(String providerReference) async {
-    return RoadsideRequestStatus.submitted;
+    throw StateError('Roadside assistance provider is not configured.');
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/journey/domain/entities/journey_endpoint.dart';
 import 'package:rihla/features/journey/domain/entities/journey_metrics.dart';
 import 'package:rihla/features/journey/domain/entities/journey_score.dart';
@@ -7,6 +8,20 @@ import 'package:rihla/features/journey/domain/models/journey_summary.dart';
 import 'package:rihla/features/routing/domain/entities/route_coordinate.dart';
 import 'package:rihla/features/routing/domain/entities/route_profile.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
+import 'package:rihla/features/location/presentation/providers/location_providers.dart';
+
+import '../location/fakes/fake_location_service.dart';
+
+/// Shared provider overrides for navigation unit tests.
+List navigationTestOverrides() {
+  final pos = samplePosition();
+  final fakeLocation = FakeLocationService()
+    ..currentPosition = pos
+    ..stream = Stream.value(pos);
+  return [
+    locationServiceProvider.overrideWithValue(fakeLocation),
+  ];
+}
 
 JourneySummary sampleJourneySummary() {
   const components = JourneyScoreComponents(

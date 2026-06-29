@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/explore/domain/entities/explore_state.dart';
-import 'package:rihla/features/explore/domain/repositories/explore_repository.dart';
 import 'package:rihla/features/explore/presentation/providers/explore_providers.dart';
 import 'package:rihla/features/explore/presentation/widgets/explore_category_bar.dart';
+import 'package:rihla/features/explore/presentation/widgets/explore_empty_state.dart';
 import 'package:rihla/features/explore/presentation/widgets/explore_filters_sheet.dart';
+import 'package:rihla/features/explore/presentation/widgets/explore_landing_overlay.dart';
 import 'package:rihla/features/explore/presentation/widgets/explore_place_sheet.dart';
+import 'package:rihla/features/explore/presentation/widgets/explore_recommendation_card.dart';
 
 /// Map overlay for the Explore discovery platform.
 class ExploreMapOverlay extends ConsumerWidget {
@@ -17,37 +19,61 @@ class ExploreMapOverlay extends ConsumerWidget {
     if (!active) return const SizedBox.shrink();
 
     final state = ref.watch(exploreControllerProvider);
-    final recommendations = ref.watch(exploreJourneyRecommendationsProvider);
-    final topPadding = MediaQuery.paddingOf(context).top + 120;
+    final topPadding = MediaQuery.paddingOf(context).top;
+
+    final selectedCategory = switch (state) {
+      ExploreReady(:final category) => category,
+      ExploreLoading(:final category) => category,
+      ExplorePlaceSelected(:final previous) => previous.category,
+      _ => null,
+    };
+    final isPlaceSelected = state is ExplorePlaceSelected;
+    final showLanding = !isPlaceSelected && selectedCategory == null;
 
     return Stack(
       children: [
-        Positioned(
-          top: topPadding,
-          left: 12,
-          right: 12,
-          child: const ExploreCategoryBar(),
-        ),
-        Positioned(
-          top: topPadding + 56,
-          right: 12,
-          child: IconButton.filled(
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
-              builder: (_) => const ExploreFiltersSheet(),
-            ),
-            icon: const Icon(Icons.tune),
-          ),
-        ),
-        if (recommendations case AsyncData(:final value) when value.isNotEmpty)
+        if (showLanding)
+          const ExploreLandingOverlay()
+        else ...[
           Positioned(
+            top: topPadding + 120,
             left: 12,
             right: 12,
-            bottom: 120 + MediaQuery.paddingOf(context).bottom,
-            child: _JourneyRecommendationsBanner(recommendations: value),
+            child: Row(
+              children: [
+                const Expanded(child: ExploreCategoryBar()),
+                const SizedBox(width: 8),
+                _FilterButton(
+                  onTap: () => showModalBottomSheet<void>(
+                    context: context,
+                    builder: (_) => const ExploreFiltersSheet(),
+                  ),
+                ),
+              ],
+            ),
           ),
+          if (!isPlaceSelected) const _RecommendationsStrip(),
+        ],
         if (state is ExploreLoading)
           const Center(child: CircularProgressIndicator()),
+        if (state is ExploreReady &&
+            state.places.isEmpty &&
+            state.category != null)
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: ExploreEmptyState(
+                category: state.category,
+                onDiscover: () =>
+                    ref.read(exploreControllerProvider.notifier).showDiscovery(),
+                onWiden: () => ref
+                    .read(exploreControllerProvider.notifier)
+                    .applyFilter(
+                      state.filter.copyWith(maxDistanceKm: 100),
+                    ),
+              ),
+            ),
+          ),
         if (state is ExplorePlaceSelected)
           ExplorePlaceSheet(
             place: state.place,
@@ -55,12 +81,13 @@ class ExploreMapOverlay extends ConsumerWidget {
                 ref.read(exploreControllerProvider.notifier).dismissPlace(),
           ),
         Positioned(
-          top: MediaQuery.paddingOf(context).top + 8,
+          top: topPadding + 8,
           left: 8,
           child: IconButton.filledTonal(
             onPressed: () =>
                 ref.read(exploreControllerProvider.notifier).deactivate(),
             icon: const Icon(Icons.close),
+            tooltip: 'Close Explore',
           ),
         ),
       ],
@@ -68,38 +95,66 @@ class ExploreMapOverlay extends ConsumerWidget {
   }
 }
 
-class _JourneyRecommendationsBanner extends StatelessWidget {
-  const _JourneyRecommendationsBanner({required this.recommendations});
+class _FilterButton extends StatelessWidget {
+  const _FilterButton({required this.onTap});
 
-  final List<ExploreJourneyRecommendation> recommendations;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final top = recommendations.first;
     return Material(
-      color: theme.colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Journey suggestion',
-              style: theme.textTheme.labelLarge,
-            ),
-            const SizedBox(height: 4),
-            Text(top.reason, style: theme.textTheme.bodyMedium),
-            if (top.places.isNotEmpty)
-              Text(
-                top.places.first.name,
-                style: theme.textTheme.titleSmall,
-              ),
-          ],
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(22),
+      elevation: 2,
+      shadowColor: Colors.black.withValues(alpha: 0.15),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(11),
+          child: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
         ),
       ),
     );
+  }
+}
+
+/// Horizontal AI recommendation strip shown above the bottom navigation while
+/// browsing a category.
+class _RecommendationsStrip extends ConsumerWidget {
+  const _RecommendationsStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recommendations = ref.watch(exploreJourneyRecommendationsProvider);
+    if (recommendations case AsyncData(:final value) when value.isNotEmpty) {
+      final bottom = MediaQuery.paddingOf(context).bottom;
+      return Positioned(
+        left: 0,
+        right: 0,
+        bottom: 104 + bottom,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 320),
+          child: SizedBox(
+            height: 124,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: value.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (context, index) => ExploreRecommendationCard(
+                recommendation: value[index],
+                onTap: (place) => ref
+                    .read(exploreControllerProvider.notifier)
+                    .selectPlace(place),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 }

@@ -27,14 +27,19 @@ class ParkingDatasource {
     double lon,
     double radiusKm,
   ) async {
-    final uri = Uri.parse('$baseUrl/parking').replace(queryParameters: {
-      'lat': '$lat',
-      'lon': '$lon',
-      'radius': '${(radiusKm * 1000).round()}',
-      if (ApiConfig.parkingApiKey != null) 'key': ApiConfig.parkingApiKey!,
-    });
+    final uri = Uri.parse('$baseUrl/parking').replace(
+      queryParameters: {
+        'lat': '$lat',
+        'lon': '$lon',
+        'radius': '${(radiusKm * 1000).round()}',
+        if (ApiConfig.parkingApiKey != null) 'key': ApiConfig.parkingApiKey!,
+      },
+    );
     try {
-      final response = await _client.get(uri, cacheTtl: const Duration(minutes: 30));
+      final response = await _client.get(
+        uri,
+        cacheTtl: const Duration(minutes: 30),
+      );
       return response.jsonList().map((e) {
         final m = e as Map<String, dynamic>;
         return ParkingLocation(
@@ -44,7 +49,7 @@ class ParkingDatasource {
           longitude: (m['longitude'] as num?)?.toDouble() ?? lon,
           distanceKm: (m['distance_km'] as num?)?.toDouble() ?? 0,
           pricePerHour: (m['price_per_hour'] as num?)?.toDouble() ?? 0,
-          currency: m['currency'] as String? ?? 'SAR',
+          currency: m['currency'] as String? ?? 'AED',
           isAvailable: m['available'] as bool? ?? true,
           openingHours: m['opening_hours'] as String? ?? '24/7',
           capacity: m['capacity'] as int?,
@@ -62,7 +67,8 @@ class ParkingDatasource {
     double radiusKm,
   ) async {
     final radiusM = (radiusKm * 1000).round();
-    final query = '''
+    final query =
+        '''
 [out:json][timeout:20];
 (
   node["amenity"="parking"](around:$radiusM,$lat,$lon);
@@ -78,14 +84,17 @@ out center 15;
         body: 'data=${Uri.encodeComponent(query)}',
         cacheTtl: const Duration(hours: 1),
       );
-      final elements = (response.jsonObject()['elements'] as List<dynamic>?) ?? [];
+      final elements =
+          (response.jsonObject()['elements'] as List<dynamic>?) ?? [];
       return elements.map((e) {
         final m = e as Map<String, dynamic>;
         final tags = m['tags'] as Map<String, dynamic>? ?? {};
-        final pLat = (m['lat'] as num?)?.toDouble() ??
+        final pLat =
+            (m['lat'] as num?)?.toDouble() ??
             (m['center'] as Map?)?['lat'] as num? ??
             lat;
-        final pLon = (m['lon'] as num?)?.toDouble() ??
+        final pLon =
+            (m['lon'] as num?)?.toDouble() ??
             (m['center'] as Map?)?['lon'] as num? ??
             lon;
         final capacity = int.tryParse('${tags['capacity'] ?? ''}');
@@ -96,7 +105,7 @@ out center 15;
           longitude: pLon.toDouble(),
           distanceKm: 0,
           pricePerHour: 0,
-          currency: 'SAR',
+          currency: 'AED',
           isAvailable: tags['access'] != 'private',
           openingHours: tags['opening_hours'] as String? ?? '24/7',
           capacity: capacity,

@@ -1,4 +1,5 @@
 import 'package:rihla/features/explore/data/catalog/explore_place_catalog.dart';
+import 'package:rihla/features/explore/data/datasources/overpass_poi_datasource.dart';
 import 'package:rihla/features/explore/data/utils/explore_geo_util.dart';
 import 'package:rihla/features/explore/data/utils/explore_marker_clusterer.dart';
 import 'package:rihla/features/explore/domain/entities/explore_category.dart';
@@ -17,24 +18,27 @@ import 'package:rihla/features/parking/domain/repositories/parking_repository.da
 import 'package:rihla/features/offline/data/poi/offline_poi_catalog.dart';
 import 'package:rihla/features/offline/domain/repositories/offline_repository.dart';
 
-/// Aggregates online catalog, live modules, and offline POIs for Explore.
+/// Aggregates live POI modules and offline POIs for Explore.
 class ExploreServiceImpl implements ExploreService {
   ExploreServiceImpl({
     required OfflineRepository offlineRepository,
     required FuelRepository fuelRepository,
     required EvChargingRepository evChargingRepository,
     required ParkingRepository parkingRepository,
+    required OverpassPoiDatasource poiDatasource,
     required bool Function() isOffline,
-  })  : _offlineRepository = offlineRepository,
-        _fuelRepository = fuelRepository,
-        _evRepository = evChargingRepository,
-        _parkingRepository = parkingRepository,
-        _isOffline = isOffline;
+  }) : _offlineRepository = offlineRepository,
+       _fuelRepository = fuelRepository,
+       _evRepository = evChargingRepository,
+       _parkingRepository = parkingRepository,
+       _poiDatasource = poiDatasource,
+       _isOffline = isOffline;
 
   final OfflineRepository _offlineRepository;
   final FuelRepository _fuelRepository;
   final EvChargingRepository _evRepository;
   final ParkingRepository _parkingRepository;
+  final OverpassPoiDatasource _poiDatasource;
   final bool Function() _isOffline;
 
   @override
@@ -83,8 +87,9 @@ class ExploreServiceImpl implements ExploreService {
 
     final start = search.page * search.pageSize;
     final end = (start + search.pageSize).clamp(0, filtered.length);
-    final pageItems =
-        start < filtered.length ? filtered.sublist(start, end) : <ExplorePlace>[];
+    final pageItems = start < filtered.length
+        ? filtered.sublist(start, end)
+        : <ExplorePlace>[];
 
     return ExploreResult(
       places: pageItems,
@@ -239,15 +244,14 @@ class ExploreServiceImpl implements ExploreService {
     double? south,
     double? east,
     double? west,
-  }) =>
-      ExploreMarkerClusterer.cluster(
-        places: places,
-        zoom: zoom,
-        north: north,
-        south: south,
-        east: east,
-        west: west,
-      );
+  }) => ExploreMarkerClusterer.cluster(
+    places: places,
+    zoom: zoom,
+    north: north,
+    south: south,
+    east: east,
+    west: west,
+  );
 
   Future<List<ExplorePlace>> _loadPlaces({
     required double latitude,
@@ -259,9 +263,17 @@ class ExploreServiceImpl implements ExploreService {
       return _loadOfflinePlaces(category: category);
     }
 
-    var places = ExplorePlaceCatalog.allPlaces();
-    if (category != null) {
-      places = places.where((p) => p.category == category).toList();
+    final categories = category == null ? ExploreCategory.values : [category];
+    var places = <ExplorePlace>[];
+
+    for (final c in categories) {
+      final livePois = await _poiDatasource.fetchNearby(
+        category: c,
+        latitude: latitude,
+        longitude: longitude,
+        radiusKm: radiusKm,
+      );
+      places = [...places, ...livePois];
     }
 
     try {
@@ -270,10 +282,7 @@ class ExploreServiceImpl implements ExploreService {
         longitude: longitude,
         radiusKm: radiusKm,
       );
-      places = [
-        ...places,
-        ...liveFuel.map(_fromFuelStation),
-      ];
+      places = [...places, ...liveFuel.map(_fromFuelStation)];
     } catch (_) {}
 
     try {
@@ -282,10 +291,7 @@ class ExploreServiceImpl implements ExploreService {
         longitude: longitude,
         radiusKm: radiusKm,
       );
-      places = [
-        ...places,
-        ...liveEv.map(_fromEvCharger),
-      ];
+      places = [...places, ...liveEv.map(_fromEvCharger)];
     } catch (_) {}
 
     try {
@@ -294,10 +300,7 @@ class ExploreServiceImpl implements ExploreService {
         longitude: longitude,
         radiusKm: radiusKm,
       );
-      places = [
-        ...places,
-        ...liveParking.map(_fromParking),
-      ];
+      places = [...places, ...liveParking.map(_fromParking)];
     } catch (_) {}
 
     if (category != null) {
@@ -320,11 +323,7 @@ class ExploreServiceImpl implements ExploreService {
       }
     }
     if (places.isEmpty) {
-      var fallback = ExplorePlaceCatalog.allPlaces();
-      if (category != null) {
-        fallback = fallback.where((p) => p.category == category).toList();
-      }
-      return fallback;
+      return const [];
     }
     return places;
   }
@@ -333,83 +332,70 @@ class ExploreServiceImpl implements ExploreService {
     List<ExplorePlace> places,
     double lat,
     double lng,
-  ) =>
-      places
-          .map(
-            (p) {
-              final km = ExploreGeoUtil.distanceKm(
-                lat,
-                lng,
-                p.latitude,
-                p.longitude,
-              );
-              return ExplorePlace(
-                id: p.id,
-                name: p.name,
-                category: p.category,
-                latitude: p.latitude,
-                longitude: p.longitude,
-                address: p.address,
-                rating: p.rating,
-                reviewCount: p.reviewCount,
-                openingHours: p.openingHours,
-                isOpenNow: p.isOpenNow,
-                isOpen24Hours: p.isOpen24Hours,
-                phone: p.phone,
-                website: p.website,
-                photoUrl: p.photoUrl,
-                distanceKm: km,
-                etaMinutes: ExploreGeoUtil.etaMinutes(km),
-                fuelTypes: p.fuelTypes,
-                evConnectorTypes: p.evConnectorTypes,
-                isFreeParking: p.isFreeParking,
-                isPaidParking: p.isPaidParking,
-                isAccessible: p.isAccessible,
-                isFamilyFriendly: p.isFamilyFriendly,
-                priceLevel: p.priceLevel,
-              );
-            },
-          )
-          .toList();
+  ) => places.map((p) {
+    final km = ExploreGeoUtil.distanceKm(lat, lng, p.latitude, p.longitude);
+    return ExplorePlace(
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      latitude: p.latitude,
+      longitude: p.longitude,
+      address: p.address,
+      rating: p.rating,
+      reviewCount: p.reviewCount,
+      openingHours: p.openingHours,
+      isOpenNow: p.isOpenNow,
+      isOpen24Hours: p.isOpen24Hours,
+      phone: p.phone,
+      website: p.website,
+      photoUrl: p.photoUrl,
+      distanceKm: km,
+      etaMinutes: ExploreGeoUtil.etaMinutes(km),
+      fuelTypes: p.fuelTypes,
+      evConnectorTypes: p.evConnectorTypes,
+      isFreeParking: p.isFreeParking,
+      isPaidParking: p.isPaidParking,
+      isAccessible: p.isAccessible,
+      isFamilyFriendly: p.isFamilyFriendly,
+      priceLevel: p.priceLevel,
+    );
+  }).toList();
 
   ExplorePlace _fromFuelStation(FuelStation s) => ExplorePlace(
-        id: 'fuel_${s.id}',
-        name: s.name,
-        category: ExploreCategory.fuelStation,
-        latitude: s.latitude,
-        longitude: s.longitude,
-        address: s.name,
-        distanceKm: s.distanceKm,
-        isOpenNow: s.isOpen,
-        fuelTypes: [s.fuelType],
-        rating: 4.2,
-      );
+    id: 'fuel_${s.id}',
+    name: s.name,
+    category: ExploreCategory.fuelStation,
+    latitude: s.latitude,
+    longitude: s.longitude,
+    address: s.name,
+    distanceKm: s.distanceKm,
+    isOpenNow: s.isOpen,
+    fuelTypes: [s.fuelType],
+  );
 
   ExplorePlace _fromEvCharger(EvCharger c) => ExplorePlace(
-        id: 'ev_${c.id}',
-        name: c.name,
-        category: ExploreCategory.evCharger,
-        latitude: c.latitude,
-        longitude: c.longitude,
-        address: c.operatorName ?? c.name,
-        distanceKm: c.distanceKm,
-        isOpenNow: c.isAvailable,
-        evConnectorTypes: c.connectorTypes,
-        rating: 4.0,
-      );
+    id: 'ev_${c.id}',
+    name: c.name,
+    category: ExploreCategory.evCharger,
+    latitude: c.latitude,
+    longitude: c.longitude,
+    address: c.operatorName ?? c.name,
+    distanceKm: c.distanceKm,
+    isOpenNow: c.isAvailable,
+    evConnectorTypes: c.connectorTypes,
+  );
 
   ExplorePlace _fromParking(ParkingLocation p) => ExplorePlace(
-        id: 'parking_${p.id}',
-        name: p.name,
-        category: ExploreCategory.parking,
-        latitude: p.latitude,
-        longitude: p.longitude,
-        address: p.name,
-        distanceKm: p.distanceKm,
-        isOpenNow: p.isAvailable,
-        isPaidParking: p.pricePerHour > 0,
-        isFreeParking: p.pricePerHour == 0,
-        openingHours: p.openingHours,
-        rating: 3.8,
-      );
+    id: 'parking_${p.id}',
+    name: p.name,
+    category: ExploreCategory.parking,
+    latitude: p.latitude,
+    longitude: p.longitude,
+    address: p.name,
+    distanceKm: p.distanceKm,
+    isOpenNow: p.isAvailable,
+    isPaidParking: p.pricePerHour > 0,
+    isFreeParking: p.pricePerHour == 0,
+    openingHours: p.openingHours,
+  );
 }

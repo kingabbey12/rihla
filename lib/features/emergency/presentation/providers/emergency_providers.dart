@@ -25,6 +25,7 @@ import 'package:rihla/features/emergency/domain/services/emergency_service.dart'
 import 'package:rihla/features/emergency/domain/services/live_location_share_provider.dart';
 import 'package:rihla/features/emergency/domain/services/roadside_provider.dart';
 import 'package:rihla/features/explore/domain/entities/explore_category.dart';
+import 'package:rihla/features/explore/domain/entities/explore_place.dart';
 import 'package:rihla/features/explore/presentation/providers/explore_providers.dart';
 import 'package:rihla/features/journey/domain/models/journey_state.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
@@ -34,6 +35,9 @@ import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_selectors.dart';
 import 'package:rihla/features/offline/presentation/providers/offline_providers.dart';
 import 'package:rihla/features/safety/presentation/providers/safety_providers.dart';
+import 'package:rihla/features/uae/domain/entities/uae_intelligence_snapshot.dart';
+import 'package:rihla/features/uae/presentation/providers/uae_providers.dart';
+import 'package:rihla/features/weather/presentation/providers/weather_providers.dart';
 
 // —— Infrastructure ————————————————————————————————————————————————————————
 
@@ -48,15 +52,16 @@ final emergencyContactsProvider = FutureProvider<List<EmergencyContact>>(
 
 final emergencyQueueLocalDatasourceProvider =
     Provider<EmergencyQueueLocalDatasource>(
-  (ref) => EmergencyQueueLocalDatasource(ref.watch(sharedPreferencesProvider)),
-);
+      (ref) =>
+          EmergencyQueueLocalDatasource(ref.watch(sharedPreferencesProvider)),
+    );
 
 final roadsideProviderProvider = Provider<RoadsideProvider>(
-  (ref) => StubRoadsideProvider(),
+  (ref) => UnconfiguredRoadsideProvider(),
 );
 
 final liveLocationShareProviderProvider = Provider<LiveLocationShareProvider>(
-  (ref) => StubLiveLocationShareProvider(),
+  (ref) => UnconfiguredLiveLocationShareProvider(),
 );
 
 final emergencyRepositoryProvider = Provider<EmergencyRepository>(
@@ -145,8 +150,8 @@ class EmergencyActiveNotifier extends Notifier<bool> {
 
 final emergencyControllerProvider =
     NotifierProvider<EmergencyController, EmergencyState>(
-  EmergencyController.new,
-);
+      EmergencyController.new,
+    );
 
 class EmergencyController extends Notifier<EmergencyState> {
   Timer? _sosTimer;
@@ -212,28 +217,25 @@ class EmergencyController extends Notifier<EmergencyState> {
         snapshots: snapshots,
         isOnline: isOnline,
       );
-      state = EmergencySosSent(
-        incidentId: incident.id,
-        queued: !isOnline,
-      );
+      state = EmergencySosSent(incidentId: incident.id, queued: !isOnline);
       trackProductEvent(
         ref,
         AnalyticsEvent.emergencyActivated,
         properties: {'queued': '${!isOnline}'},
       );
-      ref.read(appLoggerProvider).log(
-        'emergency_sos_confirmed',
-        category: ObservabilityCategory.emergency,
-        level: ObservabilityLevel.warning,
-      );
+      ref
+          .read(appLoggerProvider)
+          .log(
+            'emergency_sos_confirmed',
+            category: ObservabilityCategory.emergency,
+            level: ObservabilityLevel.warning,
+          );
       await refresh();
     } catch (e) {
       state = EmergencyError(message: e.toString());
-      ref.read(appLoggerProvider).error(
-            e,
-            StackTrace.current,
-            reason: 'emergency_sos_failed',
-          );
+      ref
+          .read(appLoggerProvider)
+          .error(e, StackTrace.current, reason: 'emergency_sos_failed');
     }
   }
 
@@ -246,7 +248,8 @@ class EmergencyController extends Notifier<EmergencyState> {
     final location = await captureEmergencyLocation(ref);
     final snapshots = buildEmergencySnapshots(ref);
     final isOnline = ref.read(networkConnectivityStateProvider);
-    final timeline = ref.read(emergencyRepositoryProvider).getActiveTimeline() ??
+    final timeline =
+        ref.read(emergencyRepositoryProvider).getActiveTimeline() ??
         EmergencyTimeline(
           id: 'timeline_${DateTime.now().millisecondsSinceEpoch}',
           events: [],
@@ -291,7 +294,9 @@ class EmergencyController extends Notifier<EmergencyState> {
       etaMinutes: snapshots.etaMinutes,
       journeyDestination: snapshots.journeyDestination,
     );
-    await ref.read(emergencyRepositoryProvider).appendTimelineEvent(
+    await ref
+        .read(emergencyRepositoryProvider)
+        .appendTimelineEvent(
           EmergencyTimelineEvent(
             id: 'share_${DateTime.now().millisecondsSinceEpoch}',
             type: EmergencyTimelineEventType.locationShared,
@@ -327,15 +332,62 @@ class EmergencyController extends Notifier<EmergencyState> {
 
   void openNearestHospital() {
     ref.read(exploreActiveProvider.notifier).activate();
-    ref.read(exploreControllerProvider.notifier).selectCategory(
-          ExploreCategory.hospital,
-        );
+    ref
+        .read(exploreControllerProvider.notifier)
+        .selectCategory(ExploreCategory.hospital);
   }
 
   void openNearestPolice() {
     ref.read(exploreActiveProvider.notifier).activate();
-    ref.read(exploreControllerProvider.notifier).selectCategory(
-          ExploreCategory.policeStation,
-        );
+    ref
+        .read(exploreControllerProvider.notifier)
+        .selectCategory(ExploreCategory.policeStation);
   }
 }
+
+/// UAE emergency directory for the user's current GPS region.
+final uaeEmergencyContactsProvider =
+    FutureProvider<List<UaeEmergencyContact>>((ref) async {
+  final location = ref.watch(locationControllerProvider);
+  double? lat;
+  double? lng;
+  if (location is LocationActive) {
+    lat = location.position.latitude;
+    lng = location.position.longitude;
+  }
+  final snapshot = await ref.read(uaeServiceProvider).evaluate(
+        latitude: lat,
+        longitude: lng,
+        preferences: ref.watch(uaePreferencesProvider),
+        weather: ref.watch(weatherSnapshotProvider),
+      );
+  return snapshot.emergencyContacts;
+});
+
+/// Nearest hospitals from live Overpass POI data.
+final emergencyNearbyHospitalsProvider =
+    FutureProvider<List<ExplorePlace>>((ref) async {
+  final location = ref.watch(locationControllerProvider);
+  if (location is! LocationActive) return const [];
+  return ref.read(exploreRepositoryProvider).getPlacesByCategory(
+        category: ExploreCategory.hospital,
+        latitude: location.position.latitude,
+        longitude: location.position.longitude,
+        radiusKm: 20,
+        limit: 5,
+      );
+});
+
+/// Nearest police stations from live Overpass POI data.
+final emergencyNearbyPoliceProvider =
+    FutureProvider<List<ExplorePlace>>((ref) async {
+  final location = ref.watch(locationControllerProvider);
+  if (location is! LocationActive) return const [];
+  return ref.read(exploreRepositoryProvider).getPlacesByCategory(
+        category: ExploreCategory.policeStation,
+        latitude: location.position.latitude,
+        longitude: location.position.longitude,
+        radiusKm: 20,
+        limit: 5,
+      );
+});

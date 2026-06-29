@@ -99,6 +99,17 @@
   "searchRemoveFromFavorites": "Remove from Favorites",
   "searchOpenMap": "Open on map",
   "searchWhereTo": "Where to?",
+  "searchVoiceLabel": "Voice search",
+  "homeMenuLabel": "Menu",
+  "homeAiRouteTitle": "Safest Route",
+  "homeAiExplanation": "Best safety score, light traffic on your usual route.",
+  "homeWhereToGreeting": "Where are you going?",
+  "homeLetsGo": "Let's Go",
+  "homeCurrentLocationLabel": "Current location",
+  "homeLocatingLabel": "Locating you…",
+  "homeGreetingMorning": "Good morning",
+  "homeGreetingAfternoon": "Good afternoon",
+  "homeGreetingEvening": "Good evening",
   "journeyPlanning": "Planning your journey…",
   "journeyDestination": "Destination",
   "journeyDistance": "Distance",
@@ -158,7 +169,7 @@
   "routeCalculating": "Calculating routes…",
   "routeChooseTitle": "Choose your route",
   "routeChooseSubtitle": "Select the journey style that fits you best",
-  "routeConfirm": "Confirm Route",
+  "routeConfirm": "Start Navigation",
   "routeCancel": "Cancel",
   "routeErrorTitle": "Routing unavailable",
   "routeErrorMessage": "We couldn't calculate routes. Please try again.",
@@ -196,6 +207,35 @@
   "navOffRoute": "Off route — rerouting",
   "navVoiceMute": "Mute voice guidance",
   "navVoiceUnmute": "Unmute voice guidance",
+  "navEtaLabel": "ETA",
+  "navTimeLeft": "Time left",
+  "navDistanceLeft": "Distance left",
+  "navSpeedLabel": "Speed",
+  "navLimitLabel": "LIMIT",
+  "navControlEnd": "End Trip",
+  "navControlMute": "Mute",
+  "navControlUnmute": "Unmute",
+  "navControlReport": "Report",
+  "navControlOverview": "Overview",
+  "navControlRecenter": "Recenter",
+  "navEndConfirmTitle": "End this journey?",
+  "navEndConfirmMessage": "Your current route will be cleared.",
+  "navEndConfirmAction": "End Trip",
+  "navKeepDriving": "Continue Navigation",
+  "navArrivedTitle": "You've arrived",
+  "navArrivedSubtitle": "Welcome to your destination",
+  "navArrivedDistance": "{distance} km driven",
+  "@navArrivedDistance": {
+    "placeholders": {
+      "distance": { "type": "String" }
+    }
+  },
+  "navArrivedDuration": "{minutes} min trip",
+  "@navArrivedDuration": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
   "navDistanceMeters": "{meters} m",
   "@navDistanceMeters": {
     "placeholders": {
