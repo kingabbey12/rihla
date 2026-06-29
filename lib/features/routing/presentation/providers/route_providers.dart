@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rihla/core/observability/observability_providers.dart';
 import 'package:rihla/core/providers/network_providers.dart';
 import 'package:rihla/features/journey/domain/entities/journey_endpoint.dart';
 import 'package:rihla/features/journey/domain/models/journey_summary.dart';
@@ -21,10 +22,10 @@ import 'package:rihla/features/routing/domain/services/route_service.dart';
 /// Provides the Valhalla-backed [RouteService] (production HTTP).
 final valhallaRouteServiceProvider = Provider<RouteService>((ref) {
   final datasource = ValhallaRouteDatasource(ref.watch(apiClientProvider));
-  return ValhallaRouteService(datasource);
+  return ValhallaRouteService(datasource, logger: ref.watch(appLoggerProvider));
 });
 
-/// Default route service — production Valhalla routing.
+/// Production Valhalla routing on all platforms.
 final routeServiceProvider = Provider<RouteService>(
   (ref) => ref.watch(valhallaRouteServiceProvider),
 );

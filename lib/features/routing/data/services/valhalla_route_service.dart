@@ -1,3 +1,5 @@
+import 'package:rihla/core/observability/app_logger.dart';
+import 'package:rihla/core/observability/breadcrumb.dart';
 import 'package:rihla/features/routing/data/datasources/valhalla_route_datasource.dart';
 import 'package:rihla/features/routing/data/mappers/valhalla_route_mapper.dart';
 import 'package:rihla/features/routing/domain/entities/route_options.dart';
@@ -9,14 +11,19 @@ import 'package:rihla/features/routing/domain/services/route_service.dart';
 
 /// Production route service backed by the Valhalla HTTP API.
 class ValhallaRouteService implements RouteService {
-  ValhallaRouteService(this._datasource);
+  // ignore: prefer_initializing_formals — named params cannot be private.
+  ValhallaRouteService(this._datasource, {AppLogger? logger})
+      : _logger = logger;
 
   final ValhallaRouteDatasource _datasource;
+  final AppLogger? _logger;
 
   @override
   Future<RouteResult> calculateRoutes(RouteRequest request) async {
     final profiles = request.options.profiles;
     final routes = <RouteSummary>[];
+
+    _logRequest(request);
 
     for (var i = 0; i < profiles.length; i++) {
       final profile = profiles[i];
@@ -38,15 +45,58 @@ class ValhallaRouteService implements RouteService {
         alternates: request.options.alternateCount,
       );
       final response = await _datasource.fetchRoute(body);
-      return ValhallaRouteMapper.fromResponse(
+      final result = ValhallaRouteMapper.fromResponse(
         response,
         profiles: profiles,
       );
+      _logResponse(result);
+      return result;
     }
 
-    return RouteResult(
+    final result = RouteResult(
       routes: routes,
       primaryRouteId: routes.first.id,
+    );
+    _logResponse(result);
+    return result;
+  }
+
+  void _logRequest(RouteRequest request) {
+    _logger?.log(
+      'valhalla_route_request',
+      category: ObservabilityCategory.navigation,
+      data: {
+        'origin': '${request.origin.latitude.toStringAsFixed(6)},'
+            '${request.origin.longitude.toStringAsFixed(6)}',
+        'destination': '${request.destination.latitude.toStringAsFixed(6)},'
+            '${request.destination.longitude.toStringAsFixed(6)}',
+        'waypoints': request.waypoints.length.toString(),
+        'profiles':
+            request.options.profiles.map((p) => p.name).join(','),
+      },
+    );
+  }
+
+  void _logResponse(RouteResult result) {
+    final primary = result.routes.isNotEmpty ? result.routes.first : null;
+    _logger?.log(
+      'valhalla_route_response',
+      category: ObservabilityCategory.navigation,
+      data: {
+        'routes': result.routes.length.toString(),
+        if (primary != null)
+          'primary_distance_km': primary.distanceKm.toStringAsFixed(2),
+        if (primary != null)
+          'primary_duration_s': primary.durationSeconds.toString(),
+        if (primary != null)
+          'primary_points': primary.coordinates.length.toString(),
+        if (primary != null && primary.coordinates.isNotEmpty)
+          'first_point': '${primary.coordinates.first.latitude.toStringAsFixed(6)},'
+              '${primary.coordinates.first.longitude.toStringAsFixed(6)}',
+        if (primary != null && primary.coordinates.isNotEmpty)
+          'last_point': '${primary.coordinates.last.latitude.toStringAsFixed(6)},'
+              '${primary.coordinates.last.longitude.toStringAsFixed(6)}',
+      },
     );
   }
 

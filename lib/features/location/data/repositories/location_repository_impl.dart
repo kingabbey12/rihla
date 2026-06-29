@@ -26,7 +26,7 @@ class LocationRepositoryImpl implements LocationRepository {
 
   @override
   Future<LocationResult<LocationPosition>> getCurrentPosition({
-    LocationAccuracyLevel accuracy = LocationAccuracyLevel.high,
+    LocationAccuracyLevel accuracy = LocationAccuracyLevel.bestForNavigation,
     Duration timeout = const Duration(seconds: 15),
   }) async {
     final failure = await _validatePreconditions();
@@ -45,8 +45,8 @@ class LocationRepositoryImpl implements LocationRepository {
 
   @override
   Stream<LocationResult<LocationPosition>> watchPosition({
-    LocationAccuracyLevel accuracy = LocationAccuracyLevel.high,
-    int distanceFilterMeters = 10,
+    LocationAccuracyLevel accuracy = LocationAccuracyLevel.bestForNavigation,
+    int distanceFilterMeters = 5,
   }) async* {
     final failure = await _validatePreconditions();
     if (failure != null) {

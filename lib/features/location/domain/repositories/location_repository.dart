@@ -13,13 +13,13 @@ abstract class LocationRepository {
   Future<GpsServiceStatus> getGpsStatus();
 
   Future<LocationResult<LocationPosition>> getCurrentPosition({
-    LocationAccuracyLevel accuracy = LocationAccuracyLevel.high,
+    LocationAccuracyLevel accuracy = LocationAccuracyLevel.bestForNavigation,
     Duration timeout = const Duration(seconds: 15),
   });
 
   Stream<LocationResult<LocationPosition>> watchPosition({
-    LocationAccuracyLevel accuracy = LocationAccuracyLevel.high,
-    int distanceFilterMeters = 10,
+    LocationAccuracyLevel accuracy = LocationAccuracyLevel.bestForNavigation,
+    int distanceFilterMeters = 5,
   });
 
   Future<bool> openAppSettings();
