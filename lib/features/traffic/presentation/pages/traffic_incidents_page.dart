@@ -1,35 +1,109 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rihla/features/location/domain/entities/location_state.dart';
+import 'package:rihla/features/location/presentation/providers/location_providers.dart';
+import 'package:rihla/features/map/presentation/providers/map_providers.dart';
+import 'package:rihla/features/traffic/domain/models/traffic_state.dart';
 import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
 import 'package:rihla/shared/ui/rihla_floating_card.dart';
 import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
 import 'package:rihla/shared/widgets/empty_screen.dart';
 
 /// Live Traffic & Incidents screen matching the production reference.
-class TrafficIncidentsPage extends ConsumerWidget {
+class TrafficIncidentsPage extends ConsumerStatefulWidget {
   const TrafficIncidentsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final live = ref.watch(trafficSnapshotProvider);
-    if (live == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Live Traffic & Incidents'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.pop(),
-          ),
-        ),
-        body: const EmptyScreen(
+  ConsumerState<TrafficIncidentsPage> createState() =>
+      _TrafficIncidentsPageState();
+}
+
+class _TrafficIncidentsPageState extends ConsumerState<TrafficIncidentsPage> {
+  /// True when we could not resolve any position to centre the area query on.
+  bool _noLocation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Only auto-fetch when no route already populated a snapshot.
+      if (ref.read(trafficControllerProvider) is TrafficIdle) {
+        _loadAreaTraffic();
+      }
+    });
+  }
+
+  Future<void> _loadAreaTraffic() async {
+    await _ensureLocation();
+    final origin = _resolveOrigin();
+    if (origin == null) {
+      // No GPS / map fix yet — show a retryable empty state.
+      if (mounted) setState(() => _noLocation = true);
+      return;
+    }
+    if (mounted) setState(() => _noLocation = false);
+    await ref.read(trafficControllerProvider.notifier).fetchForArea(
+          latitude: origin.latitude,
+          longitude: origin.longitude,
+        );
+  }
+
+  Future<void> _ensureLocation() async {
+    final location = ref.read(locationControllerProvider);
+    if (location is LocationActive) return;
+    try {
+      await ref
+          .read(locationControllerProvider.notifier)
+          .fetchCurrentPosition();
+    } catch (_) {
+      // Permission denied / GPS off — fall back to map camera in _resolveOrigin.
+    }
+  }
+
+  /// Best available centre point: live GPS fix, last-known fix, then the map
+  /// camera once it has resolved away from the (0,0) sentinel.
+  ({double latitude, double longitude})? _resolveOrigin() {
+    final location = ref.read(locationControllerProvider);
+    final position = switch (location) {
+      LocationActive(:final position) => position,
+      LocationError(:final lastKnownPosition) => lastKnownPosition,
+      _ => null,
+    };
+    if (position != null) {
+      return (latitude: position.latitude, longitude: position.longitude);
+    }
+    final camera = ref.read(mapCameraProvider);
+    if (camera.latitude == 0 && camera.longitude == 0) return null;
+    return (latitude: camera.latitude, longitude: camera.longitude);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final trafficState = ref.watch(trafficControllerProvider);
+
+    if (_noLocation || trafficState is TrafficError) {
+      return _scaffold(
+        context,
+        EmptyScreen(
           title: 'Traffic data unavailable',
-          message: 'Live traffic will appear when your location and network are available.',
+          message:
+              'Live traffic will appear when your location and network are available.',
           icon: Icons.traffic_outlined,
+          actionLabel: 'Retry',
+          onAction: _loadAreaTraffic,
         ),
       );
     }
-    final snapshot = live;
+
+    if (trafficState is TrafficLoading || trafficState is TrafficIdle) {
+      return _scaffold(
+        context,
+        const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final snapshot = (trafficState as TrafficReady).snapshot;
     final theme = Theme.of(context);
     var filter = 'All';
 
@@ -145,6 +219,19 @@ class TrafficIncidentsPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Scaffold _scaffold(BuildContext context, Widget body) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Live Traffic & Incidents'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: body,
     );
   }
 }

@@ -15,7 +15,6 @@ import 'package:rihla/features/location/presentation/providers/location_provider
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_selectors.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 import 'package:rihla/features/search/presentation/providers/search_providers.dart';
-import 'package:rihla/localization/generated/app_localizations.dart';
 import 'package:rihla/routes/route_paths.dart';
 import 'package:rihla/shared/ui/rihla_floating_card.dart';
 import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
@@ -285,17 +284,10 @@ class _RoundAction extends StatelessWidget {
   }
 }
 
-/// Waze-style idle home card: "Where are you going?" + a single "Let's Go"
-/// action that opens search. Shown only when no destination has been planned.
+/// Waze-style idle home card with a single "Let's Go" action that opens search.
+/// Shown only when no destination has been planned.
 class _AiJourneyCard extends ConsumerWidget {
   const _AiJourneyCard();
-
-  String _greeting(AppLocalizations l10n) {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return l10n.homeGreetingMorning;
-    if (hour < 17) return l10n.homeGreetingAfternoon;
-    return l10n.homeGreetingEvening;
-  }
 
   void _openSearch(BuildContext context) {
     HapticFeedback.mediumImpact();
@@ -344,13 +336,6 @@ class _AiJourneyCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _greeting(l10n),
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
                       locationLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -363,14 +348,6 @@ class _AiJourneyCard extends ConsumerWidget {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.homeWhereToGreeting,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.5,
-            ),
           ),
           const SizedBox(height: 16),
           _PressableScale(

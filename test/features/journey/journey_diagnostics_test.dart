@@ -63,7 +63,10 @@ void main() {
   late ProviderContainer container;
   late FakeLocationService fakeLocation;
 
-  Future<ProviderContainer> buildContainer({bool fixtureRouting = false}) async {
+  Future<ProviderContainer> buildContainer({
+    bool fixtureRouting = false,
+    Duration locationWaitTimeout = const Duration(seconds: 15),
+  }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     fakeLocation = FakeLocationService()
@@ -75,6 +78,7 @@ void main() {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         locationServiceProvider.overrideWithValue(fakeLocation),
+        journeyLocationWaitTimeoutProvider.overrideWithValue(locationWaitTimeout),
         journeyPlanningServiceProvider.overrideWith(
           (ref) => MockJourneyPlanningService(
             ref.watch(aiRecommendationServiceProvider),
@@ -90,8 +94,12 @@ void main() {
   tearDown(() => container.dispose());
 
   test('no GPS fix yields a specific waiting failure, not generic', () async {
-    container = await buildContainer();
-    // Do NOT fetch a position — location stays idle.
+    container = await buildContainer(
+      locationWaitTimeout: const Duration(milliseconds: 300),
+    );
+    fakeLocation.currentPosition = null;
+    fakeLocation.throwOnGetCurrent = Exception('Location unavailable');
+    fakeLocation.stream = const Stream.empty();
     await container
         .read(journeyControllerProvider.notifier)
         .planToDestination(dubaiMall);

@@ -600,16 +600,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navControlRecenter => 'إعادة التمركز';
 
   @override
-  String get navEndConfirmTitle => 'إنهاء هذه الرحلة؟';
+  String get navEndConfirmTitle => 'إنهاء الملاحة؟';
 
   @override
-  String get navEndConfirmMessage => 'سيتم مسح مسارك الحالي.';
+  String get navEndConfirmMessage => 'هل أنت متأكد أنك تريد إنهاء هذه الرحلة؟';
 
   @override
   String get navEndConfirmAction => 'إنهاء الرحلة';
 
   @override
-  String get navKeepDriving => 'متابعة الملاحة';
+  String get navKeepDriving => 'متابعة';
 
   @override
   String get navArrivedTitle => 'لقد وصلت';

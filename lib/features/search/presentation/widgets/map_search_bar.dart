@@ -1,8 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rihla/core/extensions/context_extensions.dart';
+import 'package:rihla/features/navigation/presentation/providers/navigation_session_providers.dart';
+import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/routes/route_paths.dart';
 import 'package:rihla/shared/design/rihla_design.dart';
 import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
@@ -10,21 +13,31 @@ import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
 /// Floating glass search entry point shown on the map: hamburger menu,
 /// "Where to?" prompt, and voice search. Subtly scales/elevates on press.
 ///
+/// Hidden during route preview and active navigation so the Route Preview and
+/// turn-by-turn UI own the screen (never two competing surfaces at once).
+///
 /// Layout:  ☰      Where to?                        🎤
-class MapSearchBar extends StatefulWidget {
+class MapSearchBar extends ConsumerStatefulWidget {
   const MapSearchBar({super.key});
 
   @override
-  State<MapSearchBar> createState() => _MapSearchBarState();
+  ConsumerState<MapSearchBar> createState() => _MapSearchBarState();
 }
 
-class _MapSearchBarState extends State<MapSearchBar> {
+class _MapSearchBarState extends ConsumerState<MapSearchBar> {
   bool _pressed = false;
 
   void _openSearch() => context.push(RoutePaths.search);
 
   @override
   Widget build(BuildContext context) {
+    final previewActive = ref.watch(routePreviewActiveProvider);
+    final navigating = ref.watch(navigationIsActiveProvider);
+    final hasArrived = ref.watch(navigationHasArrivedProvider);
+    if (previewActive || navigating || hasArrived) {
+      return const SizedBox.shrink();
+    }
+
     final scheme = context.colorScheme;
     final l10n = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;

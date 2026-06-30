@@ -39,6 +39,9 @@ void main() {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         locationServiceProvider.overrideWithValue(fakeLocation),
+        journeyLocationWaitTimeoutProvider.overrideWithValue(
+          const Duration(milliseconds: 300),
+        ),
         journeyPlanningServiceProvider.overrideWith(
           (ref) => MockJourneyPlanningService(
             ref.watch(aiRecommendationServiceProvider),
@@ -61,6 +64,32 @@ void main() {
     await container
         .read(journeyControllerProvider.notifier)
         .planToDestination(place);
+    expect(
+      container.read(journeyControllerProvider),
+      isA<JourneyPreview>(),
+    );
+  });
+
+  test('planToDestination waits for GPS when location is still idle', () async {
+    fakeLocation.currentPosition = null;
+    fakeLocation.throwOnGetCurrent = Exception('Location unavailable');
+    fakeLocation.stream = const Stream.empty();
+    final planningFuture = container
+        .read(journeyControllerProvider.notifier)
+        .planToDestination(place);
+
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(container.read(journeyControllerProvider), isA<JourneyLoading>());
+
+    final pos = samplePosition(latitude: 24.7136, longitude: 46.6753);
+    fakeLocation.currentPosition = pos;
+    fakeLocation.throwOnGetCurrent = null;
+    fakeLocation.stream = Stream.value(pos);
+    await container
+        .read(locationControllerProvider.notifier)
+        .startForegroundStream();
+    await planningFuture;
+
     expect(
       container.read(journeyControllerProvider),
       isA<JourneyPreview>(),

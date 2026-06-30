@@ -1229,13 +1229,13 @@ abstract class AppLocalizations {
   /// No description provided for @navEndConfirmTitle.
   ///
   /// In en, this message translates to:
-  /// **'End this journey?'**
+  /// **'End Navigation?'**
   String get navEndConfirmTitle;
 
   /// No description provided for @navEndConfirmMessage.
   ///
   /// In en, this message translates to:
-  /// **'Your current route will be cleared.'**
+  /// **'Are you sure you want to end this trip?'**
   String get navEndConfirmMessage;
 
   /// No description provided for @navEndConfirmAction.
@@ -1247,7 +1247,7 @@ abstract class AppLocalizations {
   /// No description provided for @navKeepDriving.
   ///
   /// In en, this message translates to:
-  /// **'Continue Navigation'**
+  /// **'Continue'**
   String get navKeepDriving;
 
   /// No description provided for @navArrivedTitle.

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/observability/analytics_event.dart';
 import 'package:rihla/core/observability/breadcrumb.dart';
@@ -88,8 +90,9 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     _simulateOffRoute = false;
     _pausedForLifecycle = false;
     _voice.reset();
-    // Continuous GPS updates for live navigation puck and turn-by-turn.
-    await ref.read(locationControllerProvider.notifier).startForegroundStream();
+    // Keep GPS streaming without blocking the navigation UI from appearing.
+    _ensureLocationStream();
+
     final sessionId = 'nav_${DateTime.now().millisecondsSinceEpoch}';
     final engine = ref.read(navigationSessionEngineProvider);
     var session = engine.createInitial(
@@ -99,19 +102,59 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
       simulationMode: simulationMode,
       voiceEnabled: voiceEnabled,
     );
-    session = await ref
-        .read(safetySessionEnricherProvider)
-        .enrich(session, tickCount: 0);
+
+    // Snap immediately to the live GPS fix so speed, limit, and map follow
+    // respond on the first frame instead of waiting for the 3 s tick.
+    final gpsFix = _currentGpsFix();
+    if (gpsFix != null && !simulationMode) {
+      session = engine.advance(
+        session: session,
+        tickCount: 0,
+        gpsFix: gpsFix,
+        simulateOffRoute: false,
+      );
+    }
+
+    // Show navigation UI immediately; safety enrichment hits the network and
+    // must not delay the speed-limit badge or turn banner.
     await _persist(session);
     _polyline.setRoute(route);
     _startTicking(session);
-    await _voice.announceIfNeeded(session);
+    unawaited(_scheduler.runOnce(_onTick));
+    unawaited(_enrichSafetyInBackground(session));
+    unawaited(_voice.announceIfNeeded(session));
     trackProductEvent(ref, AnalyticsEvent.journeyStarted);
     ref.read(appLoggerProvider).log(
       'journey_started',
       category: ObservabilityCategory.navigation,
       data: {'simulation': '$simulationMode'},
     );
+  }
+
+  void _ensureLocationStream() {
+    final loc = ref.read(locationControllerProvider);
+    final needsStream = switch (loc) {
+      LocationActive(:final isStreaming) => !isStreaming,
+      LocationIdle() || LocationLoading() || LocationError() => true,
+    };
+    if (needsStream) {
+      unawaited(
+        ref.read(locationControllerProvider.notifier).startForegroundStream(),
+      );
+    }
+  }
+
+  Future<void> _enrichSafetyInBackground(NavigationSession session) async {
+    final enriched = await ref.read(safetySessionEnricherProvider).enrich(
+          session,
+          tickCount: 0,
+        );
+    if (!ref.mounted) return;
+    final current = state;
+    if (current is NavigationSessionActive &&
+        current.session.sessionId == session.sessionId) {
+      await _persist(enriched);
+    }
   }
 
   Future<void> _onTick() async {

@@ -606,16 +606,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navControlRecenter => 'Recenter';
 
   @override
-  String get navEndConfirmTitle => 'End this journey?';
+  String get navEndConfirmTitle => 'End Navigation?';
 
   @override
-  String get navEndConfirmMessage => 'Your current route will be cleared.';
+  String get navEndConfirmMessage => 'Are you sure you want to end this trip?';
 
   @override
   String get navEndConfirmAction => 'End Trip';
 
   @override
-  String get navKeepDriving => 'Continue Navigation';
+  String get navKeepDriving => 'Continue';
 
   @override
   String get navArrivedTitle => 'You\'ve arrived';

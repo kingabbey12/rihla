@@ -229,8 +229,8 @@ void main() {
       // State 4: End Trip -> confirm -> return to idle and clear route.
       await tester.tap(find.byKey(const ValueKey('nav_end_trip')));
       await tester.pump();
-      expect(find.text('End this journey?'), findsOneWidget);
-      expect(find.text('Continue Navigation'), findsOneWidget);
+      expect(find.text('End Navigation?'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
 
       await tester.tap(find.widgetWithText(FilledButton, 'End Trip'));
       await tester.pump();

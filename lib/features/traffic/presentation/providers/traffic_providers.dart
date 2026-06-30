@@ -54,6 +54,37 @@ class TrafficController extends Notifier<TrafficState> {
     }
   }
 
+  /// Fetches a live traffic snapshot for the area around [latitude]/[longitude].
+  ///
+  /// Used when the Traffic & Incidents screen is opened directly (no active
+  /// route): we build a short local corridor centred on the user's position so
+  /// the live/heuristic service can return a realistic area estimate instead of
+  /// leaving the screen empty.
+  Future<void> fetchForArea({
+    required double latitude,
+    required double longitude,
+  }) async {
+    // Sample a ~8 km ring around the user (N/E/S/W) so the estimate reflects
+    // local road network in all directions, not just one corridor.
+    const spanDeg = 0.035;
+    const freeFlowDurationMinutes = 16.0;
+    await fetchAlongRoute(
+      coordinates: [
+        (latitude: latitude, longitude: longitude),
+        (latitude: latitude + spanDeg, longitude: longitude),
+        (latitude: latitude + spanDeg, longitude: longitude + spanDeg),
+        (latitude: latitude, longitude: longitude + spanDeg),
+        (latitude: latitude - spanDeg, longitude: longitude + spanDeg),
+        (latitude: latitude - spanDeg, longitude: longitude),
+        (latitude: latitude - spanDeg, longitude: longitude - spanDeg),
+        (latitude: latitude, longitude: longitude - spanDeg),
+        (latitude: latitude + spanDeg, longitude: longitude - spanDeg),
+        (latitude: latitude + spanDeg, longitude: longitude),
+      ],
+      freeFlowDurationMinutes: freeFlowDurationMinutes,
+    );
+  }
+
   void reset() => state = const TrafficIdle();
 }
 

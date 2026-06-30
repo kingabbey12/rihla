@@ -24,6 +24,8 @@ import 'package:rihla/features/journey/domain/models/journey_state.dart';
 import 'package:rihla/features/journey/presentation/providers/journey_providers.dart';
 import 'package:rihla/features/live_journey/domain/models/live_journey_state.dart';
 import 'package:rihla/features/live_journey/presentation/providers/live_journey_providers.dart';
+import 'package:rihla/features/location/domain/entities/location_state.dart';
+import 'package:rihla/features/location/presentation/providers/location_providers.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
 import 'package:rihla/features/offline/presentation/providers/offline_providers.dart';
 import 'package:rihla/features/parking/presentation/providers/parking_providers.dart';
@@ -98,6 +100,35 @@ class ExploreController extends Notifier<ExploreState> {
     }
   }
 
+  /// Ensures we have a real device position before searching. Without this the
+  /// search falls back to the map camera, which is the (0, 0) sentinel until the
+  /// map itself resolves GPS — yielding "nearby" results in the Atlantic Ocean.
+  Future<void> _ensureLocation() async {
+    final location = ref.read(locationControllerProvider);
+    if (location is LocationActive) return;
+    try {
+      await ref.read(locationControllerProvider.notifier).fetchCurrentPosition();
+    } catch (_) {
+      // Permission denied / GPS off — fall back to the map camera origin.
+    }
+  }
+
+  /// Best available search origin: the live GPS fix first, then the last known
+  /// fix, then the map camera (only once it has resolved to a real location).
+  ({double latitude, double longitude}) _resolveOrigin() {
+    final location = ref.read(locationControllerProvider);
+    final position = switch (location) {
+      LocationActive(:final position) => position,
+      LocationError(:final lastKnownPosition) => lastKnownPosition,
+      _ => null,
+    };
+    if (position != null) {
+      return (latitude: position.latitude, longitude: position.longitude);
+    }
+    final camera = ref.read(mapCameraProvider);
+    return (latitude: camera.latitude, longitude: camera.longitude);
+  }
+
   void deactivate() {
     ref.read(exploreActiveProvider.notifier).deactivate();
     state = const ExploreIdle();
@@ -145,14 +176,15 @@ class ExploreController extends Notifier<ExploreState> {
     if (current is! ExploreReady || !current.hasMore) return;
     _page++;
     final camera = ref.read(mapCameraProvider);
+    final origin = _resolveOrigin();
     final result = await ref
         .read(exploreRepositoryProvider)
         .search(
           ExploreSearch(
             category: _category,
             filter: _filter,
-            latitude: camera.latitude,
-            longitude: camera.longitude,
+            latitude: origin.latitude,
+            longitude: origin.longitude,
             page: _page,
           ),
         );
@@ -203,15 +235,17 @@ class ExploreController extends Notifier<ExploreState> {
 
   Future<void> _load() async {
     try {
+      await _ensureLocation();
       final camera = ref.read(mapCameraProvider);
+      final origin = _resolveOrigin();
       final result = await ref
           .read(exploreRepositoryProvider)
           .search(
             ExploreSearch(
               category: _category,
               filter: _filter,
-              latitude: camera.latitude,
-              longitude: camera.longitude,
+              latitude: origin.latitude,
+              longitude: origin.longitude,
               page: _page,
             ),
           );

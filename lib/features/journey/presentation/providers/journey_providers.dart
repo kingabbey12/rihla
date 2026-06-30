@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/geo/coordinate_validation.dart';
 import 'package:rihla/core/observability/breadcrumb.dart';
@@ -17,6 +19,7 @@ import 'package:rihla/features/journey/domain/models/journey_summary.dart';
 import 'package:rihla/features/journey/domain/repositories/journey_repository.dart';
 import 'package:rihla/features/journey/domain/services/ai_recommendation_service.dart';
 import 'package:rihla/features/journey/domain/services/journey_planning_service.dart';
+import 'package:rihla/features/location/domain/entities/location_position.dart';
 import 'package:rihla/features/location/domain/entities/location_state.dart';
 import 'package:rihla/features/location/presentation/providers/location_providers.dart';
 import 'package:rihla/features/map/domain/entities/map_camera.dart';
@@ -55,6 +58,11 @@ final journeyControllerProvider =
   JourneyController.new,
 );
 
+/// How long [JourneyController] waits for the first GPS fix before failing.
+final journeyLocationWaitTimeoutProvider = Provider<Duration>(
+  (ref) => const Duration(seconds: 15),
+);
+
 class JourneyController extends Notifier<JourneyState> {
   SearchPlace? _pendingDestination;
 
@@ -69,47 +77,78 @@ class JourneyController extends Notifier<JourneyState> {
         );
   }
 
-  /// Resolves the journey origin from the live location state, throwing a
-  /// specific [JourneyFailure] (never the generic one) when GPS is not ready.
-  /// Kicks off a location stream when idle so [retry] can succeed.
-  JourneyEndpoint _resolveOrigin() {
-    final locationState = ref.read(locationControllerProvider);
-
-    switch (locationState) {
-      case LocationActive(:final position):
-        final reason = CoordinateValidation.invalidReason(
-          position.latitude,
-          position.longitude,
-        );
-        if (reason != null) {
-          _log('journey_origin_invalid', data: {'reason': reason});
-          throw JourneyInvalidCoordinatesFailure(
-            endpoint: 'origin',
-            reason: reason,
-          );
-        }
-        return JourneyEndpoint(
-          id: 'current_location',
-          name: 'Current Location',
-          address: 'Your location',
-          latitude: position.latitude,
-          longitude: position.longitude,
-        );
-
-      case LocationError(:final failure):
-        _log('journey_origin_gps_error', data: {'detail': failure.message});
-        throw JourneyGpsUnavailableFailure(failure.message);
-
-      case LocationLoading():
-        _log('journey_origin_waiting');
-        throw const JourneyLocationWaitingFailure();
-
-      case LocationIdle():
-        // Nothing has requested a fix yet — start one so retry works.
-        _log('journey_origin_idle_starting_stream');
-        ref.read(locationControllerProvider.notifier).startForegroundStream();
-        throw const JourneyLocationWaitingFailure();
+  JourneyEndpoint _endpointFromPosition(LocationPosition position) {
+    final reason = CoordinateValidation.invalidReason(
+      position.latitude,
+      position.longitude,
+    );
+    if (reason != null) {
+      _log('journey_origin_invalid', data: {'reason': reason});
+      throw JourneyInvalidCoordinatesFailure(
+        endpoint: 'origin',
+        reason: reason,
+      );
     }
+    return JourneyEndpoint(
+      id: 'current_location',
+      name: 'Current Location',
+      address: 'Your location',
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
+  }
+
+  /// Resolves the journey origin from the live location state.
+  ///
+  /// When GPS is still acquiring, waits up to [timeout] for the first fix
+  /// instead of failing immediately — matching Waze/Google Maps behaviour where
+  /// picking a destination while locating still proceeds to route preview.
+  Future<JourneyEndpoint> _resolveOrigin({
+    Duration? timeout,
+  }) async {
+    final Duration waitTimeout =
+        timeout ?? ref.read(journeyLocationWaitTimeoutProvider);
+    final locationNotifier = ref.read(locationControllerProvider.notifier);
+    var locationState = ref.read(locationControllerProvider);
+
+    if (locationState is LocationIdle || locationState is LocationError) {
+      _log('journey_origin_idle_starting_stream');
+      // One-shot fix is usually faster than waiting for the stream's first event.
+      await locationNotifier.fetchCurrentPosition();
+      locationState = ref.read(locationControllerProvider);
+      if (locationState is LocationActive) {
+        return _endpointFromPosition(locationState.position);
+      }
+      unawaited(locationNotifier.startForegroundStream());
+    }
+
+    final deadline = DateTime.now().add(waitTimeout);
+    while (DateTime.now().isBefore(deadline)) {
+      locationState = ref.read(locationControllerProvider);
+      switch (locationState) {
+        case LocationActive(:final position):
+          return _endpointFromPosition(position);
+        case LocationError(:final lastKnownPosition)
+            when lastKnownPosition != null:
+          _log('journey_origin_stale_fix');
+          return _endpointFromPosition(lastKnownPosition);
+        case LocationIdle() || LocationLoading() || LocationError():
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          continue;
+      }
+    }
+
+    locationState = ref.read(locationControllerProvider);
+    if (locationState is LocationActive) {
+      return _endpointFromPosition(locationState.position);
+    }
+    if (locationState is LocationError) {
+      _log('journey_origin_gps_error',
+          data: {'detail': locationState.failure.message});
+      throw JourneyGpsUnavailableFailure(locationState.failure.message);
+    }
+    _log('journey_origin_waiting');
+    throw const JourneyLocationWaitingFailure();
   }
 
   /// Plans a journey to [destination] and transitions to preview.
@@ -144,7 +183,7 @@ class JourneyController extends Notifier<JourneyState> {
     }
 
     try {
-      final origin = _resolveOrigin();
+      final origin = await _resolveOrigin();
 
       _log('journey_plan_request', data: {
         'origin': CoordinateValidation.format(

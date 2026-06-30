@@ -595,7 +595,15 @@ class _MapViewState extends ConsumerState<MapView> {
       _renderExploreMarkers(next);
     });
     ref.listen(navigationIsActiveProvider, (_, next) {
-      if (next) _navFollow = true;
+      if (!next) return;
+      _navFollow = true;
+      final pos = ref.read(navigationCurrentPositionProvider);
+      if (pos != null) {
+        final speed =
+            ref.read(navigationSpeedProvider) ?? (pos.speed ?? 0) * 3.6;
+        final heading = ref.read(navigationHeadingProvider) ?? pos.heading ?? 0;
+        _followNavigation(pos, speed, heading);
+      }
     });
     ref.listen(navigationCurrentPositionProvider, (_, next) {
       if (next == null || !_navFollow) return;

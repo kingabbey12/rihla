@@ -474,6 +474,14 @@ class _MapFallbackViewState extends ConsumerState<MapFallbackView>
     final isNavigating = ref.watch(navigationIsActiveProvider);
     final trafficSnapshot = ref.watch(trafficSnapshotProvider);
 
+    ref.listen(navigationIsActiveProvider, (previous, next) {
+      if (next && previous != true) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _resumeFollow();
+        });
+      }
+    });
+
     // Heading / speed: prefer the live navigation session, fall back to the GPS
     // fix so the puck still orients before a session starts.
     final navHeading = ref.watch(navigationHeadingProvider);
@@ -611,7 +619,7 @@ class _MapFallbackViewState extends ConsumerState<MapFallbackView>
               targetCenter,
               targetZoom,
               destRotation: targetRotation,
-              duration: Duration(milliseconds: isNavigating ? 700 : 900),
+              duration: Duration(milliseconds: isNavigating ? 350 : 900),
               curve: isNavigating ? Curves.easeOut : Curves.linear,
             );
           }

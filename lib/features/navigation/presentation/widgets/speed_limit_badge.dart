@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:rihla/core/extensions/context_extensions.dart';
 
 /// Classic red-ring speed limit badge (US/EU MUTCD-style) used in the HUD.
+///
+/// [limitKmh] may be null or non-positive when the limit is unknown; in that
+/// case a "--" placeholder is shown so the badge never disappears during
+/// active navigation.
 class SpeedLimitBadge extends StatelessWidget {
   const SpeedLimitBadge({required this.limitKmh, super.key, this.size = 52});
 
-  final int limitKmh;
+  final int? limitKmh;
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final hasLimit = (limitKmh ?? 0) > 0;
+    final valueLabel = hasLimit ? '$limitKmh' : '--';
     return Container(
       width: size,
       height: size,
@@ -39,7 +45,7 @@ class SpeedLimitBadge extends StatelessWidget {
           ),
           const SizedBox(height: 1),
           Text(
-            '$limitKmh',
+            valueLabel,
             style: TextStyle(
               color: Colors.black,
               fontSize: size * 0.36,

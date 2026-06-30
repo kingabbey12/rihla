@@ -68,10 +68,12 @@ class HeuristicTrafficDatasource {
     final rushHour = hour >= 7 && hour <= 9 || hour >= 16 && hour <= 19;
     final congestionFactor = rushHour ? 1.35 : 1.1;
     final urbanFactor = distanceKm < 5 ? 1.15 : 1.0;
+    final factor = congestionFactor * urbanFactor;
 
     return TrafficMapper.heuristic(
       freeFlowDurationMinutes: freeFlowDurationMinutes,
-      congestionFactor: congestionFactor * urbanFactor,
+      congestionFactor: factor,
+      areaCoordinates: coordinates.length >= 4 ? coordinates : null,
     );
   }
 
