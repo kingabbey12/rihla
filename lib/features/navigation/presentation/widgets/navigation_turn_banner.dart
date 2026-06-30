@@ -234,9 +234,8 @@ class _TripMetricsRow extends StatelessWidget {
                 .journeyKm(session.remainingDistanceKm.toStringAsFixed(1)),
           ),
         ),
-        if (session.speedLimit.isPlaceholder) ...[
+        if (session.speedLimit.limitKmh > 0) ...[
           const SizedBox(width: 12),
-          // Compact inline limit chip; full badge lives in the HUD.
           _LimitChip(limit: session.speedLimit.limitKmh),
         ],
       ],

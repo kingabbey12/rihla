@@ -153,36 +153,47 @@ class _ControlBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _ControlButton(
-                key: const ValueKey('nav_end_trip'),
-                icon: Icons.close_rounded,
-                label: l10n.navControlEnd,
-                color: RihlaReferenceTokens.emergencyRed,
-                onTap: onEnd,
+              Expanded(
+                child: _ControlButton(
+                  key: const ValueKey('nav_end_trip'),
+                  icon: Icons.close_rounded,
+                  label: l10n.navControlEnd,
+                  color: RihlaReferenceTokens.emergencyRed,
+                  onTap: onEnd,
+                ),
               ),
-              _ControlButton(
-                icon: voiceEnabled
-                    ? Icons.volume_up_rounded
-                    : Icons.volume_off_rounded,
-                label:
-                    voiceEnabled ? l10n.navControlMute : l10n.navControlUnmute,
-                onTap: onMute,
+              Expanded(
+                child: _ControlButton(
+                  icon: voiceEnabled
+                      ? Icons.volume_up_rounded
+                      : Icons.volume_off_rounded,
+                  label: voiceEnabled
+                      ? l10n.navControlMute
+                      : l10n.navControlUnmute,
+                  onTap: onMute,
+                ),
               ),
-              _ControlButton(
-                icon: Icons.report_outlined,
-                label: l10n.navControlReport,
-                color: RihlaReferenceTokens.goldAccent,
-                onTap: onReport,
+              Expanded(
+                child: _ControlButton(
+                  icon: Icons.report_outlined,
+                  label: l10n.navControlReport,
+                  color: RihlaReferenceTokens.goldAccent,
+                  onTap: onReport,
+                ),
               ),
-              _ControlButton(
-                icon: Icons.alt_route_rounded,
-                label: l10n.navControlOverview,
-                onTap: onOverview,
+              Expanded(
+                child: _ControlButton(
+                  icon: Icons.alt_route_rounded,
+                  label: l10n.navControlOverview,
+                  onTap: onOverview,
+                ),
               ),
-              _ControlButton(
-                icon: Icons.my_location_rounded,
-                label: l10n.navControlRecenter,
-                onTap: onRecenter,
+              Expanded(
+                child: _ControlButton(
+                  icon: Icons.my_location_rounded,
+                  label: l10n.navControlRecenter,
+                  onTap: onRecenter,
+                ),
               ),
             ],
           ),
@@ -214,13 +225,13 @@ class _ControlButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: tint.withValues(alpha: 0.12),
@@ -230,6 +241,8 @@ class _ControlButton extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,

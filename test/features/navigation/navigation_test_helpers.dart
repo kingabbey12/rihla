@@ -9,6 +9,9 @@ import 'package:rihla/features/routing/domain/entities/route_coordinate.dart';
 import 'package:rihla/features/routing/domain/entities/route_profile.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
 import 'package:rihla/features/location/presentation/providers/location_providers.dart';
+import 'package:rihla/features/navigation/data/services/mock_tts_provider.dart';
+import 'package:rihla/features/navigation/data/services/mock_voice_guidance_service.dart';
+import 'package:rihla/features/navigation/presentation/providers/voice_guidance_providers.dart';
 
 import '../location/fakes/fake_location_service.dart';
 
@@ -18,8 +21,13 @@ List navigationTestOverrides() {
   final fakeLocation = FakeLocationService()
     ..currentPosition = pos
     ..stream = Stream.value(pos);
+  final mockTts = MockTtsProvider();
   return [
     locationServiceProvider.overrideWithValue(fakeLocation),
+    ttsProviderProvider.overrideWithValue(mockTts),
+    voiceGuidanceServiceProvider.overrideWithValue(
+      MockVoiceGuidanceService(mockTts),
+    ),
   ];
 }
 

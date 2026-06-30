@@ -22,6 +22,7 @@ import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
 import 'package:rihla/features/traffic/domain/entities/traffic_snapshot.dart';
 import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
+import 'package:rihla/features/traffic/presentation/utils/route_traffic_segments.dart';
 import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
 
 /// Interactive raster-tile map used on platforms without a native MapLibre
@@ -239,7 +240,7 @@ class _MapFallbackViewState extends ConsumerState<MapFallbackView>
     required LatLng? origin,
     required JourneyState journeyState,
     required bool isNavigating,
-    required TrafficDensity? trafficDensity,
+    required TrafficSnapshot? trafficSnapshot,
     required double drawT,
   }) {
     final theme = Theme.of(context);
@@ -325,16 +326,35 @@ class _MapFallbackViewState extends ConsumerState<MapFallbackView>
           (fullPts.length * drawT).clamp(2, fullPts.length).round();
       final pts = fullPts.sublist(0, revealCount);
 
-      // Soft glow / casing under the route. When navigating with live traffic
-      // the casing adopts the congestion colour; otherwise it's a teal glow.
-      final casing = isNavigating ? _trafficColor(trafficDensity) : null;
-      glowLines.add(
-        Polyline(
-          points: pts,
-          color: (casing ?? teal).withValues(alpha: casing != null ? 0.55 : 0.20),
-          strokeWidth: 16,
-        ),
-      );
+      // Traffic-coloured casing segments (green → dark red) under the route core.
+      if (isNavigating && trafficSnapshot != null) {
+        final segments = buildRouteTrafficSegments(
+          route: mainCoords,
+          snapshot: trafficSnapshot,
+        );
+        for (final segment in segments) {
+          if (segment.coordinates.length < 2) continue;
+          final segPts = segment.coordinates.map(_toLatLng).toList();
+          final revealEnd =
+              (segPts.length * drawT).clamp(2, segPts.length).round();
+          glowLines.add(
+            Polyline(
+              points: segPts.sublist(0, revealEnd),
+              color: (_trafficColor(segment.density) ?? teal)
+                  .withValues(alpha: 0.62),
+              strokeWidth: 14,
+            ),
+          );
+        }
+      } else {
+        glowLines.add(
+          Polyline(
+            points: pts,
+            color: teal.withValues(alpha: 0.20),
+            strokeWidth: 16,
+          ),
+        );
+      }
 
       // Thick gradient core line.
       polylines.add(
@@ -452,7 +472,7 @@ class _MapFallbackViewState extends ConsumerState<MapFallbackView>
     final routeState = ref.watch(routeControllerProvider);
     final navPolyline = ref.watch(mapRoutePolylineProvider);
     final isNavigating = ref.watch(navigationIsActiveProvider);
-    final trafficDensity = ref.watch(trafficDensityProvider);
+    final trafficSnapshot = ref.watch(trafficSnapshotProvider);
 
     // Heading / speed: prefer the live navigation session, fall back to the GPS
     // fix so the puck still orients before a session starts.
@@ -481,7 +501,7 @@ class _MapFallbackViewState extends ConsumerState<MapFallbackView>
       origin: userLatLng,
       journeyState: journeyState,
       isNavigating: isNavigating,
-      trafficDensity: trafficDensity,
+      trafficSnapshot: trafficSnapshot,
       drawT: _routeDrawT,
     );
 

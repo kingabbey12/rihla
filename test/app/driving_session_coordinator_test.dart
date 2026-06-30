@@ -18,12 +18,18 @@ import 'package:rihla/features/safety/presentation/providers/safety_providers.da
 
 import '../features/navigation/navigation_test_helpers.dart';
 
+import 'package:rihla/core/providers/app_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('coordinator starts navigation when route is confirmed', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
     final container = ProviderContainer(
       overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
         ...navigationTestOverrides(),
         routeServiceProvider.overrideWith(
           (ref) => MockRouteService(simulatedDelay: Duration.zero),
@@ -61,8 +67,11 @@ void main() {
   });
 
   test('cancelDrivingSession clears navigation', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
     final container = ProviderContainer(
       overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
         ...navigationTestOverrides(),
         safetyServiceProvider.overrideWith((ref) => MockSafetyService()),
         remoteConfigProvider.overrideWithValue(const RemoteConfig()),

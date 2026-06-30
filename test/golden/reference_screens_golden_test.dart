@@ -16,6 +16,8 @@ import 'package:rihla/localization/generated/app_localizations.dart';
 import 'package:rihla/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../features/navigation/navigation_test_helpers.dart';
+
 late SharedPreferences _prefs;
 
 Future<void> _loadRealFonts() async {
@@ -53,7 +55,10 @@ Future<void> _capture(
 }) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [sharedPreferencesProvider.overrideWithValue(_prefs)],
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(_prefs),
+        ...navigationTestOverrides(),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: theme ?? AppTheme.light,
@@ -69,6 +74,9 @@ Future<void> _capture(
     find.byType(MaterialApp),
     matchesGoldenFile('goldens/$file'),
   );
+  // Drain async work before the next screen so disposed trees don't report overflow.
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(milliseconds: 200));
 }
 
 void main() {
@@ -79,21 +87,53 @@ void main() {
     _prefs = await SharedPreferences.getInstance();
   });
 
-  testWidgets('reference screens', (tester) async {
+  Future<void> golden(
+    WidgetTester tester,
+    Widget page,
+    String file, {
+    ThemeData? theme,
+  }) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await _capture(tester, page, file, theme: theme);
+  }
 
-    await _capture(tester, const WelcomePage(), 'screen_welcome.png',
-        theme: AppTheme.dark);
-    await _capture(tester, const ExploreNearbyPage(), 'screen_explore.png',
-        theme: AppTheme.dark);
-    await _capture(tester, const EmergencyDashboardPage(), 'screen_emergency.png',
-        theme: AppTheme.dark);
-    await _capture(tester, const ReportIncidentPage(), 'screen_report_incident.png');
-    await _capture(tester, const TrafficIncidentsPage(), 'screen_traffic.png');
-    await _capture(tester, const RihlaDrivePage(), 'screen_drive.png',
-        theme: AppTheme.dark);
-    await _capture(tester, const ProfilePage(), 'screen_profile.png',
-        theme: AppTheme.dark);
+  testWidgets('welcome screen', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await golden(tester, const WelcomePage(), 'screen_welcome.png', theme: AppTheme.dark);
+  }, skip: !Platform.isMacOS);
+
+  testWidgets('explore screen', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await golden(tester, const ExploreNearbyPage(), 'screen_explore.png', theme: AppTheme.dark);
+  }, skip: !Platform.isMacOS);
+
+  testWidgets('emergency screen', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await golden(
+      tester,
+      const EmergencyDashboardPage(),
+      'screen_emergency.png',
+      theme: AppTheme.dark,
+    );
+  }, skip: !Platform.isMacOS);
+
+  testWidgets('report incident screen', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await golden(tester, const ReportIncidentPage(), 'screen_report_incident.png');
+  }, skip: !Platform.isMacOS);
+
+  testWidgets('traffic screen', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await golden(tester, const TrafficIncidentsPage(), 'screen_traffic.png');
+  }, skip: !Platform.isMacOS);
+
+  testWidgets('drive screen', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await golden(tester, const RihlaDrivePage(), 'screen_drive.png', theme: AppTheme.dark);
+  }, skip: !Platform.isMacOS);
+
+  testWidgets('profile screen', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await golden(tester, const ProfilePage(), 'screen_profile.png', theme: AppTheme.dark);
   }, skip: !Platform.isMacOS);
 }

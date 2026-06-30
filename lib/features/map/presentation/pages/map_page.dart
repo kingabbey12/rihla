@@ -5,6 +5,7 @@ import 'package:rihla/app/widgets/map_session_host.dart';
 import 'package:rihla/config/app_config.dart';
 import 'package:rihla/features/map/domain/models/map_view_status.dart';
 import 'package:rihla/features/map/presentation/providers/map_providers.dart';
+import 'package:rihla/features/navigation/presentation/widgets/navigation_debug_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_debug_overlay.dart';
 import 'package:rihla/features/map/presentation/widgets/map_empty_view.dart';
 import 'package:rihla/features/map/presentation/widgets/map_error_view.dart';
@@ -61,12 +62,18 @@ class MapPage extends ConsumerWidget {
                   },
                 ),
               ),
-            if (kDebugMode && AppConfig.showDebugOverlay)
+            if (kDebugMode && AppConfig.showDebugOverlay) ...[
               Positioned(
                 left: 12,
                 top: MediaQuery.paddingOf(context).top + 64,
                 child: const MapDebugOverlay(),
               ),
+              Positioned(
+                right: 12,
+                top: MediaQuery.paddingOf(context).top + 64,
+                child: const NavigationDebugOverlay(),
+              ),
+            ],
             const MapOverlaysStack(),
             const HomeDashboardOverlay(),
             const Positioned(

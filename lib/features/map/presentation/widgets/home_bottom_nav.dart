@@ -48,6 +48,7 @@ class HomeBottomNav extends ConsumerWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
+        key: const ValueKey('home_bottom_nav_visible'),
         constraints: const BoxConstraints(maxWidth: 560),
         margin: EdgeInsets.fromLTRB(
           12,

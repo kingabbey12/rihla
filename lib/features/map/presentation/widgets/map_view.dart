@@ -22,6 +22,8 @@ import 'package:rihla/features/routing/domain/entities/route_profile.dart';
 import 'package:rihla/features/routing/domain/entities/route_summary.dart';
 import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/presentation/providers/route_providers.dart';
+import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
+import 'package:rihla/features/traffic/presentation/utils/route_traffic_segments.dart';
 import 'package:rihla/features/explore/domain/entities/explore_marker.dart';
 import 'package:rihla/features/explore/presentation/providers/explore_providers.dart';
 import 'package:rihla/features/map/presentation/widgets/map_controls.dart';
@@ -50,6 +52,7 @@ class _MapViewState extends ConsumerState<MapView> {
   Line? _routeLine;
   Line? _animatedRouteLine;
   final List<Line> _routeAlternativeLines = [];
+  final List<Line> _trafficCasingLines = [];
   List<RouteCoordinate>? _pendingPolyline;
   final Map<Circle, ExploreMarker> _exploreCircleMarkers = {};
   Brightness? _lastSyncedBrightness;
@@ -241,7 +244,44 @@ class _MapViewState extends ConsumerState<MapView> {
       await controller.removeLine(line);
     }
     _routeAlternativeLines.clear();
+    await _clearTrafficCasing();
     _lastRouteSignature = null;
+  }
+
+  Future<void> _clearTrafficCasing() async {
+    final controller = _controller;
+    if (controller == null) return;
+    for (final line in _trafficCasingLines) {
+      await controller.removeLine(line);
+    }
+    _trafficCasingLines.clear();
+  }
+
+  Future<void> _renderTrafficCasing(RouteSummary route) async {
+    final controller = _controller;
+    if (controller == null || route.coordinates.length < 2) return;
+
+    await _clearTrafficCasing();
+    final snapshot = ref.read(trafficSnapshotProvider);
+    final segments = buildRouteTrafficSegments(
+      route: route.coordinates,
+      snapshot: snapshot,
+    );
+
+    for (final segment in segments) {
+      if (segment.coordinates.length < 2) continue;
+      final line = await controller.addLine(
+        LineOptions(
+          geometry: segment.coordinates
+              .map((c) => LatLng(c.latitude, c.longitude))
+              .toList(),
+          lineColor: trafficColorHex(segment.density),
+          lineWidth: 12,
+          lineOpacity: 0.58,
+        ),
+      );
+      _trafficCasingLines.add(line);
+    }
   }
 
   Future<void> _renderRouteState(RouteState state) async {
@@ -301,6 +341,7 @@ class _MapViewState extends ConsumerState<MapView> {
 
     await _frameRoutes(routes);
     await _drawSelectedRouteProgressively(selected);
+    await _renderTrafficCasing(selected);
   }
 
   Future<void> _frameRoutes(List<RouteSummary> routes) async {
@@ -540,6 +581,15 @@ class _MapViewState extends ConsumerState<MapView> {
     });
     ref.listen(routeControllerProvider, (_, next) {
       _renderRouteState(next);
+    });
+    ref.listen(trafficSnapshotProvider, (_, _) {
+      final routeState = ref.read(routeControllerProvider);
+      final selected = switch (routeState) {
+        RouteSelected(:final selected) => selected,
+        RouteReady(:final result) => result.primary,
+        _ => null,
+      };
+      if (selected != null) _renderTrafficCasing(selected);
     });
     ref.listen(exploreMapMarkersProvider, (_, next) {
       _renderExploreMarkers(next);

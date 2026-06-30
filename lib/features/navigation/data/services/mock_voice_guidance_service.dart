@@ -1,4 +1,3 @@
-import 'package:rihla/features/navigation/data/services/mock_tts_provider.dart';
 import 'package:rihla/features/navigation/domain/services/tts_provider.dart';
 import 'package:rihla/features/navigation/domain/services/voice_guidance_service.dart';
 
@@ -32,11 +31,11 @@ class VoiceQueue {
   void clear() => _pending.clear();
 }
 
-/// Voice guidance backed by [MockTtsProvider] until platform TTS is integrated.
+/// FIFO voice guidance backed by any [TtsProvider] (mock or platform).
 class MockVoiceGuidanceService implements VoiceGuidanceService {
   MockVoiceGuidanceService(this._tts);
 
-  final MockTtsProvider _tts;
+  final TtsProvider _tts;
   final VoiceQueue _queue = VoiceQueue();
   bool _muted = false;
   String _languageCode = 'en';

@@ -81,7 +81,7 @@ class NavigationSessionController extends Notifier<NavigationSessionState> {
     required JourneySummary journey,
     required RouteSummary route,
     bool simulationMode = false,
-    bool voiceEnabled = false,
+    bool voiceEnabled = true,
   }) async {
     _stopTicking();
     _tickCount = 0;

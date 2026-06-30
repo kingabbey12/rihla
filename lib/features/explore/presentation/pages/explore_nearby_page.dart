@@ -7,7 +7,6 @@ import 'package:rihla/features/explore/domain/entities/explore_state.dart';
 import 'package:rihla/features/explore/presentation/providers/explore_providers.dart';
 import 'package:rihla/shared/ui/rihla_reference_tokens.dart';
 import 'package:rihla/shared/widgets/empty_screen.dart';
-import 'package:rihla/shared/widgets/loading_screen.dart';
 import 'package:rihla/theme/app_colors.dart';
 
 /// Nearby places loaded from live explore APIs (fuel, EV, parking, OSM, etc.).
@@ -90,7 +89,7 @@ class _ExploreNearbyPageState extends ConsumerState<ExploreNearbyPage> {
           switch (exploreState) {
             ExploreLoading() => const SizedBox(
                 height: 200,
-                child: LoadingScreen(),
+                child: Center(child: CircularProgressIndicator()),
               ),
             ExploreError(:final message) => EmptyScreen(
                 title: 'Could not load places',
@@ -113,7 +112,7 @@ class _ExploreNearbyPageState extends ConsumerState<ExploreNearbyPage> {
               ),
             _ => const SizedBox(
                 height: 120,
-                child: LoadingScreen(),
+                child: Center(child: CircularProgressIndicator()),
               ),
           },
         ],

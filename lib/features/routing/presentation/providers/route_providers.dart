@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/core/observability/breadcrumb.dart';
 import 'package:rihla/core/observability/observability_providers.dart';
@@ -19,6 +21,7 @@ import 'package:rihla/features/routing/domain/models/route_result.dart';
 import 'package:rihla/features/routing/domain/models/route_state.dart';
 import 'package:rihla/features/routing/domain/repositories/route_repository.dart';
 import 'package:rihla/features/routing/domain/services/route_service.dart';
+import 'package:rihla/features/traffic/presentation/providers/traffic_providers.dart';
 
 /// Provides the Valhalla-backed [RouteService] (production HTTP).
 final valhallaRouteServiceProvider = Provider<RouteService>((ref) {
@@ -164,6 +167,18 @@ class RouteController extends Notifier<RouteState> {
     if (selected == null) return;
     state = RouteSelected(result: result, selected: selected);
     ref.read(mapRoutePolylineProvider.notifier).set(selected.coordinates);
+    unawaited(_refreshTrafficForRoute(selected));
+  }
+
+  Future<void> _refreshTrafficForRoute(RouteSummary route) async {
+    if (route.coordinates.length < 2) return;
+    await ref.read(trafficControllerProvider.notifier).fetchAlongRoute(
+          coordinates: [
+            for (final c in route.coordinates)
+              (latitude: c.latitude, longitude: c.longitude),
+          ],
+          freeFlowDurationMinutes: route.durationSeconds / 60,
+        );
   }
 
   void confirmSelection() {
