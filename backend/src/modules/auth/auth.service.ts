@@ -28,10 +28,10 @@ export class AuthService {
         success: false,
         provider: 'supabase',
         message: error.message,
-        code: error.code ?? null,
-        status: error.status ?? null,
-        name: error.name ?? null,
-        raw: JSON.parse(JSON.stringify(error)),
+        code: error.code,
+        status: error.status,
+        name: error.name,
+        error,
       });
     }
     if (!data.user || !data.session) {
