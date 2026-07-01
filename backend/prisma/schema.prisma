@@ -1,0 +1,797 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid()) @db.Uuid
+  supabaseId String   @unique @map("supabase_id")
+  email      String   @unique
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  profile            Profile?
+  vehicles           Vehicle[]
+  savedPlaces        SavedPlace[]
+  journeys           Journey[]
+  navigationSessions NavigationSession[]
+  devices            Device[]
+  settings           Setting?
+  notifications      Notification[]
+  aiConversations    AiConversation[]
+  searchHistory      SearchHistory[]
+  savedSearches      SavedSearch[]
+  placeReviews       PlaceReview[]
+  recommendations    Recommendation[]
+  emergencyContacts  EmergencyContact[]
+  medicalProfile     MedicalProfile?
+  vehicleProfile     VehicleProfile?
+  roadsideRequests   RoadsideRequest[]
+  incidentReports    IncidentReport[]
+  sosRequests        SosRequest[]
+  liveLocationSessions LiveLocationSession[]
+  emergencyDispatchEvents EmergencyDispatchEvent[]
+  userStatistics         UserStatistics?
+  drivingScores          DrivingScore[]
+  journeyAnalytics       JourneyAnalytics[]
+  vehicleAnalytics       VehicleAnalytics[]
+  weeklyReports          WeeklyReport[]
+  monthlyReports         MonthlyReport[]
+  userAchievements       UserAchievement[]
+  analyticsEvents        AnalyticsEvent[]
+
+  @@map("users")
+}
+
+model Profile {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @unique @map("user_id") @db.Uuid
+  displayName String?  @map("display_name")
+  avatarUrl   String?  @map("avatar_url")
+  phone       String?
+  locale      String   @default("en")
+  timezone    String   @default("Asia/Dubai")
+  bio         String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Vehicle {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  make         String
+  model        String
+  year         Int?
+  licensePlate String?  @map("license_plate")
+  color        String?
+  fuelType     String   @default("petrol") @map("fuel_type")
+  isDefault    Boolean  @default(false) @map("is_default")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("vehicles")
+}
+
+model SavedPlace {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String
+  address   String
+  latitude  Float
+  longitude Float
+  category  String   @default("other")
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_places")
+}
+
+model Journey {
+  id              String    @id @default(uuid()) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  originName      String    @map("origin_name")
+  originLat       Float     @map("origin_lat")
+  originLng       Float     @map("origin_lng")
+  destinationName String    @map("destination_name")
+  destinationLat  Float     @map("destination_lat")
+  destinationLng  Float     @map("destination_lng")
+  distanceKm      Float?    @map("distance_km")
+  durationMinutes Int?      @map("duration_minutes")
+  status          String    @default("planned")
+  mode            String    @default("driving")
+  startedAt       DateTime? @map("started_at")
+  completedAt     DateTime? @map("completed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routes Route[]
+
+  @@index([userId, status])
+  @@map("journeys")
+}
+
+model Route {
+  id                String   @id @default(uuid()) @db.Uuid
+  journeyId         String   @map("journey_id") @db.Uuid
+  profile           String   @default("fast")
+  mode              String   @default("driving")
+  distanceKm        Float    @map("distance_km")
+  durationSeconds   Int      @map("duration_seconds")
+  polyline          String   @db.Text
+  encodedPolyline6  String?  @map("encoded_polyline6") @db.Text
+  instructions      Json?    @map("instructions")
+  elevationGainM    Float?   @map("elevation_gain_m")
+  trafficWeight     Float?   @map("traffic_weight")
+  trafficSummary    String?  @map("traffic_summary")
+  isSelected        Boolean  @default(false) @map("is_selected")
+  isAlternative     Boolean  @default(false) @map("is_alternative")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  journey            Journey             @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  navigationSessions NavigationSession[]
+  segments           RouteSegment[]
+
+  @@index([journeyId])
+  @@map("routes")
+}
+
+model RouteSegment {
+  id              String @id @default(uuid()) @db.Uuid
+  routeId         String @map("route_id") @db.Uuid
+  segmentIndex    Int    @map("segment_index")
+  startLat        Float  @map("start_lat")
+  startLng        Float  @map("start_lng")
+  endLat          Float  @map("end_lat")
+  endLng          Float  @map("end_lng")
+  distanceKm      Float  @map("distance_km")
+  durationSeconds Int    @map("duration_seconds")
+  instruction     String
+  maneuverType    String @map("maneuver_type")
+  polyline        String @db.Text
+
+  route Route @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@index([routeId, segmentIndex])
+  @@map("route_segments")
+}
+
+model NavigationSession {
+  id              String    @id @default(uuid()) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  journeyId       String?   @map("journey_id") @db.Uuid
+  routeId         String?   @map("route_id") @db.Uuid
+  status          String    @default("active")
+  mode            String    @default("driving")
+  currentLat      Float?    @map("current_lat")
+  currentLng      Float?    @map("current_lng")
+  speedKmh        Float?    @map("speed_kmh")
+  headingDeg      Float?    @map("heading_deg")
+  remainingKm     Float?    @map("remaining_km")
+  remainingMin    Int?      @map("remaining_min")
+  distanceTravelledKm Float @default(0) @map("distance_travelled_km")
+  averageSpeedKmh Float?    @map("average_speed_kmh")
+  isOffRoute      Boolean   @default(false) @map("is_off_route")
+  voiceEnabled    Boolean   @default(true) @map("voice_enabled")
+  startedAt       DateTime  @default(now()) @map("started_at")
+  pausedAt        DateTime? @map("paused_at")
+  endedAt         DateTime? @map("ended_at")
+  arrivedAt       DateTime? @map("arrived_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  route      Route?             @relation(fields: [routeId], references: [id], onDelete: SetNull)
+  points     JourneyPoint[]
+  events     RouteEvent[]
+  statistics JourneyStatistics?
+
+  @@index([userId, status])
+  @@map("navigation_sessions")
+}
+
+model JourneyPoint {
+  id          String   @id @default(uuid()) @db.Uuid
+  sessionId   String   @map("session_id") @db.Uuid
+  sequence    Int
+  latitude    Float
+  longitude   Float
+  speedKmh    Float?   @map("speed_kmh")
+  headingDeg  Float?   @map("heading_deg")
+  accuracyM   Float?   @map("accuracy_m")
+  altitudeM   Float?   @map("altitude_m")
+  recordedAt  DateTime @map("recorded_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  session NavigationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, sequence])
+  @@index([sessionId, recordedAt])
+  @@map("journey_points")
+}
+
+model RouteEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  sessionId String   @map("session_id") @db.Uuid
+  eventType String   @map("event_type")
+  payload   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  session NavigationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, eventType])
+  @@index([sessionId, createdAt])
+  @@map("route_events")
+}
+
+model JourneyStatistics {
+  id                  String    @id @default(uuid()) @db.Uuid
+  sessionId           String    @unique @map("session_id") @db.Uuid
+  distanceTravelledKm Float     @default(0) @map("distance_travelled_km")
+  averageSpeedKmh     Float?    @map("average_speed_kmh")
+  maxSpeedKmh         Float?    @map("max_speed_kmh")
+  durationSeconds     Int       @default(0) @map("duration_seconds")
+  offRouteCount       Int       @default(0) @map("off_route_count")
+  pointsRecorded      Int       @default(0) @map("points_recorded")
+  arrivalAt           DateTime? @map("arrival_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  session NavigationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("journey_statistics")
+}
+
+model Device {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  deviceId     String   @map("device_id")
+  platform     String
+  pushToken    String?  @map("push_token")
+  appVersion   String?  @map("app_version")
+  lastActiveAt DateTime @default(now()) @map("last_active_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@index([userId])
+  @@map("devices")
+}
+
+model Setting {
+  id                   String   @id @default(uuid()) @db.Uuid
+  userId               String   @unique @map("user_id") @db.Uuid
+  theme                String   @default("system")
+  language             String   @default("en")
+  units                String   @default("metric")
+  voiceGuidance        Boolean  @default(true) @map("voice_guidance")
+  trafficAlerts        Boolean  @default(true) @map("traffic_alerts")
+  speedLimitWarnings   Boolean  @default(true) @map("speed_limit_warnings")
+  notificationsEnabled Boolean  @default(true) @map("notifications_enabled")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("settings")
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  type      String
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model AiConversation {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  title     String?
+  mode      String   @default("driving_assistant")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AiMessage[]
+
+  @@index([userId, updatedAt])
+  @@map("ai_conversations")
+}
+
+model AiMessage {
+  id             String   @id @default(uuid()) @db.Uuid
+  conversationId String   @map("conversation_id") @db.Uuid
+  role           String
+  content        String   @db.Text
+  tokensUsed     Int?     @map("tokens_used")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("ai_messages")
+}
+
+model SearchHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  query     String
+  resultCount Int    @default(0) @map("result_count")
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("search_history")
+}
+
+model SavedSearch {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  label     String
+  query     String
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_searches")
+}
+
+model PlaceReview {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  placeId   String   @map("place_id")
+  placeName String   @map("place_name")
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([placeId])
+  @@index([userId])
+  @@map("place_reviews")
+}
+
+model Recommendation {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  type        String
+  title       String
+  description String   @db.Text
+  latitude    Float?
+  longitude   Float?
+  priority    Int      @default(0)
+  metadata    Json?
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([userId, expiresAt])
+  @@map("recommendations")
+}
+
+model PoiCache {
+  id        String   @id @default(uuid()) @db.Uuid
+  cacheKey  String   @unique @map("cache_key")
+  category  String
+  latitude  Float
+  longitude Float
+  radiusKm  Float    @map("radius_km")
+  payload   Json
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("poi_cache")
+}
+
+model WeatherCache {
+  id        String   @id @default(uuid()) @db.Uuid
+  cacheKey  String   @unique @map("cache_key")
+  latitude  Float
+  longitude Float
+  payload   Json
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("weather_cache")
+}
+
+model TrafficCache {
+  id        String   @id @default(uuid()) @db.Uuid
+  cacheKey  String   @unique @map("cache_key")
+  latitude  Float
+  longitude Float
+  payload   Json
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("traffic_cache")
+}
+
+model EmergencyContact {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  nameEnc      String   @map("name_enc") @db.Text
+  phoneEnc     String   @map("phone_enc") @db.Text
+  relationship String?
+  isPrimary    Boolean  @default(false) @map("is_primary")
+  notifyOnSos  Boolean  @default(true) @map("notify_on_sos")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("emergency_contacts")
+}
+
+model MedicalProfile {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @map("user_id") @db.Uuid
+  bloodTypeEnc    String?  @map("blood_type_enc") @db.Text
+  allergiesEnc    String?  @map("allergies_enc") @db.Text
+  medicationsEnc  String?  @map("medications_enc") @db.Text
+  conditionsEnc   String?  @map("conditions_enc") @db.Text
+  notesEnc        String?  @map("notes_enc") @db.Text
+  organDonor      Boolean  @default(false) @map("organ_donor")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("medical_profiles")
+}
+
+model VehicleProfile {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @unique @map("user_id") @db.Uuid
+  vehicleId             String?  @map("vehicle_id") @db.Uuid
+  makeEnc               String?  @map("make_enc") @db.Text
+  modelEnc              String?  @map("model_enc") @db.Text
+  colorEnc              String?  @map("color_enc") @db.Text
+  licensePlateEnc       String?  @map("license_plate_enc") @db.Text
+  insuranceProviderEnc  String?  @map("insurance_provider_enc") @db.Text
+  insurancePolicyEnc    String?  @map("insurance_policy_enc") @db.Text
+  roadsideMembershipEnc String?  @map("roadside_membership_enc") @db.Text
+  vinEnc                String?  @map("vin_enc") @db.Text
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_profiles")
+}
+
+model SosRequest {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  status            String    @default("active")
+  latitude          Float
+  longitude         Float
+  headingDeg        Float?    @map("heading_deg")
+  speedKmh          Float?    @map("speed_kmh")
+  batteryLevel      Float?    @map("battery_level")
+  deviceId          String?   @map("device_id")
+  devicePlatform    String?   @map("device_platform")
+  vehicleSnapshot   Json?     @map("vehicle_snapshot")
+  medicalSnapshot   Json?     @map("medical_snapshot")
+  contactsSnapshot  Json?     @map("contacts_snapshot")
+  startedAt         DateTime  @default(now()) @map("started_at")
+  cancelledAt       DateTime? @map("cancelled_at")
+  resolvedAt        DateTime? @map("resolved_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("sos_requests")
+}
+
+model RoadsideRequest {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  type        String
+  status      String    @default("pending")
+  latitude    Float
+  longitude   Float
+  description String?   @db.Text
+  provider    String?
+  etaMinutes  Int?      @map("eta_minutes")
+  resolvedAt  DateTime? @map("resolved_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("roadside_requests")
+}
+
+model IncidentReport {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  type          String
+  status        String   @default("submitted")
+  latitude      Float
+  longitude     Float
+  description   String?  @db.Text
+  imageUrls     Json?    @map("image_urls")
+  voiceNoteUrl  String?  @map("voice_note_url")
+  voiceNoteMeta Json?    @map("voice_note_meta")
+  reporterName  String?  @map("reporter_name")
+  reporterPhone String?  @map("reporter_phone")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("incident_reports")
+}
+
+model LiveLocationSession {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  shareTokenHash String  @unique @map("share_token_hash")
+  channelName  String    @map("channel_name")
+  status       String    @default("active")
+  expiresAt    DateTime  @map("expires_at")
+  currentLat   Float?    @map("current_lat")
+  currentLng   Float?    @map("current_lng")
+  headingDeg   Float?    @map("heading_deg")
+  speedKmh     Float?    @map("speed_kmh")
+  startedAt    DateTime  @default(now()) @map("started_at")
+  pausedAt     DateTime? @map("paused_at")
+  endedAt      DateTime? @map("ended_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@map("live_location_sessions")
+}
+
+model EmergencyDispatchEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  sourceType String   @map("source_type")
+  sourceId   String   @map("source_id") @db.Uuid
+  eventType  String   @map("event_type")
+  payload    Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sourceType, sourceId])
+  @@index([userId, createdAt])
+  @@map("emergency_dispatch_events")
+}
+
+model UserStatistics {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @unique @map("user_id") @db.Uuid
+  tripsCompleted        Int      @default(0) @map("trips_completed")
+  tripsCancelled        Int      @default(0) @map("trips_cancelled")
+  totalDistanceKm       Float    @default(0) @map("total_distance_km")
+  totalDrivingSeconds   Int      @default(0) @map("total_driving_seconds")
+  totalIdleSeconds      Int      @default(0) @map("total_idle_seconds")
+  averageSpeedKmh       Float?   @map("average_speed_kmh")
+  maxSpeedKmh           Float?   @map("max_speed_kmh")
+  harshBrakingCount     Int      @default(0) @map("harsh_braking_count")
+  rapidAccelerationCount Int     @default(0) @map("rapid_acceleration_count")
+  sharpTurnCount        Int      @default(0) @map("sharp_turn_count")
+  offRouteCount         Int      @default(0) @map("off_route_count")
+  trafficDelaySeconds   Int      @default(0) @map("traffic_delay_seconds")
+  nightDrivingSeconds   Int      @default(0) @map("night_driving_seconds")
+  rainDrivingSeconds    Int      @default(0) @map("rain_driving_seconds")
+  fogDrivingSeconds     Int      @default(0) @map("fog_driving_seconds")
+  heatExposureMinutes   Int      @default(0) @map("heat_exposure_minutes")
+  journeyCompletionRate Float    @default(0) @map("journey_completion_rate")
+  fuelLitresEstimate    Float    @default(0) @map("fuel_litres_estimate")
+  evKwhEstimate         Float    @default(0) @map("ev_kwh_estimate")
+  co2KgEstimate         Float    @default(0) @map("co2_kg_estimate")
+  currentDrivingScore   Int      @default(0) @map("current_driving_score")
+  lastCalculatedAt      DateTime @default(now()) @map("last_calculated_at")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_statistics")
+}
+
+model DrivingScore {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  score       Int
+  factors     Json
+  periodStart DateTime @map("period_start")
+  periodEnd   DateTime @map("period_end")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("driving_scores")
+}
+
+model JourneyAnalytics {
+  id                 String   @id @default(uuid()) @db.Uuid
+  userId             String   @map("user_id") @db.Uuid
+  journeyId          String   @unique @map("journey_id") @db.Uuid
+  sessionId          String?  @map("session_id") @db.Uuid
+  distanceKm         Float    @default(0) @map("distance_km")
+  drivingSeconds     Int      @default(0) @map("driving_seconds")
+  idleSeconds        Int      @default(0) @map("idle_seconds")
+  averageSpeedKmh    Float?   @map("average_speed_kmh")
+  maxSpeedKmh        Float?   @map("max_speed_kmh")
+  harshBraking       Int      @default(0) @map("harsh_braking")
+  rapidAcceleration  Int      @default(0) @map("rapid_acceleration")
+  sharpTurns         Int      @default(0) @map("sharp_turns")
+  offRouteCount      Int      @default(0) @map("off_route_count")
+  trafficDelaySeconds Int     @default(0) @map("traffic_delay_seconds")
+  nightDrivingSeconds Int     @default(0) @map("night_driving_seconds")
+  rainDrivingSeconds Int      @default(0) @map("rain_driving_seconds")
+  fogDrivingSeconds  Int      @default(0) @map("fog_driving_seconds")
+  heatExposureMinutes Int     @default(0) @map("heat_exposure_minutes")
+  fuelLitresEstimate Float    @default(0) @map("fuel_litres_estimate")
+  evKwhEstimate      Float    @default(0) @map("ev_kwh_estimate")
+  co2KgEstimate      Float    @default(0) @map("co2_kg_estimate")
+  completed          Boolean  @default(false)
+  destinationName    String?  @map("destination_name")
+  metrics            Json?
+  computedAt         DateTime @default(now()) @map("computed_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, computedAt])
+  @@map("journey_analytics")
+}
+
+model VehicleAnalytics {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  vehicleId       String?  @map("vehicle_id") @db.Uuid
+  totalDistanceKm Float    @default(0) @map("total_distance_km")
+  totalTrips      Int      @default(0) @map("total_trips")
+  fuelLitres      Float    @default(0) @map("fuel_litres")
+  evKwh           Float    @default(0) @map("ev_kwh")
+  co2Kg           Float    @default(0) @map("co2_kg")
+  averageScore    Int      @default(0) @map("average_score")
+  periodStart     DateTime @map("period_start")
+  periodEnd       DateTime @map("period_end")
+  metrics         Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, periodEnd])
+  @@map("vehicle_analytics")
+}
+
+model WeeklyReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  weekStart   DateTime @map("week_start")
+  weekEnd     DateTime @map("week_end")
+  payload     Json
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@index([userId, weekStart])
+  @@map("weekly_reports")
+}
+
+model MonthlyReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  month       Int
+  year        Int
+  payload     Json
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@index([userId, year, month])
+  @@map("monthly_reports")
+}
+
+model Achievement {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  name        String
+  description String   @db.Text
+  category    String
+  criteria    Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  achievementId String   @map("achievement_id") @db.Uuid
+  earnedAt      DateTime @default(now()) @map("earned_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId, earnedAt])
+  @@map("user_achievements")
+}
+
+model Leaderboard {
+  id          String   @id @default(uuid()) @db.Uuid
+  scope       String
+  metric      String
+  period      String
+  rankings    Json
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  @@unique([scope, metric, period])
+  @@index([scope, metric])
+  @@map("leaderboards")
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  eventType String   @map("event_type")
+  sourceId  String?  @map("source_id")
+  payload   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, eventType])
+  @@index([userId, createdAt])
+  @@map("analytics_events")
+}

@@ -1,0 +1,75 @@
+# Local development stack — hot reload, exposed ports, dev credentials.
+# Usage: docker compose -f docker/docker-compose.dev.yml up --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rihla-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rihla
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rihla_dev_secret}
+      POSTGRES_DB: rihla
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - rihla-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rihla -d rihla"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: rihla-redis-dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - rihla-dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: rihla-api-dev
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://rihla:${POSTGRES_PASSWORD:-rihla_dev_secret}@postgres:5432/rihla?schema=public
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ../src:/app/src:ro
+      - ../prisma:/app/prisma:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rihla-dev
+
+networks:
+  rihla-dev:
+    driver: bridge
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:

@@ -1,0 +1,71 @@
+{
+  "name": "rihla-backend",
+  "version": "1.0.0",
+  "description": "Rihla production API — NestJS + Prisma + PostgreSQL + Redis + Supabase",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main",
+    "lint": "tsc --noEmit",
+    "audit": "npm audit --audit-level=high",
+    "docker:build": "docker build -f docker/Dockerfile -t rihla-api .",
+    "docker:dev": "docker compose -f docker/docker-compose.dev.yml up --build",
+    "docker:prod": "docker compose -f docker/docker-compose.prod.yml up -d --build",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.12",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.12",
+    "@nestjs/platform-express": "^11.0.12",
+    "@nestjs/swagger": "^11.1.0",
+    "@nestjs/throttler": "^6.4.0",
+    "@prisma/client": "^6.6.0",
+    "@supabase/supabase-js": "^2.49.4",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "compression": "^1.8.0",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.6.0",
+    "nestjs-pino": "^4.4.0",
+    "pino": "^9.6.0",
+    "pino-http": "^10.4.0",
+    "pino-pretty": "^13.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.6",
+    "@nestjs/schematics": "^11.0.3",
+    "@nestjs/testing": "^11.0.12",
+    "@types/compression": "^1.7.5",
+    "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.14.0",
+    "@types/supertest": "^6.0.3",
+    "@types/ws": "^8.18.1",
+    "jest": "^29.7.0",
+    "prisma": "^6.6.0",
+    "supertest": "^7.1.0",
+    "ts-jest": "^29.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
