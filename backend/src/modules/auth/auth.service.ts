@@ -24,21 +24,14 @@ export class AuthService {
     });
 
     if (error) {
-      console.error('SUPABASE SIGNUP ERROR', {
-        message: error.message,
-        status: error.status,
-        code: error.code,
-        name: error.name,
-        error,
-      });
-
       throw new BadRequestException({
         success: false,
         provider: 'supabase',
         message: error.message,
-        status: error.status,
-        code: error.code,
-        details: error,
+        code: error.code ?? null,
+        status: error.status ?? null,
+        name: error.name ?? null,
+        raw: JSON.parse(JSON.stringify(error)),
       });
     }
     if (!data.user || !data.session) {
