@@ -23,6 +23,7 @@ import 'package:rihla/localization/generated/app_localizations.dart';
 import 'package:rihla/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../home/home_dashboard_test_overrides.dart';
 import '../navigation/navigation_test_helpers.dart';
 
 void main() {
@@ -60,6 +61,7 @@ void main() {
               (ref) => MockRouteService(simulatedDelay: Duration.zero),
             ),
             ...navigationTestOverrides(),
+            ...homeDashboardTestOverrides(),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -145,6 +147,7 @@ void main() {
               (ref) => MockRouteService(simulatedDelay: Duration.zero),
             ),
             ...navigationTestOverrides(),
+            ...homeDashboardTestOverrides(),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,

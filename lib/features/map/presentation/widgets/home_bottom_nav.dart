@@ -22,8 +22,7 @@ class HomeBottomNav extends ConsumerWidget {
     if (isNavigating || routePreviewActive) return const SizedBox.shrink();
 
     final exploreActive = ref.watch(exploreActiveProvider);
-    final emergencyActive = ref.watch(emergencyActiveProvider);
-    final selected = emergencyActive ? 2 : (exploreActive ? 1 : 0);
+    final selected = exploreActive ? 1 : 0;
 
     final l10n = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -39,8 +38,15 @@ class HomeBottomNav extends ConsumerWidget {
           context.push(RoutePaths.exploreNearby);
         case 2:
           ref.read(exploreControllerProvider.notifier).deactivate();
-          context.push(RoutePaths.emergencyDashboard);
+          ref.read(emergencyControllerProvider.notifier).deactivate();
+          context.push(RoutePaths.aiHome);
         case 3:
+          ref.read(exploreControllerProvider.notifier).deactivate();
+          ref.read(emergencyControllerProvider.notifier).deactivate();
+          context.push(RoutePaths.profile);
+        case 4:
+          ref.read(exploreControllerProvider.notifier).deactivate();
+          ref.read(emergencyControllerProvider.notifier).deactivate();
           context.push(RoutePaths.profile);
       }
     }
@@ -67,10 +73,11 @@ class HomeBottomNav extends ConsumerWidget {
           child: NavigationBarTheme(
             data: NavigationBarThemeData(
               labelTextStyle: WidgetStateProperty.resolveWith((states) {
-                final selected = states.contains(WidgetState.selected);
-                return context.textTheme.labelMedium?.copyWith(
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  color: selected
+                final isSelected = states.contains(WidgetState.selected);
+                return context.textTheme.labelSmall?.copyWith(
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 11,
+                  color: isSelected
                       ? RihlaReferenceTokens.mapTeal
                       : Theme.of(context).colorScheme.onSurfaceVariant,
                 );
@@ -99,17 +106,22 @@ class HomeBottomNav extends ConsumerWidget {
                   active: selected == 1,
                 ),
                 _animatedDestination(
-                  outlined: Icons.emergency_outlined,
-                  filled: Icons.emergency_rounded,
-                  label: l10n.featureEmergency,
-                  active: selected == 2,
-                  activeColor: RihlaReferenceTokens.emergencyRed,
+                  outlined: Icons.auto_awesome_outlined,
+                  filled: Icons.auto_awesome_rounded,
+                  label: l10n.homeQuickAi,
+                  active: false,
+                ),
+                _animatedDestination(
+                  outlined: Icons.insights_outlined,
+                  filled: Icons.insights_rounded,
+                  label: l10n.featureAnalytics,
+                  active: false,
                 ),
                 _animatedDestination(
                   outlined: Icons.person_outline_rounded,
                   filled: Icons.person_rounded,
                   label: l10n.featureProfile,
-                  active: selected == 3,
+                  active: false,
                 ),
               ],
             ),
@@ -130,12 +142,12 @@ class HomeBottomNav extends ConsumerWidget {
     final color = activeColor ?? RihlaReferenceTokens.mapTeal;
     return NavigationDestination(
       label: label,
-      icon: Icon(outlined),
+      icon: Icon(outlined, size: 22),
       selectedIcon: AnimatedScale(
         scale: active ? 1.12 : 1,
         duration: const Duration(milliseconds: 280),
         curve: Curves.easeOutBack,
-        child: Icon(filled, color: color),
+        child: Icon(filled, color: color, size: 22),
       ),
     );
   }

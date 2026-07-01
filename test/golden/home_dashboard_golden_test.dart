@@ -8,9 +8,10 @@ import 'package:rihla/features/map/presentation/widgets/home_bottom_nav.dart';
 import 'package:rihla/features/map/presentation/widgets/home_dashboard_overlay.dart';
 import 'package:rihla/features/search/domain/entities/search_place.dart';
 import 'package:rihla/features/search/presentation/providers/search_providers.dart';
-import 'package:rihla/features/search/presentation/widgets/map_search_bar.dart';
 import 'package:rihla/localization/generated/app_localizations.dart';
 import 'package:rihla/theme/app_theme.dart';
+
+import '../features/home/home_dashboard_test_overrides.dart';
 
 class _StubHome extends SearchHomeNotifier {
   @override
@@ -91,6 +92,7 @@ void main() {
           searchHomeProvider.overrideWith(_StubHome.new),
           searchWorkProvider.overrideWith(_StubWork.new),
           searchFavoritesProvider.overrideWith(_StubFavorites.new),
+          ...homeDashboardTestOverrides(),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -101,7 +103,6 @@ void main() {
             body: Stack(
               children: [
                 Positioned.fill(child: _MapBackdrop()),
-                MapSearchBar(),
                 HomeDashboardOverlay(),
                 Positioned(
                   left: 0,

@@ -9,6 +9,10 @@ abstract final class RihlaRadii {
   static const double xl = 22;
   static const double xxl = 28;
 
+  /// Primary card radius (20–24px design spec).
+  static const double card = 22;
+  static const BorderRadius cardAll = BorderRadius.all(Radius.circular(card));
+
   /// Fully rounded (pills, avatars, FABs).
   static const double pill = 999;
 

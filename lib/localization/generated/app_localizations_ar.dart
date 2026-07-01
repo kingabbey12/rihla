@@ -759,4 +759,89 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiEnginePowered => 'مدعوم بمحركات التوجيه والسلامة';
+
+  @override
+  String get featureAnalytics => 'التحليلات';
+
+  @override
+  String get homeSearchPlaceholder => 'إلى أين تريد الذهاب؟';
+
+  @override
+  String get homeStartNavigation => 'بدء الملاحة';
+
+  @override
+  String get homeAiJourneyBriefTitle => 'ملخص الرحلة بالذكاء الاصطناعي';
+
+  @override
+  String get homeRecentPlaces => 'الأماكن الأخيرة';
+
+  @override
+  String get homeTodaysDriving => 'قيادتك اليوم';
+
+  @override
+  String get homeTodaysTrips => 'رحلات اليوم';
+
+  @override
+  String get homeDrivingScore => 'درجة القيادة';
+
+  @override
+  String get homeTimeDriving => 'وقت القيادة';
+
+  @override
+  String get homeDistanceLabel => 'المسافة';
+
+  @override
+  String get homeMapPreviewTitle => 'خريطة مباشرة';
+
+  @override
+  String get homeOpenFullMap => 'اضغط لفتح الخريطة الكاملة';
+
+  @override
+  String get homeShowDashboard => 'عرض اللوحة الرئيسية';
+
+  @override
+  String get homeJourneyBriefUnavailable =>
+      'ستظهر رؤى الرحلة عند الاتصال وتوفر الموقع.';
+
+  @override
+  String get homeTrafficSummary => 'الازدحام';
+
+  @override
+  String get homeWeatherWarning => 'الطقس';
+
+  @override
+  String get homeBestDeparture => 'أفضل وقت للمغادرة';
+
+  @override
+  String get homeRoadIncidents => 'الحوادث';
+
+  @override
+  String get homeAiRecommendation => 'التوصية';
+
+  @override
+  String get homeQuickFuel => 'وقود';
+
+  @override
+  String get homeQuickEv => 'شحن كهربائي';
+
+  @override
+  String get homeQuickRestaurants => 'مطاعم';
+
+  @override
+  String get homeQuickHospitals => 'مستشفيات';
+
+  @override
+  String get homeQuickRestrooms => 'دورات مياه';
+
+  @override
+  String get homeQuickHazard => 'الإبلاغ عن خطر';
+
+  @override
+  String get homeQuickSos => 'طوارئ';
+
+  @override
+  String get homeQuickAi => 'المساعد الذكي';
+
+  @override
+  String get homeGuestName => 'مسافر';
 }

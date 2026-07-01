@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rihla/features/ai_copilot/presentation/widgets/ai_copilot_map_overlay.dart';
 import 'package:rihla/features/emergency/presentation/widgets/emergency_map_overlay.dart';
 import 'package:rihla/features/explore/presentation/widgets/explore_map_overlay.dart';
+import 'package:rihla/features/home/presentation/providers/home_dashboard_providers.dart';
 import 'package:rihla/features/journey/presentation/widgets/journey_map_overlay.dart';
 import 'package:rihla/features/live_journey/presentation/widgets/journey_dashboard_map_overlay.dart';
 import 'package:rihla/features/navigation/presentation/providers/navigation_session_selectors.dart';
@@ -26,10 +27,12 @@ class MapOverlaysStack extends ConsumerWidget {
     // hide map clutter (AI copilot, safety markers, UAE alert banner) so the
     // route ahead stays visible.
     final isNavigating = ref.watch(navigationIsActiveProvider);
+    final homeDashboardVisible = ref.watch(homeDashboardVisibleProvider);
 
     return Stack(
       children: [
-        const Positioned(top: 0, left: 0, right: 0, child: MapSearchBar()),
+        if (!homeDashboardVisible)
+          const Positioned(top: 0, left: 0, right: 0, child: MapSearchBar()),
         const Positioned.fill(child: JourneyMapOverlay()),
         const Positioned.fill(child: ExploreMapOverlay()),
         const Positioned.fill(child: EmergencyMapOverlay()),

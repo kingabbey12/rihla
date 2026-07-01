@@ -1519,6 +1519,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Powered by routing and safety engines'**
   String get aiEnginePowered;
+
+  /// No description provided for @featureAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get featureAnalytics;
+
+  /// No description provided for @homeSearchPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do you want to go?'**
+  String get homeSearchPlaceholder;
+
+  /// No description provided for @homeStartNavigation.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Navigation'**
+  String get homeStartNavigation;
+
+  /// No description provided for @homeAiJourneyBriefTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Journey Brief'**
+  String get homeAiJourneyBriefTitle;
+
+  /// No description provided for @homeRecentPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Places'**
+  String get homeRecentPlaces;
+
+  /// No description provided for @homeTodaysDriving.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Driving'**
+  String get homeTodaysDriving;
+
+  /// No description provided for @homeTodaysTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Trips'**
+  String get homeTodaysTrips;
+
+  /// No description provided for @homeDrivingScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving Score'**
+  String get homeDrivingScore;
+
+  /// No description provided for @homeTimeDriving.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Driving'**
+  String get homeTimeDriving;
+
+  /// No description provided for @homeDistanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get homeDistanceLabel;
+
+  /// No description provided for @homeMapPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Map'**
+  String get homeMapPreviewTitle;
+
+  /// No description provided for @homeOpenFullMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to open full map'**
+  String get homeOpenFullMap;
+
+  /// No description provided for @homeShowDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Show dashboard'**
+  String get homeShowDashboard;
+
+  /// No description provided for @homeJourneyBriefUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey insights will appear when you\'re online and location is available.'**
+  String get homeJourneyBriefUnavailable;
+
+  /// No description provided for @homeTrafficSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic'**
+  String get homeTrafficSummary;
+
+  /// No description provided for @homeWeatherWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get homeWeatherWarning;
+
+  /// No description provided for @homeBestDeparture.
+  ///
+  /// In en, this message translates to:
+  /// **'Best departure'**
+  String get homeBestDeparture;
+
+  /// No description provided for @homeRoadIncidents.
+  ///
+  /// In en, this message translates to:
+  /// **'Incidents'**
+  String get homeRoadIncidents;
+
+  /// No description provided for @homeAiRecommendation.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation'**
+  String get homeAiRecommendation;
+
+  /// No description provided for @homeQuickFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get homeQuickFuel;
+
+  /// No description provided for @homeQuickEv.
+  ///
+  /// In en, this message translates to:
+  /// **'EV Charging'**
+  String get homeQuickEv;
+
+  /// No description provided for @homeQuickRestaurants.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurants'**
+  String get homeQuickRestaurants;
+
+  /// No description provided for @homeQuickHospitals.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospitals'**
+  String get homeQuickHospitals;
+
+  /// No description provided for @homeQuickRestrooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Restrooms'**
+  String get homeQuickRestrooms;
+
+  /// No description provided for @homeQuickHazard.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Hazard'**
+  String get homeQuickHazard;
+
+  /// No description provided for @homeQuickSos.
+  ///
+  /// In en, this message translates to:
+  /// **'SOS'**
+  String get homeQuickSos;
+
+  /// No description provided for @homeQuickAi.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
+  String get homeQuickAi;
+
+  /// No description provided for @homeGuestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Traveler'**
+  String get homeGuestName;
 }
 
 class _AppLocalizationsDelegate

@@ -765,4 +765,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiEnginePowered => 'Powered by routing and safety engines';
+
+  @override
+  String get featureAnalytics => 'Analytics';
+
+  @override
+  String get homeSearchPlaceholder => 'Where do you want to go?';
+
+  @override
+  String get homeStartNavigation => 'Start Navigation';
+
+  @override
+  String get homeAiJourneyBriefTitle => 'AI Journey Brief';
+
+  @override
+  String get homeRecentPlaces => 'Recent Places';
+
+  @override
+  String get homeTodaysDriving => 'Today\'s Driving';
+
+  @override
+  String get homeTodaysTrips => 'Today\'s Trips';
+
+  @override
+  String get homeDrivingScore => 'Driving Score';
+
+  @override
+  String get homeTimeDriving => 'Time Driving';
+
+  @override
+  String get homeDistanceLabel => 'Distance';
+
+  @override
+  String get homeMapPreviewTitle => 'Live Map';
+
+  @override
+  String get homeOpenFullMap => 'Tap to open full map';
+
+  @override
+  String get homeShowDashboard => 'Show dashboard';
+
+  @override
+  String get homeJourneyBriefUnavailable =>
+      'Journey insights will appear when you\'re online and location is available.';
+
+  @override
+  String get homeTrafficSummary => 'Traffic';
+
+  @override
+  String get homeWeatherWarning => 'Weather';
+
+  @override
+  String get homeBestDeparture => 'Best departure';
+
+  @override
+  String get homeRoadIncidents => 'Incidents';
+
+  @override
+  String get homeAiRecommendation => 'Recommendation';
+
+  @override
+  String get homeQuickFuel => 'Fuel';
+
+  @override
+  String get homeQuickEv => 'EV Charging';
+
+  @override
+  String get homeQuickRestaurants => 'Restaurants';
+
+  @override
+  String get homeQuickHospitals => 'Hospitals';
+
+  @override
+  String get homeQuickRestrooms => 'Restrooms';
+
+  @override
+  String get homeQuickHazard => 'Report Hazard';
+
+  @override
+  String get homeQuickSos => 'SOS';
+
+  @override
+  String get homeQuickAi => 'AI Assistant';
+
+  @override
+  String get homeGuestName => 'Traveler';
 }
