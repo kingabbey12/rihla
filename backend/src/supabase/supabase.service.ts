@@ -16,6 +16,7 @@ export class SupabaseService {
 
     console.log('SUPABASE CONFIG', {
       url,
+      projectRef: url.replace(/^https:\/\/([^.]+)\..*$/, '$1'),
       anonKeyPresent: !!anonKey,
       serviceKeyPresent: !!serviceKey,
     });
