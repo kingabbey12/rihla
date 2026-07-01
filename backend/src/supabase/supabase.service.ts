@@ -14,6 +14,12 @@ export class SupabaseService {
     const anonKey = this.config.get<string>('supabase.anonKey')!;
     const serviceKey = this.config.get<string>('supabase.serviceKey')!;
 
+    console.log('SUPABASE CONFIG', {
+      url,
+      anonKeyPresent: !!anonKey,
+      serviceKeyPresent: !!serviceKey,
+    });
+
     this.client = createClient(url, anonKey, supabaseClientOptions());
     this.adminClient = createClient(
       url,
