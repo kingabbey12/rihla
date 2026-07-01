@@ -71,6 +71,20 @@ describe('HealthController (e2e)', () => {
     expect(res.body.success).toBe(true);
   });
 
+  it('GET /api/v1/live returns 200 when readiness dependencies are down', async () => {
+    mockHealthService.ready.mockResolvedValueOnce({
+      success: false,
+      status: 'down',
+      timestamp: new Date().toISOString(),
+      checks: { database: 'down', redis: 'down' },
+      timingsMs: {},
+    });
+
+    const res = await request(app.getHttpServer()).get('/api/v1/live').expect(200);
+    expect(res.body.status).toBe('ok');
+    expect(mockHealthService.live).not.toHaveBeenCalled();
+  });
+
   it('GET /api/v1/ready returns 503 when not ready', async () => {
     mockHealthService.ready.mockResolvedValueOnce({
       success: false,

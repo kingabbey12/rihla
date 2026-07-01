@@ -18,10 +18,13 @@ export class HealthController {
   constructor(private readonly health: HealthService) {}
 
   @Get('live')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(200)
   @ApiOperation({ summary: 'Liveness probe — process is running' })
   live() {
-    return this.health.live();
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+    };
   }
 
   @Get('ready')
