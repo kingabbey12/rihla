@@ -31,8 +31,7 @@ function isSet(key: string): boolean {
   return value != null && value.trim().length > 0;
 }
 
-function isStrongSecret(key: string, minLength = 32): boolean {
-  const value = process.env[key];
+function isStrongSecret(value?: string, minLength = 32): boolean {
   return value != null && value.length >= minLength;
 }
 
@@ -52,7 +51,7 @@ export function validateEnvironment(
       if (!env[key]?.trim()) errors.push(`${key} is required in ${environment}`);
     }
 
-    if (!isStrongSecret(env.ENCRYPTION_KEY ?? '')) {
+    if (!isStrongSecret(env.ENCRYPTION_KEY)) {
       errors.push('ENCRYPTION_KEY must be at least 32 characters in production');
     }
 
