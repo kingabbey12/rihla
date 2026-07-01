@@ -24,7 +24,22 @@ export class AuthService {
     });
 
     if (error) {
-      throw new BadRequestException(error.message);
+      console.error('SUPABASE SIGNUP ERROR', {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        name: error.name,
+        error,
+      });
+
+      throw new BadRequestException({
+        success: false,
+        provider: 'supabase',
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        details: error,
+      });
     }
     if (!data.user || !data.session) {
       throw new BadRequestException('Registration failed — check email confirmation settings');
