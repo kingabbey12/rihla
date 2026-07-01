@@ -34,5 +34,5 @@ COPY --chown=rihla:rihla package.json ./
 USER rihla
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/live || exit 1
+  CMD wget -qO- http://127.0.0.1:3000/api/v1/live || exit 1
 CMD ["dumb-init", "sh", "-c", "npx prisma migrate deploy && node dist/main"]

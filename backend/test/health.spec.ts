@@ -48,6 +48,7 @@ describe('HealthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api/v1');
     await app.init();
   });
 
@@ -55,22 +56,22 @@ describe('HealthController (e2e)', () => {
     await app.close();
   });
 
-  it('GET /live returns ok', async () => {
-    const res = await request(app.getHttpServer()).get('/live').expect(200);
+  it('GET /api/v1/live returns ok', async () => {
+    const res = await request(app.getHttpServer()).get('/api/v1/live').expect(200);
     expect(res.body.status).toBe('ok');
   });
 
-  it('GET /ready returns ok when dependencies are up', async () => {
-    const res = await request(app.getHttpServer()).get('/ready').expect(200);
+  it('GET /api/v1/ready returns ok when dependencies are up', async () => {
+    const res = await request(app.getHttpServer()).get('/api/v1/ready').expect(200);
     expect(res.body.success).toBe(true);
   });
 
-  it('GET /health returns full check', async () => {
-    const res = await request(app.getHttpServer()).get('/health').expect(200);
+  it('GET /api/v1/health returns full check', async () => {
+    const res = await request(app.getHttpServer()).get('/api/v1/health').expect(200);
     expect(res.body.success).toBe(true);
   });
 
-  it('GET /ready returns 503 when not ready', async () => {
+  it('GET /api/v1/ready returns 503 when not ready', async () => {
     mockHealthService.ready.mockResolvedValueOnce({
       success: false,
       status: 'down',
@@ -79,6 +80,6 @@ describe('HealthController (e2e)', () => {
       timingsMs: {},
     });
 
-    await request(app.getHttpServer()).get('/ready').expect(503);
+    await request(app.getHttpServer()).get('/api/v1/ready').expect(503);
   });
 });

@@ -63,9 +63,7 @@ async function bootstrap() {
   });
 
   const apiPrefix = config.get<string>('apiPrefix') ?? 'api/v1';
-  app.setGlobalPrefix(apiPrefix, {
-    exclude: ['live', 'ready', 'health'],
-  });
+  app.setGlobalPrefix(apiPrefix);
   console.log('STARTUP STEP 8: after middleware and global configuration');
 
   const swaggerConfig = new DocumentBuilder()
@@ -94,7 +92,7 @@ async function bootstrap() {
   console.log('SERVER LISTENING');
 
   logger.log(`Rihla API running on http://localhost:${port}/${apiPrefix}`);
-  logger.log(`Health: /live /ready /health`);
+  logger.log(`Health: /${apiPrefix}/live /${apiPrefix}/ready /${apiPrefix}/health`);
   logger.log(`Swagger docs at http://localhost:${port}/api/docs`);
 
   const shutdown = async (signal: string) => {
