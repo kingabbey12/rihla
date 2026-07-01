@@ -7,6 +7,7 @@ import compression from 'compression';
 import { AppModule } from './app.module';
 import { globalValidationPipe } from './common/pipes/validation.pipe';
 import { assertValidEnvironment } from './config/env.validation';
+import { logRuntimeRouteRegistration } from './bootstrap/route-debug.util';
 
 async function bootstrap() {
   console.log('STARTUP STEP 1: before assertValidEnvironment');
@@ -63,6 +64,9 @@ async function bootstrap() {
   });
 
   const apiPrefix = config.get<string>('apiPrefix') ?? 'api/v1';
+  console.log(
+    `ROUTE DEBUG: apiPrefix="${apiPrefix}" (API_PREFIX env=${JSON.stringify(process.env.API_PREFIX ?? null)})`,
+  );
   app.setGlobalPrefix(apiPrefix);
   console.log('STARTUP STEP 8: after middleware and global configuration');
 
@@ -90,6 +94,10 @@ async function bootstrap() {
   );
   await app.listen(port);
   console.log('SERVER LISTENING');
+  console.log(
+    `ROUTE DEBUG: deployment commit=${process.env.RAILWAY_GIT_COMMIT_SHA ?? process.env.GIT_COMMIT ?? 'unknown'}`,
+  );
+  logRuntimeRouteRegistration(app);
 
   logger.log(`Rihla API running on http://localhost:${port}/${apiPrefix}`);
   logger.log(`Health: /${apiPrefix}/live /${apiPrefix}/ready /${apiPrefix}/health`);
