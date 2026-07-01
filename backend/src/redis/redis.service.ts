@@ -15,12 +15,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly config: ConfigService) {}
 
   async onModuleInit() {
+    console.log('STARTUP: redis connect — begin');
     const url = this.config.get<string>('redisUrl')!;
     this.client = new Redis(url, {
       maxRetriesPerRequest: 3,
       lazyConnect: true,
     });
     await this.client.connect();
+    console.log('STARTUP: redis connect — done');
     this.logger.log('Redis connected');
   }
 

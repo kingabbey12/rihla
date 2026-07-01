@@ -22,7 +22,9 @@ export class HealthService {
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly config: ConfigService,
-  ) {}
+  ) {
+    console.log('STARTUP: health service constructed');
+  }
 
   live(): { status: 'ok'; timestamp: string } {
     return { status: 'ok', timestamp: new Date().toISOString() };

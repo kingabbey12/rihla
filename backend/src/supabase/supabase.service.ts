@@ -9,6 +9,7 @@ export class SupabaseService {
   private readonly adminClient: SupabaseClient;
 
   constructor(private readonly config: ConfigService) {
+    console.log('STARTUP: supabase client init — begin');
     const url = this.config.get<string>('supabase.url')!;
     const anonKey = this.config.get<string>('supabase.anonKey')!;
     const serviceKey = this.config.get<string>('supabase.serviceKey')!;
@@ -21,6 +22,7 @@ export class SupabaseService {
         auth: { autoRefreshToken: false, persistSession: false },
       }),
     );
+    console.log('STARTUP: supabase client init — done');
   }
 
   getClient(): SupabaseClient {

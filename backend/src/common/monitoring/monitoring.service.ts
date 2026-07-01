@@ -8,6 +8,7 @@ export class MonitoringService implements OnModuleInit {
   constructor(private readonly config: ConfigService) {}
 
   onModuleInit() {
+    console.log('STARTUP: monitoring init — begin');
     const sentryDsn = this.config.get<string>('monitoring.sentryDsn');
     const otelEnabled = this.config.get<boolean>('monitoring.otelEnabled');
 
@@ -22,6 +23,7 @@ export class MonitoringService implements OnModuleInit {
     } else {
       this.logger.log('OpenTelemetry disabled (OTEL_ENABLED=false)');
     }
+    console.log('STARTUP: monitoring init — done');
   }
 
   private initSentry(dsn: string) {

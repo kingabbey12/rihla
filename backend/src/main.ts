@@ -9,17 +9,25 @@ import { globalValidationPipe } from './common/pipes/validation.pipe';
 import { assertValidEnvironment } from './config/env.validation';
 
 async function bootstrap() {
+  console.log('STARTUP STEP 1: before assertValidEnvironment');
   if (process.env.NODE_ENV !== 'test') {
     assertValidEnvironment();
   }
+  console.log('STARTUP STEP 2: after assertValidEnvironment');
 
+  console.log('STARTUP STEP 3: before NestFactory.create');
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
     rawBody: false,
   });
+  console.log('STARTUP STEP 4: after NestFactory.create');
+
+  console.log('STARTUP STEP 5: before ConfigService and Logger resolution');
   const config = app.get(ConfigService);
   const logger = app.get(Logger);
+  console.log('STARTUP STEP 6: after ConfigService and Logger resolution');
 
+  console.log('STARTUP STEP 7: before middleware and global configuration');
   app.useLogger(logger);
   app.enableShutdownHooks();
 
@@ -58,6 +66,7 @@ async function bootstrap() {
   app.setGlobalPrefix(apiPrefix, {
     exclude: ['live', 'ready', 'health'],
   });
+  console.log('STARTUP STEP 8: after middleware and global configuration');
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Rihla API')
@@ -67,13 +76,22 @@ async function bootstrap() {
     .addTag('health')
     .build();
 
+  console.log('STARTUP STEP 9: before Swagger createDocument');
   const document = SwaggerModule.createDocument(app, swaggerConfig);
+  console.log('STARTUP STEP 10: after Swagger createDocument');
+
+  console.log('STARTUP STEP 11: before Swagger setup');
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: { persistAuthorization: true },
   });
+  console.log('STARTUP STEP 12: after Swagger setup');
 
   const port = config.get<number>('port') ?? 3000;
+  console.log(
+    `STARTUP STEP 13: before app.listen (port=${port}, process.env.PORT=${process.env.PORT ?? 'unset'})`,
+  );
   await app.listen(port);
+  console.log('SERVER LISTENING');
 
   logger.log(`Rihla API running on http://localhost:${port}/${apiPrefix}`);
   logger.log(`Health: /live /ready /health`);
