@@ -34,8 +34,8 @@ export class AuthService {
         error,
       });
     }
-    if (!data.user || !data.session) {
-      throw new BadRequestException('Registration failed — check email confirmation settings');
+    if (!data.user) {
+      throw new BadRequestException('Registration failed');
     }
 
     const user = await this.ensureLocalUser(data.user.id, data.user.email!);
@@ -49,6 +49,15 @@ export class AuthService {
           displayName: dto.displayName,
         },
       });
+    }
+
+    if (!data.session) {
+      return {
+        success: true,
+        requiresEmailConfirmation: true,
+        message:
+          'Account created successfully. Please check your email to verify your account before signing in.',
+      };
     }
 
     return this.buildAuthResponse(user, data.session);
