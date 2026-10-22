@@ -40,10 +40,12 @@ class BufferingCrashReporter implements CrashReporter {
   BufferingCrashReporter({
     LogSanitizer sanitizer = const LogSanitizer(),
     this.maxBreadcrumbs = 50,
+    this.maxErrors = 100,
   }) : _sanitizer = sanitizer;
 
   final LogSanitizer _sanitizer;
   final int maxBreadcrumbs;
+  final int maxErrors;
 
   final List<Breadcrumb> breadcrumbs = [];
   final List<RecordedError> errors = [];
@@ -53,30 +55,41 @@ class BufferingCrashReporter implements CrashReporter {
 
   @override
   void recordFatal(Object error, StackTrace? stack, {String? reason}) {
-    errors.add(
+    _addError(
       RecordedError(
         message: _sanitizer.scrub(error.toString()),
         reason: reason == null ? null : _sanitizer.scrub(reason),
         fatal: true,
-        stack: stack,
+        stack: _sanitizeStack(stack),
       ),
     );
   }
 
   @override
   void recordNonFatal(Object error, StackTrace? stack, {String? reason}) {
-    errors.add(
+    _addError(
       RecordedError(
         message: _sanitizer.scrub(error.toString()),
         reason: reason == null ? null : _sanitizer.scrub(reason),
         fatal: false,
-        stack: stack,
+        stack: _sanitizeStack(stack),
       ),
     );
   }
 
+  StackTrace? _sanitizeStack(StackTrace? stack) => stack == null
+      ? null
+      : StackTrace.fromString(_sanitizer.scrub(stack.toString()));
+
+  void _addError(RecordedError error) {
+    if (maxErrors <= 0) return;
+    errors.add(error);
+    if (errors.length > maxErrors) errors.removeAt(0);
+  }
+
   @override
   void addBreadcrumb(Breadcrumb crumb) {
+    if (maxBreadcrumbs <= 0) return;
     breadcrumbs.add(
       Breadcrumb(
         message: _sanitizer.scrub(crumb.message),
@@ -93,13 +106,16 @@ class BufferingCrashReporter implements CrashReporter {
 
   @override
   void setUserContext({String? userId, bool isGuest = false}) {
-    this.userId = userId;
+    this.userId = userId == null ? null : _sanitizer.scrub(userId);
     this.isGuest = isGuest;
   }
 
   @override
   void setCustomKey(String key, String value) {
-    customKeys[key] = _sanitizer.scrub(value);
+    final safeKey = _sanitizer.scrub(key);
+    customKeys[safeKey] = LogSanitizer.sensitiveKeys.contains(key.toLowerCase())
+        ? '[redacted]'
+        : _sanitizer.scrub(value);
   }
 }
 

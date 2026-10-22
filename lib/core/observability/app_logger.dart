@@ -32,7 +32,7 @@ class AppLogger {
     _crashReporter.addBreadcrumb(crumb);
     if (kDebugMode) {
       // ignore: avoid_print
-      debugPrint('RIHLA ${crumb.toString()}');
+      debugPrint('RIHLA ${_sanitizer.scrub(crumb.toString())}');
     }
   }
 
