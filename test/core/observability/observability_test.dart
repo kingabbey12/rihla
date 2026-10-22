@@ -62,6 +62,40 @@ void main() {
       expect(reporter.breadcrumbs, hasLength(3));
       expect(reporter.breadcrumbs.last.message, 'step 9');
     });
+
+    test('bounds errors and sanitizes stack traces and context', () {
+      final reporter = BufferingCrashReporter(maxErrors: 2);
+      reporter.recordFatal(
+        Exception('first'),
+        StackTrace.fromString('at user@example.com'),
+      );
+      reporter.recordNonFatal(Exception('second'), null);
+      reporter.recordNonFatal(Exception('third'), null);
+      expect(reporter.errors, hasLength(2));
+      expect(reporter.errors.first.message, contains('second'));
+
+      reporter.recordFatal(
+        Exception('fourth'),
+        StackTrace.fromString('at user@example.com'),
+      );
+      expect(reporter.errors.last.stack.toString(),
+          contains('[redacted-email]'));
+      reporter.setCustomKey('password', 'secret123');
+      expect(reporter.customKeys['password'], '[redacted]');
+      reporter.setUserContext(userId: 'user@example.com');
+      expect(reporter.userId, '[redacted-email]');
+    });
+
+    test('zero-capacity buffers do not retain events', () {
+      final reporter = BufferingCrashReporter(
+        maxErrors: 0,
+        maxBreadcrumbs: 0,
+      );
+      reporter.recordFatal(Exception('test'), null);
+      reporter.addBreadcrumb(Breadcrumb(message: 'test'));
+      expect(reporter.errors, isEmpty);
+      expect(reporter.breadcrumbs, isEmpty);
+    });
   });
 
   group('AppLogger', () {
